@@ -1,5 +1,5 @@
 var express = require("express");
-var gateway = require("../helpers/braintree");
+var gateway = require("../helpers/braintreeHelper");
 var router = express.Router();
 
 router.get("/client_token", (req, res) => {
@@ -22,7 +22,9 @@ router.post("/checkout", (req, res) => {
     },
     (err, result) => {
       console.log(result.status);
-      res.send(result);
+      const fullResult = `<div><a href="/">Home</a></div><div>${JSON.stringify(result)}</div>`
+        res.send(fullResult);
+      
     }
   );
 });

@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const braintree = require('braintree');
-const gateway = require("../helpers/braintree");
+const gateway = require("../helpers/braintreeHelper");
 
 router.post('/', (req, res, next) => {
   // const gateway = new braintree.BraintreeGateway({
@@ -27,6 +27,7 @@ router.post('/', (req, res, next) => {
     }
   }, (error, result) => {
       if (result) {
+        result.homeURl = "/";
         res.send(result);
       } else {
         res.status(500).send(error);

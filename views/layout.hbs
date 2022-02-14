@@ -1,38 +1,42 @@
 <html>
-  <head>
-    <title>{{title}}</title>
-    <link rel="stylesheet" href="/stylesheets/style.css" />
-    <!-- includes the Braintree JS client SDK -->
-    <!-- dropin -->
-    <script src="https://js.braintreegateway.com/web/dropin/1.32.1/js/dropin.min.js"></script>
-    <!-- hosted fields- -->
-    <script src="https://js.braintreegateway.com/web/3.84.0/js/client.min.js"></script>
-    <script src="https://js.braintreegateway.com/web/3.84.0/js/hosted-fields.min.js"></script>
+
+<head>
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="/stylesheets/style.css" />
+ 
 
 
-    <!-- includes jQuery -->
-    <script
-      src="http://code.jquery.com/jquery-3.2.1.min.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <style>
-    #card-number {
-      width: 150px; 
-      height: 50px 
-    }
+ {{!-- PP Rest API Advanced --}}
+  <link rel="stylesheet" type="text/css" href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/css/cardfields.css"/>
 
-    #cvv {
-      width: 150px; 
-      height: 50px 
-    }
-    #expiration-date {
-      width: 150px; 
-      height: 50px 
-    }
-    
-  </style>
-  <body>
-    {{{body}}}
-  </body>
+  
+
+
+
+
+  <!-- includes jQuery -->
+  <script src="http://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+
+</head>
+{{!-- <style>
+  #card-number {
+    width: 150px;
+    height: 50px
+  }
+
+  #cvv {
+    width: 150px;
+    height: 50px
+  }
+
+  #expiration-date {
+    width: 150px;
+    height: 50px
+  }
+</style> --}}
+
+<body>
+  {{{body}}}
+</body>
+
 </html>

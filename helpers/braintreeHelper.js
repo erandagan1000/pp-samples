@@ -1,5 +1,6 @@
 const braintree = require("braintree");
-
+//braintree sandbox account under eran.dagan1@gmail.com
+//https://sandbox.braintreegateway.com/login
 const gateway = new braintree.BraintreeGateway({
   environment: braintree.Environment.Sandbox,
   merchantId: "8n5hz5rwnb656jks",
