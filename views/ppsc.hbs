@@ -1,10 +1,11 @@
 <div><a href="/">Home</a></div>
-<h1>PP Rest API - Advanced Checkout</h1>
+<h1>{{title}}</h1>
 <div id="paypal-button-container"></div>
 <div id="paypal-result-container"></div>
  {{!-- PP Rest API simple --}}
+ {{!-- client-id=AeGY.. #App: MerchantApp | Account: eran.m.il@merchant.com (BusinessPro) --}}
   <script
-    src="https://www.paypal.com/sdk/js?client-id=AeGYWEKwAbpNAOQaBkUyNXAalNwEZ5ialX-niqRbbcdZkLY8t-YuOMBLhDJUTP1JWKmJMMCFAeOWUSzF&currency=USD">
+    src="https://www.paypal.com/sdk/js?client-id=AeGYWEKwAbpNAOQaBkUyNXAalNwEZ5ialX-niqRbbcdZkLY8t-YuOMBLhDJUTP1JWKmJMMCFAeOWUSzF&currency=USD&debug=true&commit=false&components=buttons,marks,messages&enable-funding=venmo&vault=true">
     </script>
 
     <script>

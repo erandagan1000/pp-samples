@@ -1,0 +1,169 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<hr>
+<!---------------- Paypal Button ------------------>
+<div>
+  <div id="paypal-button"></div>
+</div>
+
+
+<div>
+  {{!-- <button id="generate-token">Generate Access Token</button> --}}
+  <div class="loading" id="loading-token">Generating access token...</div>
+  <div style="inline-size: 1350px;overflow-wrap: break-word; ">
+    <p>Access token: </p>
+    <div id="token" style="font-size: 6pt;"></div>
+  </div>
+
+
+  <div class="loading" id="loading-button">Loading paypal button...</div>
+
+</div>
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>OnApprove payload: </p>
+  <div id="approve-payload">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>Checkout Server message: </p>
+  <div id="checkout-message">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>Checkout Server result: </p>
+  <div id="checkout-result">&nbsp;</div>
+</div>
+
+
+<!-- includes the Braintree JS client SDK -->
+<!-- Load the client component. -->
+<script src="https://js.braintreegateway.com/web/3.85.2/js/client.min.js"></script>
+
+<!-- Load the PayPal Checkout component. -->
+<script src="https://js.braintreegateway.com/web/3.85.2/js/paypal-checkout.min.js"></script>
+
+
+<!-- Load the PayPal JS SDK with your PayPal Client ID-->
+{{!-- client-id=AbfWH.. #App: ACDC | Account: eran.m.us@merchant.com (BusinessPro) --}}
+<script
+  src="https://www.paypal.com/sdk/js?client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk"></script>
+
+
+<script>
+
+  // -----------------------------------------------------------------
+  // client server example
+  // -----------------------------------------------------------------
+  var tokenSpan = document.querySelector('#token')
+  var token = undefined;
+  var customerId = '812414362';
+
+  (function () {
+
+    $.ajax({
+      type: 'GET',
+      url: `/bt/vault/payment/client_token/${customerId}`
+    }).done(function (result) {
+      // console.log(result);
+      token = result;
+      tokenSpan.innerHTML = `${token}`;
+      $("#loading-token").hide();
+
+      initBtVaultCheckout(token);
+
+    });
+
+
+  }());
+
+  // -----------------------------------------------------------------
+
+  // Vault checkout
+  function initBtVaultCheckout(token) {
+    $("#loading-button").show();
+
+    // Create a client.
+    braintree.client.create({
+      authorization: token
+    }).then(function (clientInstance) {
+      // Create a PayPal Checkout component.
+      return braintree.paypalCheckout.create({
+        autoSetDataUserIdToken: true,
+        client: clientInstance
+      });
+    }).then(function (paypalCheckoutInstance) {
+      return paypalCheckoutInstance.loadPayPalSDK({
+        dataAttributes: {
+          amount: "100.00"
+        }
+      });
+    }).then(function (paypalCheckoutInstance) {
+      $("#loading-button").hide();
+      return paypal.Buttons({
+        fundingSource: paypal.FUNDING.PAYPAL,
+        createOrder: function () {
+          return paypalCheckoutInstance.createPayment({
+            flow: 'checkout', // Required
+            amount: 10.00, // Required
+            currency: 'USD', // Required, must match the currency passed in with loadPayPalSDK
+          });
+        },
+
+        onApprove: function (data, actions) {
+          return paypalCheckoutInstance.tokenizePayment(data).then(function (payload) {
+            // Submit `payload.nonce` to your server
+
+            console.log("Here you call the merchant API payment endpoint with the payload.nonce");
+
+            $.ajax({
+              type: 'POST',
+              url: '/bt/vault/payment/vault',
+              data: {
+                'paymentMethodNonce': payload.nonce,
+                'amount': '55.00'
+
+              }
+            }).done(function (result) {
+
+              if (result.success) {
+                var approveDiv = document.querySelector('#approve-payload');
+                approveDiv.innerHTML = JSON.stringify(payload);
+
+                $('#checkout-message').html('<h1>Success</h1><p>Vault Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
+
+                var serverResultDiv = document.querySelector('#checkout-result');
+                serverResultDiv.innerHTML = JSON.stringify(result);
+              } else {
+                console.log(result);
+                $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+              }
+            });
+
+
+          });
+        },
+
+        onCancel: function (data) {
+          console.log('PayPal payment canceled', JSON.stringify(data, 0, 2));
+        },
+
+        onError: function (err) {
+          console.error('PayPal error', err);
+        }
+      }).render('#paypal-button');
+    }).then(function () {
+      // The PayPal button will be rendered in an html element with the ID
+      // `paypal-button`. This function will be called when the PayPal button
+      // is set up and ready to be used
+      console.log("Checkout button render completed");
+    }).catch(function (err) {
+      // Handle component creation error
+    });
+  }
+
+
+
+
+
+
+</script>

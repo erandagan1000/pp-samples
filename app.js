@@ -6,11 +6,17 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+
+//pp api
 var authRouter = require('./routes/ppApiAuthRoute');
-var btCheckoutRouter = require('./routes/btCheckoutRoute');
-var btPaymentRouter = require('./routes/btpayment');
 var ppApiPaymentRouter = require('./routes/ppApiPaymentRoute');
 var ppApiOrderRouter = require('./routes/ppApiOrderRoute');
+
+//braintree
+var btDropInCheckoutRouter = require('./routes/btDropInCheckoutRoute');
+var btHostedFieldsPaymentRouter = require('./routes/btHostedFieldsPaymentRoute');
+var btVaultPaymentRouter = require('./routes/btVaultPaymentRoute');
+
 var app = express();
 require('dotenv').config();
 
@@ -47,8 +53,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/ppapi/auth', authRouter);
-app.use('/bt/di/checkout', btCheckoutRouter);
-app.use('/bt/hf/payment', btPaymentRouter);
+app.use('/bt/di/checkout', btDropInCheckoutRouter);
+app.use('/bt/hf/payment', btHostedFieldsPaymentRouter);
+app.use('/bt/vault/payment', btVaultPaymentRouter);
 app.use('/ppapi/payment',ppApiPaymentRouter);
 app.use('/ppapi/order',ppApiOrderRouter);
 
