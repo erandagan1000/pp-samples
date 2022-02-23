@@ -8,12 +8,31 @@
 
 
 <div>
-    {{!-- <button id="generate-token" >Generate Access Token</button> --}}
-   <span id="loading-token">Generating access token...</span> 
-  <span id="token"></span>
+  {{!-- <button id="generate-token">Generate Access Token</button> --}}
+  <div class="loading" id="loading-token">Generating access token...</div>
+  <div style="inline-size: 1350px;overflow-wrap: break-word; ">
+    <p>Access token: </p>
+    <div id="token" style="font-size: 6pt;"></div>
+  </div>
 
-  <span id="loading-button">Loading paypal button...</span> 
 
+  <div class="loading" id="loading-button">Loading paypal button...</div>
+
+</div>
+<!-------- results -------------------->
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>OnApprove payload: </p>
+  <div id="approve-payload">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>Checkout Server message: </p>
+  <div id="checkout-message">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>Checkout Server result: </p>
+  <div id="checkout-result">&nbsp;</div>
 </div>
 
 <!-- includes the Braintree JS client SDK -->
@@ -30,17 +49,14 @@
 
 
 <script>
-
-  // -----------------------------------------------------------------
-  // client server example
-  // -----------------------------------------------------------------
+ 
   var tokenSpan = document.querySelector('#token')
   var token = undefined;
   
   (function () {
     $.ajax({
       type: 'GET',
-      url: '/bt/hf/payment/client_token'
+      url: '/bt/vault/payment/client_token'
     }).done(function (result) {
       // console.log(result);
       token = result;
@@ -48,18 +64,12 @@
       $("#loading-token").hide();
 
       initBtPaypalCheckout(token);
-
     });
-
-
   }());
   
-  
-  
-  
   // -----------------------------------------------------------------
-
-  // paypal basic checkout
+  
+  // paypal checkout
   function initBtPaypalCheckout(token) {
     $("#loading-button").show();
     // promise style
@@ -84,9 +94,8 @@
         createOrder: function () {
           return paypalCheckoutInstance.createPayment({
             flow: 'checkout', // Required
-            amount: 10.00, // Required
+            amount: '33.00', // Required
             currency: 'USD', // Required, must match the currency passed in with loadPayPalSDK
-
             intent: 'capture', // Must match the intent passed in with loadPayPalSDK
 
             enableShippingAddress: true,
@@ -107,6 +116,29 @@
         onApprove: function (data, actions) {
           return paypalCheckoutInstance.tokenizePayment(data).then(function (payload) {
             // Submit `payload.nonce` to your server
+            $.ajax({
+              type: 'POST',
+              url: '/bt/vault/payment/checkout',
+              data: {
+                'paymentMethodNonce': payload.nonce,
+                'amount': '55.00'
+
+              }
+            }).done(function (result) {
+
+              if (result.success) {
+                var approveDiv = document.querySelector('#approve-payload');
+                approveDiv.innerHTML = JSON.stringify(payload);
+
+                $('#checkout-message').html('<h1>Success</h1><p>BT Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
+
+                var serverResultDiv = document.querySelector('#checkout-result');
+                serverResultDiv.innerHTML = JSON.stringify(result);
+              } else {
+                console.log(result);
+                $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+              }
+            });
           });
         },
 
@@ -124,10 +156,6 @@
       // is set up and ready to be used
     });
   }
-  // Hosted fields example
-
-
-
-
+  
 
 </script>

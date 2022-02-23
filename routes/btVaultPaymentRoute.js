@@ -21,20 +21,18 @@ router.get("/client_token/:customerid", (req, res) => {
 });
 
 router.post("/checkout", (req, res) => {
-  var nonceFromTheClient = req.body.payment_method_nonce;
+  var nonceFromTheClient = req.body.paymentMethodNonce;
   gateway.transaction.sale(
     {
       amount: "20.00",
       paymentMethodNonce: nonceFromTheClient,
-      // deviceData: deviceDataFromTheClient,
       options: {
         submitForSettlement: true,
       },
     },
     (err, result) => {
-      console.log(result.status);
-      const fullResult = `<div><a href="/">Home</a></div><div>${JSON.stringify(result)}</div>`
-        res.send(fullResult);
+      //const fullResult = JSON.stringify(result)
+        res.send(result);
       
     }
   );

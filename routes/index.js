@@ -5,8 +5,8 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
-router.get('/btsimple', function(req, res, next) {
-  res.render('braintreeSimple', { title: 'BrainTree Paypal Checkout' });
+router.get('/btcheckout', function(req, res, next) {
+  res.render('braintreePPCheckout', { title: 'BrainTree Paypal Checkout' });
 });
 router.get('/btvault', function(req, res, next) {
   res.render('braintreeVault', { title: 'BrainTree Paypal Vault' });
