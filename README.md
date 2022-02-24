@@ -7,6 +7,8 @@ Sample code for various payapl payment integrations:
  
  
  # Run this sample
+  - Clone this repository
   - npm ci (or npm install)
   - npm start
+  - Open browser on http://localhost:3000
  
