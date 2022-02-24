@@ -91,13 +91,16 @@ router.post("/checkout/localpaymethod", (req, res) => {
       },
     }).then(result => {
       if (result.success) {
+        
         const message = "Success! Transaction ID: " + result.transaction.id;
-        console.log(message);
-        res.status(200).send(message);
+        const response = {message, success: result.success, transaction: result.transaction};
+        console.log(response);
+        res.status(200).send(response);
       } else {
-        const errMessage = "Error:  " + result.message
-        console.log(errMessage);
-        res.status(400).send(errMessage);
+        const errMessage = "Error:  " + result.message;
+        const errResponse = {message: errMessage, success: result.success, transaction: undefined};
+        console.log(errResponse);
+        res.status(400).send(errResponse);
       }
     }).catch(err => {
       console.log("Error:  " + err);

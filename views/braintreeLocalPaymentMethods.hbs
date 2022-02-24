@@ -39,6 +39,7 @@
 <div style="inline-size: 1350px;overflow-wrap: break-word; ">
   <p>Checkout Server result: </p>
   <div id="checkout-result">&nbsp;</div>
+  <div id="server-result">&nbsp;</div>
 </div>
 
 <!-- includes the Braintree JS client SDK -->
@@ -130,7 +131,7 @@
 
         globalPaymentId = data.paymentId
         console.log("paymentId: ", globalPaymentId);
-        $("#payment-start-data").innerHTML = `<h3>paymentId: ${globalPaymentId}</h3>`
+        $("#payment-start-data").html(`<h3>paymentId: ${globalPaymentId}</h3>`);
 
         // Call start to initiate the popup
         start();
@@ -138,7 +139,7 @@
     }).then(function (payload) {
       // Send the nonce to your server to create a transaction
       console.log(payload.nonce);
-      $("#payment-start-resolved").innerHTML = `<h3>nonce: ${payload.nonce}</h3>`
+      $("#payment-start-resolved").html(`<h3>nonce: ${payload.nonce}</h3>`);
       
       $.ajax({
               type: 'POST',
@@ -152,16 +153,14 @@
             }).done(function (result) {
 
               if (result.success) {
-                var approveDiv = document.querySelector('#approve-payload');
-                approveDiv.innerHTML = JSON.stringify(payload);
 
-                $('#checkout-message').html('<h1>Success</h1><p>BT Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
+                $('#checkout-result').html('<h1 style="color:green">Success</h1><p>BT Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
 
-                var serverResultDiv = document.querySelector('#checkout-result');
-                serverResultDiv.innerHTML = JSON.stringify(result);
+                var serverResultDiv = document.querySelector('#server-result');
+                serverResultDiv.innerHTML = JSON.stringify(result.transaction);
               } else {
                 console.log(result);
-                $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+                $('#checkout-result').html('<h1 style="color:red">Error</h1><p>Check your console.</p>');
               }
             });
 
