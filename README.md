@@ -1,11 +1,26 @@
 # pp-samples
-Sample code for various payapl payment integrations:
- - Rest API - Standard Checkout
- - Rst API -  Advanced Checkout
- - Braintree - Dropin, Hosted Fields
+Live demo for various payapl/braintree integrations:
+ - ### Braintree 
+    - Dropin UI + Hosted Fields
+    - Paypal Checkout
+    - Paypal Checkout + Vault
+    - Paypal Vault
+    - Paypal Data Collector
+    - Paypal Returning Customer
+    - Local Payment Method
+ 
+ <br/>    
+ 
+ - ### Rest API (Orders v2)
+    - Paypal Standard Checkout
+    - Paypal Custom Checkout With Shipping
+    - Paypal Custom Checkout Other Payment Methods (marks)
+    - Paypal Advanced Checkout
+  
  - More to come...
  
- 
+ <br/>
+
  # Run this sample
   - Clone this repository
   - npm ci (or npm install)
