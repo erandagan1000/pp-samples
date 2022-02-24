@@ -49,11 +49,10 @@
 
 
 <script>
- 
+
   var tokenSpan = document.querySelector('#token')
   var token = undefined;
-  $("#paypal-button").hide();
-  
+
   (function () {
     $.ajax({
       type: 'GET',
@@ -64,14 +63,14 @@
       tokenSpan.innerHTML = `${token}`;
       $("#loading-token").hide();
 
-      initBtPaypalCheckout(token);
+      initBtPaypalCheckoutVault(token);
     });
   }());
-  
+
   // -----------------------------------------------------------------
-  
+
   // paypal checkout
-  function initBtPaypalCheckout(token) {
+  function initBtPaypalCheckoutVault(token) {
     $("#loading-button").show();
     // promise style
     // Create a client.
@@ -88,16 +87,20 @@
         intent: 'capture'
       });
     }).then(function (paypalCheckoutInstance) {
-    
-      
+      $("#loading-button").hide();
       return paypal.Buttons({
         fundingSource: paypal.FUNDING.PAYPAL,
 
         createOrder: function () {
           return paypalCheckoutInstance.createPayment({
             flow: 'checkout', // Required
-            amount: '33.00', // Required
+            amount: 44.00, // Required
             currency: 'USD', // Required, must match the currency passed in with loadPayPalSDK
+            requestBillingAgreement: true, // Required
+            billingAgreementDetails: {
+              description: 'This is the billing agreement defined by merchant'
+            },
+
             intent: 'capture', // Must match the intent passed in with loadPayPalSDK
 
             enableShippingAddress: true,
@@ -123,7 +126,7 @@
               url: '/bt/vault/payment/checkout',
               data: {
                 'paymentMethodNonce': payload.nonce,
-                'amount': '55.00'
+                'amount': '48.00'
 
               }
             }).done(function (result) {
@@ -156,10 +159,9 @@
       // The PayPal button will be rendered in an html element with the ID
       // `paypal-button`. This function will be called when the PayPal button
       // is set up and ready to be used
-      $("#paypal-button").show();
       $("#loading-button").hide();
     });
   }
-  
+
 
 </script>

@@ -14,7 +14,7 @@ router.get("/client_token", (req, res) => {
 
 router.get("/client_token/:customerid", (req, res) => {
   const customerId = req.params.customerid;
-  gateway.clientToken.generate({customerId: customerId}).then((response) => {
+  gateway.clientToken.generate({ customerId: customerId }).then((response) => {
     // console.log(response);
     res.send(response.clientToken);
   });
@@ -22,9 +22,11 @@ router.get("/client_token/:customerid", (req, res) => {
 
 router.post("/checkout", (req, res) => {
   var nonceFromTheClient = req.body.paymentMethodNonce;
+  var amount = req.body.amount;
+
   gateway.transaction.sale(
     {
-      amount: "20.00",
+      amount,
       paymentMethodNonce: nonceFromTheClient,
       options: {
         submitForSettlement: true,
@@ -32,8 +34,8 @@ router.post("/checkout", (req, res) => {
     },
     (err, result) => {
       //const fullResult = JSON.stringify(result)
-        res.send(result);
-      
+      res.send(result);
+
     }
   );
 });
@@ -54,7 +56,7 @@ router.post('/vault', (req, res, next) => {
       },
     }
   };
-  
+
   gateway.transaction.sale(saleRequest).then(result => {
     if (result.success) {
       console.log("Success! Transaction ID: " + result.transaction.id);
@@ -70,6 +72,38 @@ router.post('/vault', (req, res, next) => {
 
 });
 
-router.post('/checkout/vault', (req, res, next) => {});
+router.post('/checkout/vault', (req, res, next) => { });
+
+router.post("/checkout/localpaymethod", (req, res) => {
+  var nonceFromTheClient = req.body.paymentMethodNonce;   //from client or from webhook 
+  var amount = req.body.amount;
+  var orderId = randomstring.generate(5);
+  var descriptorName = "Eran Merchant US";
+
+  gateway.transaction.sale(
+    {
+      amount,
+      paymentMethodNonce: nonceFromTheClient,
+      orderId,
+      //descriptorName: descriptorName,
+      options: {
+        submitForSettlement: true,
+      },
+    }).then(result => {
+      if (result.success) {
+        const message = "Success! Transaction ID: " + result.transaction.id;
+        console.log(message);
+        res.status(200).send(message);
+      } else {
+        const errMessage = "Error:  " + result.message
+        console.log(errMessage);
+        res.status(400).send(errMessage);
+      }
+    }).catch(err => {
+      console.log("Error:  " + err);
+      res.status(500).send(err);
+    });
+
+});
 
 module.exports = router;

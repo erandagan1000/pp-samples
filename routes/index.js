@@ -5,19 +5,24 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
-router.get('/btcheckout', function(req, res, next) {
+router.get('/btco', function(req, res, next) {
   res.render('braintreePPCheckout', { title: 'BrainTree Paypal Checkout' });
 });
-router.get('/btvault', function(req, res, next) {
-  res.render('braintreeVault', { title: 'BrainTree Paypal Vault' });
+router.get('/btcov', function(req, res, next) {
+  res.render('braintreePPCheckoutVault', { title: 'BrainTree Paypal Checkout Vault' });
 });
-router.get('/btvaultdatacollector', function(req, res, next) {
-  res.render('braintreeVaultWithDataCollector', { title: 'BrainTree Paypal Vault With Data Collector' });
+router.get('/btv', function(req, res, next) {
+  res.render('braintreePPVault', { title: 'BrainTree Paypal Vault' });
 });
-router.get('/btvaultreturncustomer', function(req, res, next) {
-  res.render('braintreePPVaultReturnungCustomer', { title: 'BrainTree Paypal Vault Returning Customer' });
+router.get('/btvdc', function(req, res, next) {
+  res.render('braintreePPVaultWithDataCollector', { title: 'BrainTree Paypal Vault With Data Collector' });
 });
-
+router.get('/btvrc', function(req, res, next) {
+  res.render('braintreePPVaultReturningCustomer', { title: 'BrainTree Paypal Vault Returning Customer' });
+});
+router.get('/btlpm', function(req, res, next) {
+  res.render('braintreeLocalPaymentMethods', { title: 'BrainTree Local Payment Methods' });
+});
 router.get('/bt', function(req, res, next) {
   res.render('braintree', { title: 'BrainTree Dropin + Hosted Fields' });
 });

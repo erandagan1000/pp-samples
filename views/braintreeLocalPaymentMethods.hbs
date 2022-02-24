@@ -1,0 +1,183 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<hr>
+<!---------------- Local payment Buttons Button ------------------>
+<div>
+  <button id="ideal-button">
+    <img width="35px" height="30px" src="https://www.paypalobjects.com/images/checkout/alternative_payments/paypal_ideal_color.svg" class="payment-button" />
+  </button>
+  <button id="sofort-button">
+    <img  width="45px" height="30px" src="https://www.paypalobjects.com/images/checkout/alternative_payments/paypal_sofort_black.svg" class="payment-button" />
+  </button>
+</div>
+
+
+<div>
+  {{!-- <button id="generate-token">Generate Access Token</button> --}}
+  <div class="loading" id="loading-token">Generating access token...</div>
+  <div style="inline-size: 1350px;overflow-wrap: break-word; ">
+    <p>Access token: </p>
+    <div id="token" style="font-size: 6pt;"></div>
+  </div>
+
+
+  <div class="loading" id="loading-button">Loading paypal button...</div>
+
+</div>
+<!-------- results -------------------->
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>onPaymentStart data: </p>
+  <div id="payment-start-data">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>onPaymentStart Resolved: </p>
+  <div id="payment-start-resolved">&nbsp;</div>
+</div>
+
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>Checkout Server result: </p>
+  <div id="checkout-result">&nbsp;</div>
+</div>
+
+<!-- includes the Braintree JS client SDK -->
+<!-- Load the client component. -->
+<script src="https://js.braintreegateway.com/web/3.85.2/js/client.min.js"></script>
+
+<!-- Load the local payment component. -->
+<script src="https://js.braintreegateway.com/web/3.85.2/js/local-payment.min.js"></script>
+<script>
+
+  var tokenSpan = document.querySelector('#token')
+  var token = undefined;
+
+  (function () {
+    $.ajax({
+      type: 'GET',
+      url: '/bt/vault/payment/client_token'
+    }).done(function (result) {
+      // console.log(result);
+      token = result;
+      tokenSpan.innerHTML = `${token}`;
+      $("#loading-token").hide();
+
+      initBtLocalPaymentMethod(token);
+    });
+  }());
+
+  // -----------------------------------------------------------------
+  var idealButton = document.getElementById('ideal-button');  //NL EURO
+  var sofortButton = document.getElementById('sofort-button'); // AT, BE, DE, IT, NL, ES, GB EURO, GBP
+  var globalLocalPaymentInstance;
+  var globalPaymentId;
+  function merchantAccountId() {
+    return ("eranltd-europe");
+  }
+  
+  // setup local pament method client
+  function initBtLocalPaymentMethod(token) {
+    $("#loading-button").show();
+    // promise style
+    // Create a client.
+    braintree.client.create({
+      authorization: token
+    }).then(function (clientInstance) {
+      // Create a PayPal Checkout component.
+      return braintree.localPayment.create({
+        client: clientInstance,
+        merchantAccountId: merchantAccountId()
+      });
+    }).then(function (localPaymentInstance) {
+      globalLocalPaymentInstance = localPaymentInstance;
+      $("#loading-button").hide();
+
+    });
+  }
+
+  function createLocalPaymentClickListener(type) {
+  return function (event) {
+    event.preventDefault();
+
+    globalLocalPaymentInstance.startPayment({
+      paymentType: type,
+      amount: '100.00',
+      fallback: { // see Fallback section for details on these params
+        url: 'https://your-domain.com/page-to-complete-checkout',
+        buttonText: 'Complete Payment'
+      },
+      currencyCode: 'EUR',
+      shippingAddressRequired: false,
+      givenName: 'Joe',
+      surname: 'Doe',
+      address: {
+        countryCode: 'NL'
+      },
+      // address requires set shippingAddressRequired = true:
+      /*address: {
+        streetAddress: 'Oosterdoksstraat 110',
+        extendedAddress: 'Apt. B',
+        locality: 'DK Amsterdam',
+        postalCode: '1011',
+        region: 'NH',
+        countryCode: 'NL'
+      },*/
+      onPaymentStart: function (data, start) {
+        // NOTE: It is critical here to store data.paymentId on your server
+        //       so it can be mapped to a webhook sent by Braintree once the
+        //       buyer completes their payment. See Start the payment
+        //       section for details.
+
+        globalPaymentId = data.paymentId
+        console.log("paymentId: ", globalPaymentId);
+        $("#payment-start-data").innerHTML = `<h3>paymentId: ${globalPaymentId}</h3>`
+
+        // Call start to initiate the popup
+        start();
+      }
+    }).then(function (payload) {
+      // Send the nonce to your server to create a transaction
+      console.log(payload.nonce);
+      $("#payment-start-resolved").innerHTML = `<h3>nonce: ${payload.nonce}</h3>`
+      
+      $.ajax({
+              type: 'POST',
+              url: '/bt/vault/payment/checkout/localpaymethod',
+              data: {
+                'paymentMethodNonce': payload.nonce,
+                'amount': '100.00',
+                'paymenmtId': globalPaymentId 
+
+              }
+            }).done(function (result) {
+
+              if (result.success) {
+                var approveDiv = document.querySelector('#approve-payload');
+                approveDiv.innerHTML = JSON.stringify(payload);
+
+                $('#checkout-message').html('<h1>Success</h1><p>BT Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
+
+                var serverResultDiv = document.querySelector('#checkout-result');
+                serverResultDiv.innerHTML = JSON.stringify(result);
+              } else {
+                console.log(result);
+                $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+              }
+            });
+
+
+
+    }).catch(function (err) {
+      if (err.code === 'LOCAL_PAYMENT_POPUP_CLOSED') {
+        console.error('Customer closed Local Payment popup.');
+      } else {
+        console.error('Error!', err);
+      }
+    });
+  };
+}
+
+idealButton.addEventListener('click', createLocalPaymentClickListener('ideal'));
+sofortButton.addEventListener('click', createLocalPaymentClickListener('sofort'));
+
+</script>
