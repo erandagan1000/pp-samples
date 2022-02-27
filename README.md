@@ -7,11 +7,11 @@ Live demo for various payapl/braintree integrations:
     - Paypal Vault
     - Paypal Data Collector
     - Paypal Returning Customer
-    - Local Payment Method
+    - Local Payment Methods
  
  <br/>    
  
- - ### Rest API (Orders v2)
+ - ### ACDC - A.K.A Rest API (Orders v2)
     - Paypal Standard Checkout
     - Paypal Custom Checkout With Shipping
     - Paypal Custom Checkout Other Payment Methods (marks)
