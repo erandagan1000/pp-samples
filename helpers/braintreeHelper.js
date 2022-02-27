@@ -1,4 +1,23 @@
 const braintree = require("braintree");
+
+//ECBT - eran.m.us@merchant.com
+const btConfigEcbtUS = {
+  accessToken: "access_token$sandbox$hq7c8r82tfvt3yqw$f2468ab77bd83587c48979083f4ac57e"
+}
+
+//ECBT - eran.m.uk@merchant.com
+const btConfigEcbtUK = {
+  accessToken: "access_token$sandbox$dc95jmkxp82n6wxj$eec6c23d7ae7a481677df772631d4aa4"
+}
+
+// BT Integration
+const btConfig = {
+  environment: braintree.Environment.Sandbox,
+  merchantId: "8n5hz5rwnb656jks",
+  publicKey: "y7254zqncx2hnm52",
+  privateKey: "26303b7ff60ab3ebe401e22b172d972e",
+}
+
 //braintree sandbox account under eran.dagan1@gmail.com
 //https://sandbox.braintreegateway.com/login
 
@@ -9,12 +28,7 @@ const braintree = require("braintree");
 //   privateKey: process.env.BT_PRIVSTE_KEY // "26303b7ff60ab3ebe401e22b172d972e",
 // };
 
-const btConfig = {
-  environment: braintree.Environment.Sandbox,
-  merchantId: "8n5hz5rwnb656jks",
-  publicKey: "y7254zqncx2hnm52",
-  privateKey: "26303b7ff60ab3ebe401e22b172d972e",
-}
+
 
 const gateway = new braintree.BraintreeGateway(btConfig);
 
