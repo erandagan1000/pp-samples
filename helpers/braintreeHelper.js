@@ -1,5 +1,8 @@
 const braintree = require("braintree");
 
+// In server side
+// if using the ECBT integration, merchant will typically use:  btConfigEcbtUS or btConfigEcbtUK (no BT launchpad access)
+// if using full BT integration, merchant will typically use btConfig (full access to BT launchpad)
 //ECBT - eran.m.us@merchant.com
 const btConfigEcbtUS = {
   accessToken: "access_token$sandbox$hq7c8r82tfvt3yqw$f2468ab77bd83587c48979083f4ac57e"
