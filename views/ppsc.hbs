@@ -1,45 +1,48 @@
 <div><a href="/">Home</a></div>
 <h1>{{title}}</h1>
+<div class="loading" id="loading-button">Loading paypal button...</div>
 <div id="paypal-button-container"></div>
 <div id="paypal-result-container"></div>
- {{!-- PP Rest API simple --}}
- {{!-- client-id=AeGY.. #App: MerchantApp | Account: eran.m.il@merchant.com (BusinessPro) --}}
-  <script
-    src="https://www.paypal.com/sdk/js?client-id=AeGYWEKwAbpNAOQaBkUyNXAalNwEZ5ialX-niqRbbcdZkLY8t-YuOMBLhDJUTP1JWKmJMMCFAeOWUSzF&currency=USD&debug=true&commit=false&components=buttons,marks,messages&enable-funding=venmo&vault=true">
-    </script>
+{{!-- PP Rest API simple --}}
+{{!-- client-id=AeGY.. #App: MerchantApp | Account: eran.m.il@merchant.com (BusinessPro) --}}
+<script
+  src="https://www.paypal.com/sdk/js?client-id=AeGYWEKwAbpNAOQaBkUyNXAalNwEZ5ialX-niqRbbcdZkLY8t-YuOMBLhDJUTP1JWKmJMMCFAeOWUSzF&currency=USD&debug=true&commit=false&components=buttons,marks,messages&enable-funding=venmo&vault=true">
+  </script>
 
-    <script>
+<script>
+  $("#loading-button").show();
+  paypal.Buttons({
 
-      paypal.Buttons({
+    // Sets up the transaction when a payment button is clicked
+    createOrder: function (data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: '77.44' // Can reference variables or functions. Example: `value: document.getElementById('...').value`
+          }
+        }]
+      });
+    },
 
-        // Sets up the transaction when a payment button is clicked
-        createOrder: function(data, actions) {
-          return actions.order.create({
-            purchase_units: [{
-              amount: {
-                value: '77.44' // Can reference variables or functions. Example: `value: document.getElementById('...').value`
-              }
-            }]
-          });
-        },
-
-        // Finalize the transaction after payer approval
-        onApprove: function(data, actions) {
-          return actions.order.capture().then(function(orderData) {
-            // Successful capture! For dev/demo purposes:
-                let resultJson = JSON.stringify(orderData, null, 2);
-                console.log('Capture result', orderData, resultJson);
-                var transaction = orderData.purchase_units[0].payments.captures[0];
-                alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
-                $('#paypal-result-container').text(resultJson);
-            // When ready to go live, remove the alert and show a success message within this page. For example:
-            // var element = document.getElementById('paypal-button-container');
-            // element.innerHTML = '';
-            // element.innerHTML = '<h3>Thank you for your payment!</h3>';
-            // Or go to another URL:  actions.redirect('thank_you.html');
-          });
-        }
-      }).render('#paypal-button-container');
+    // Finalize the transaction after payer approval
+    onApprove: function (data, actions) {
+      return actions.order.capture().then(function (orderData) {
+        // Successful capture! For dev/demo purposes:
+        let resultJson = JSON.stringify(orderData, null, 2);
+        console.log('Capture result', orderData, resultJson);
+        var transaction = orderData.purchase_units[0].payments.captures[0];
+        alert('Transaction ' + transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
+        $('#paypal-result-container').text(resultJson);
+        // When ready to go live, remove the alert and show a success message within this page. For example:
+        // var element = document.getElementById('paypal-button-container');
+        // element.innerHTML = '';
+        // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+        // Or go to another URL:  actions.redirect('thank_you.html');
+      });
+    }
+  }).render('#paypal-button-container').then(function() {
+    $("#loading-button").hide();
+  });
 
 
-    </script>
+</script>

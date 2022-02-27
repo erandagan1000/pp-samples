@@ -14,7 +14,7 @@
 </head>
 
 <body>
-
+  <div class="loading" id="loading-button">Loading paypal button...</div>
   <!-- JavaScript SDK -->
   <script
     src="https://www.paypal.com/sdk/js?components=buttons,hosted-fields&client-id=AY30GJsxw_QS7g7HaAeCW58FcbcSHVL82ixgep50NtkTBgSYqVqTpMD_5VO01ILjH2AdFUAuFm-aJ0CC"
@@ -38,7 +38,7 @@
       </table>
     </div>
 
-    <div align="left" style="padding:10px;margin-top:120px"> or </div>
+    <div align="left" style="padding:10px;margin-top:120px;font-size:17pt;font-weight:700"> or </div>
 
     <!-- Advanced credit and debit card payments form -->
     <div class="card_container" id="card-fields" style="margin-left:0px;padding:10px;margin-top:0px">
@@ -101,6 +101,7 @@
 
   <!-- Implementation -->
   <script>
+    $("#loading-button").show();
     let orderId;
 
     // Displays PayPal buttons
@@ -125,7 +126,7 @@
 
         });
       }
-    }).render("#paypal-button-container");
+    }).render("#paypal-button-container").then(() => $("#loading-button").hide());
 
     // If this returns false or the card fields aren't visible, see Step #1.
     if (paypal.HostedFields.isEligible()) {
@@ -168,6 +169,7 @@
           }
         }
       }).then(function (cardFields) {
+        $("#loading-button").hide();
         document.querySelector("#card-form").addEventListener('submit', (event) => {
           event.preventDefault();
 

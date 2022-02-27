@@ -3,11 +3,13 @@
 <script
   src="https://www.paypal.com/sdk/js?components=buttons,marks&client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk">
   </script>
-
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<div class="loading" id="loading-button">Loading paypal button...</div>
 <!-- Render the radio buttons and marks -->
 <label>
   <input type="radio" name="payment-option" value="paypal" checked>
-  <img src="paypal-mark.jpg" alt="Pay with PayPal">
+  <img src="paypal-mark.jpeg" width="45px" alt="Pay with PayPal">
 </label>
 
 <label>
@@ -22,10 +24,11 @@
 
 <script>
   // Render the PayPal marks
-  paypal.Marks().render('#paypal-marks-container');
+  $("#loading-button").show();
+  paypal.Marks().render('#paypal-marks-container').then( () => $("#loading-button").hide());
 
   // Render the PayPal buttons
-  paypal.Buttons().render('#paypal-buttons-container');
+  paypal.Buttons().render('#paypal-buttons-container').then(() => $("#loading-button").hide());
 
   // Listen for changes to the radio buttons
   document.querySelectorAll('input[name=payment-option]')
