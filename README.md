@@ -1,4 +1,4 @@
-# pp-samples
+# Paypal and Braintree sample integrationd (jQuery + Node.js)
 Live demo for various payapl/braintree integrations:
  - ### Braintree 
     - Dropin UI + Hosted Fields
