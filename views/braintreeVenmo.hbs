@@ -1,0 +1,140 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<hr>
+<!---------------- Paypal Button ------------------>
+<div>
+  <div id="venmo-button"></div>
+</div>
+
+
+<div>
+  {{!-- <button id="generate-token">Generate Access Token</button> --}}
+  <div class="loading" id="loading-token">Generating access token...</div>
+  <div style="inline-size: 1350px;overflow-wrap: break-word; ">
+    <p>Access token: </p>
+    <div id="token" style="font-size: 6pt;"></div>
+  </div>
+
+
+  <div class="loading" id="loading-message">Loading button...</div>
+
+</div>
+<!-------- results -------------------->
+{{!-- <div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>OnApprove payload: </p>
+  <div id="approve-payload">&nbsp;</div>
+</div> --}}
+
+<!-- includes the Braintree JS client SDK -->
+<script src="https://js.braintreegateway.com/web/3.85.2/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.85.2/js/venmo.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.85.2/js/data-collector.min.js"></script>
+
+<script>
+
+  var tokenSpan = document.querySelector('#token')
+  var token = undefined;
+  $("#venmo-button").hide();
+  var venmoButton = document.getElementById('venmo-button');
+
+  (function () {
+    $.ajax({
+      type: 'GET',
+      url: '/bt/vault/payment/client_token'
+    }).done(function (result) {
+      // console.log(result);
+      token = result;
+      tokenSpan.innerHTML = `${token}`;
+      $("#loading-token").hide();
+
+      initBtVenmoPayment(token);
+    });
+  }());
+
+  // -----------------------------------------------------------------
+
+
+  function initBtVenmoPayment(token) {
+    $("#loading-message").show();
+    // promise style
+    // Create a client.
+    braintree.client.create({
+      authorization: token
+    }).then(function (clientInstance) {
+      // You may need to polyfill Promise
+      // if used on older browsers that
+      // do not natively support it.
+      return Promise.all([
+        braintree.dataCollector.create({
+          client: clientInstance,
+          paypal: true
+        }),
+        braintree.venmo.create({
+          client: clientInstance,
+          allowDesktop: true,
+          paymentMethodUsage: 'multi_use' // available in v3.77.0+
+          // Add allowNewBrowserTab: false if your checkout page does not support
+          // relaunching in a new tab when returning from the Venmo app. This can
+          // be omitted otherwise.
+          // allowNewBrowserTab: false
+          // profileId: 'YOUR_VENMO_PROFILE_ID', for custom integration, when multiple websites use single BT gatewqay
+        })
+      ]);
+    }).then(function (results) {
+      var dataCollectorInstance = results[0];
+      var venmoInstance = results[1];
+
+      // At this point, you should access the deviceData value and provide it
+      // to your server, e.g. by injecting it into your form as a hidden input.
+      console.log('Got device data:', dataCollectorInstance.deviceData);
+
+      // Verify browser support before proceeding.
+      if (!venmoInstance.isBrowserSupported()) {
+        console.log('Browser does not support Venmo');
+        return;
+      }
+
+      displayVenmoButton(venmoInstance);
+
+      // Check if tokenization results already exist. This occurs when your
+      // checkout page is relaunched in a new tab. This step can be omitted
+      // if allowNewBrowserTab is false.
+      if (venmoInstance.hasTokenizationResult()) {
+        venmoInstance.tokenize().then(handleVenmoSuccess).catch(handleVenmoError);
+      }
+    });
+  }
+    function displayVenmoButton(venmoInstance) {
+      // Assumes that venmoButton is initially display: none.
+      venmoButton.style.display = 'block';
+
+      venmoButton.addEventListener('click', function () {
+        venmoButton.disabled = true;
+
+        venmoInstance.tokenize().then(handleVenmoSuccess).catch(handleVenmoError).then(function () {
+          venmoButton.removeAttribute('disabled');
+        });
+      });
+    }
+
+    function handleVenmoError(err) {
+      if (err.code === 'VENMO_CANCELED') {
+        console.log('App is not available or user aborted payment flow');
+      } else if (err.code === 'VENMO_APP_CANCELED') {
+        console.log('User canceled payment flow');
+      } else {
+        console.error('An error occurred:', err.message);
+      }
+    }
+
+    function handleVenmoSuccess(payload) {
+      $("#loading-message").hide();
+      $("#venmo-button").show();
+      // Send the payment method nonce to your server, e.g. by injecting
+      // it into your form as a hidden input.
+      console.log('Got a payment method nonce:', payload.nonce);
+      // Display the Venmo username in your checkout UI.
+      console.log('Venmo user:', payload.details.username);
+    }
+</script>
+

@@ -26,6 +26,9 @@ router.get('/btlpm', function(req, res, next) {
 router.get('/bt', function(req, res, next) {
   res.render('braintree', { title: 'BrainTree Dropin + Hosted Fields' });
 });
+router.get('/btvenmo', function(req, res, next) {
+  res.render('braintreeVenmo', { title: 'BrainTree Venmo' });
+});
 router.get('/ppsc', function(req, res, next) {
   res.render('ppsc', { title: 'PP Rest API - Standard Checkout' });
 });
