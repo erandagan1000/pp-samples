@@ -8,6 +8,7 @@ Live demo for various payapl/braintree integrations:
     - Paypal Data Collector
     - Paypal Returning Customer
     - Local Payment Methods
+    - Venmo
  
  <br/>    
  
