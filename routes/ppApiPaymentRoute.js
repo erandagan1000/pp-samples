@@ -1,3 +1,6 @@
+// This backend code, can be used when merchant wants to combine using PP SDK 
+// together with merchant API, the client will call merchant API onCreate or onAprove instead of using the builtin createOrder function in the SDK
+// full details here: https://developer.paypal.com/docs/checkout/standard/upgrade-integration/
 
 const { default: axios } = require('axios');
 const express = require('express');

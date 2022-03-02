@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const ppApiHelper = require('../helpers/ppApiHelper')
+const ppApiHelperV1 = require('../helpers/ppApiHelperV1')
 
 // test
 router.get('/', (req, res, next) => {
   // res.status(200).send("works");
-  res.status(200).send(ppApiHelper.test());
+  res.status(200).send(ppApiHelperV1.test());
 
 }, (error, result) => {
   if (result) {
@@ -22,7 +22,7 @@ router.get('/', (req, res, next) => {
 router.post('/accesstoken/generate', (req, res, next) => {
 
   try {
-    ppApiHelper.generateAccessToken((data, error) => {
+    ppApiHelperV1.generateAccessToken((data, error) => {
       if (error) {
         res.status(500).send(error);
         return;
@@ -47,7 +47,7 @@ router.post('/accesstoken/generate', (req, res, next) => {
 router.post('/clienttoken/generate', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
-  ppApiHelper.generateClientToken(accessToken, (data, error) => {
+  ppApiHelperV1.generateClientToken(accessToken, (data, error) => {
     if (error) {
       res.status(500).send(error);
       return;

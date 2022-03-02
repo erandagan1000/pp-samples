@@ -11,6 +11,7 @@ var usersRouter = require('./routes/users');
 var authRouter = require('./routes/ppApiAuthRoute');
 var ppApiPaymentRouter = require('./routes/ppApiPaymentRoute');
 var ppApiOrderRouter = require('./routes/ppApiOrderRoute');
+var ppApiRtRouter = require('./routes/ppApiReferenceTransactionRoute');
 
 //braintree
 var btDropInCheckoutRouter = require('./routes/btDropInCheckoutRoute');
@@ -58,6 +59,7 @@ app.use('/bt/hf/payment', btHostedFieldsPaymentRouter);
 app.use('/bt/vault/payment', btVaultPaymentRouter);
 app.use('/ppapi/payment',ppApiPaymentRouter);
 app.use('/ppapi/order',ppApiOrderRouter);
+app.use('/ppapi/rt',ppApiRtRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

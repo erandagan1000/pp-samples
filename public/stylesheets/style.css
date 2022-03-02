@@ -24,3 +24,9 @@ li
   margin: 10px;
  
 }
+
+.alert {
+  font-size:12pt;
+  color:red;
+  
+}

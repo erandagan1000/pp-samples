@@ -44,6 +44,13 @@ router.get('/ppccm', function(req, res, next) {
 router.get('/ppac', function(req, res, next) {
   res.render('ppac', { title: 'PP Rest API - Advanced Checkout' });
 });
+router.get('/pprt', function(req, res, next) {
+  res.render('pprt', { title: 'PP Rest API - Reference Transaction' });
+});
+
+
+
+
 router.get('/success', function(req, res, next) {
   res.render('success', { title: 'Transaction completed' });
 });
