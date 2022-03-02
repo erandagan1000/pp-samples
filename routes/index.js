@@ -29,6 +29,9 @@ router.get('/bt', function(req, res, next) {
 router.get('/btvenmo', function(req, res, next) {
   res.render('braintreeVenmo', { title: 'BrainTree Venmo' });
 });
+router.get('/btach', function(req, res, next) {
+  res.render('braintreeAchDirectDebit', { title: 'BrainTree ACH Direct Debit' });
+});
 router.get('/ppsc', function(req, res, next) {
   res.render('ppsc', { title: 'PP Rest API - Standard Checkout' });
 });

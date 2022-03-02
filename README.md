@@ -9,6 +9,7 @@ Live demo for various payapl/braintree integrations:
     - Paypal Returning Customer
     - Local Payment Methods
     - Venmo
+    - ACH Direct Debit
  
  <br/>    
  

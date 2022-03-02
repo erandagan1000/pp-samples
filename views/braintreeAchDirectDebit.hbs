@@ -1,0 +1,201 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<p style="color:red;font-size:larger">This sample is not complete<br/>Need to contact BT support to enable ACH DD to merchant on sandbox
+</p>
+<hr>
+<!---------------- Paypal Button ------------------>
+<div>
+    <div id="paypal-button"></div>
+</div>
+
+
+<div>
+    {{!-- <button id="generate-token">Generate Access Token</button> --}}
+    <div class="loading" id="loading-token">Generating access token...</div>
+    <div style="inline-size: 1350px;overflow-wrap: break-word; ">
+        <p>Access token: </p>
+        <div id="token" style="font-size: 6pt;"></div>
+    </div>
+
+
+    {{!-- <div class="loading" id="loading-button">Loading paypal button...</div> --}}
+
+</div>
+<p>
+    <input type="radio" id="check1" onclick="setCheckMethod(1)">Network Check / Micro-Transfers / Independent Check
+    <input type="radio" id="check2" onclick="setCheckMethod(2)">Tokenized Check
+</p>
+
+<p>
+<form id="bank-details-check-1">
+    <p>Network Check / Micro-Transfers / Independent Check</p>
+    <input type="text" id="routingNumber" placeholder="routingNumber">
+    <input type="text" id="accountNumber" placeholder="accountNumber">
+    <input type="text" id="accountType" placeholder="accountType">
+    <input type="text" id="ownershipType" placeholder="ownershipType (personal/business)">
+    <input type="text" id="firstName" placeholder="firstName">
+    <input type="text" id="lastName" placeholder="lastName">
+    <input type="text" id="businessName" placeholder="businessName">
+    <input type="text" id="billingAddress" placeholder="billingAddress">
+</form>
+
+<form id="bank-details-check-2">
+    <p>Tokenized Check</p>
+
+    <input type="text" id="displayName" placeholder="displayName">
+    <input type="text" id="ownershipType" placeholder="ownershipType (personal/business)">
+    <input type="text" id="firstName" placeholder="firstName">
+    <input type="text" id="lastName" placeholder="lastName">
+    <input type="text" id="businessName" placeholder="businessName">
+    <input type="text" id="billingAddress" placeholder="billingAddress">
+    <button id="bank-login-button">BANK LOGIN</button>
+</form>
+</p>
+
+
+
+<!-------- results -------------------->
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+    <p>OnApprove payload: </p>
+    <div id="approve-payload">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+    <p>Checkout Server message: </p>
+    <div id="checkout-message">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+    <p>Checkout Server result: </p>
+    <div id="checkout-result">&nbsp;</div>
+</div>
+<script src="https://js.braintreegateway.com/web/3.85.2/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.85.2/js/us-bank-account.min.js"></script>
+
+<script>
+    $("#check1").prop("checked", true);
+    var selectedBankAccountCheck = 1;
+    function setCheckMethod(type) {
+        if (type == 1) {
+            $("#check1").prop("checked", true);
+            $("#check2").prop("checked", false);
+            $("#bank-details-check-1").show();
+            $("#bank-details-check-2").hide();
+            selectedBankAccountCheck = 1;
+        }
+        if (type == 2) {
+            $("#check1").prop("checked", false);
+            $("#check2").prop("checked", true);
+            $("#bank-details-check-1").hide();
+            $("#bank-details-check-2").show();
+            selectedBankAccountCheck = 2;
+        }
+    }
+
+    var tokenSpan = document.querySelector('#token')
+    var token = undefined;
+
+    (function () {
+        $.ajax({
+            type: 'GET',
+            url: '/bt/vault/payment/client_token'
+        }).done(function (result) {
+            // console.log(result);
+            token = result;
+            tokenSpan.innerHTML = `${token}`;
+            $("#loading-token").hide();
+
+            initBtUsBankAccount(token);
+        });
+    }());
+
+
+        var checkOption1 = function (usBankAccountInstance) {
+        var bankDetails = {
+            accountNumber: $('#account-number').val(),
+            routingNumber: $('#routing-number').val(),
+            accountType: $('input[name="account-type"]:checked').val(),
+            ownershipType: $('input[name="ownership-type"]:checked').val(),
+            billingAddress: {
+                streetAddress: $('#billing-street-address').val(),
+                extendedAddress: $('#billing-extended-address').val(),
+                locality: $('#billing-locality').val(),
+                region: $('#billing-region').val(),
+                postalCode: $('#billing-postal-code').val()
+            }
+        };
+
+        if (bankDetails.ownershipType === 'personal') {
+            bankDetails.firstName = $('#first-name').val();
+            bankDetails.lastName = $('#last-name').val();
+        } else {
+            bankDetails.businessName = $('#business-name').val();
+        }
+
+        usBankAccountInstance.tokenize({
+            bankDetails: bankDetails, // or bankLogin: bankLogin
+            mandateText: 'By clicking ["Checkout"], I authorize Braintree, a service of PayPal, on behalf of [your business name here] (i) to verify my bank account information using bank information and consumer reports and (ii) to debit my bank account.'
+        }).then(function (tokenizedPayload) {
+            // Submit tokenizedPayload.nonce to your server as you would
+            // other payment method nonces.
+            console.log("nonce:" + tokenizedPayload.nonce);
+            // continue here: https://developer.paypal.com/braintree/docs/guides/ach/server-side
+        });
+    };
+
+    var checkOption2 = function (usBankAccountInstance) {
+        $('#bank-login-button').on('click', function (event) {
+            event.preventDefault();
+
+            var bankLogin = {
+                displayName: 'My Merchant',
+                ownershipType: $('input[name="ownership-type"]:checked').val(),
+                billingAddress: {
+                    streetAddress: $('#billing-street-address').val(),
+                    extendedAddress: $('#billing-extended-address').val(),
+                    locality: $('#billing-locality').val(),
+                    region: $('#billing-region').val(),
+                    postalCode: $('#billing-postal-code').val()
+                }
+            };
+
+            if (bankLogin.ownershipType === 'personal') {
+                bankLogin.firstName = $('#first-name').val();
+                bankLogin.lastName = $('#last-name').val();
+            } else {
+                bankLogin.businessName = $('#business-name').val();
+            }
+
+            usBankAccountInstance.tokenize({
+                bankDetails: bankLogin, // or bankLogin: bankLogin
+                mandateText: 'By clicking ["Checkout"], I authorize Braintree, a service of PayPal, on behalf of [your business name here] (i) to verify my bank account information using bank information and consumer reports and (ii) to debit my bank account.'
+            }).then(function (tokenizedPayload) {
+                // Submit tokenizedPayload.nonce to your server as you would
+                // other payment method nonces.
+                console.log("nonce:" + tokenizedPayload.nonce);
+                // continue here: https://developer.paypal.com/braintree/docs/guides/ach/server-side
+            });
+
+
+        });
+
+    };
+
+
+    var bankAccountCheckCallback = selectedBankAccountCheck == 1 ? checkOption1 : checkOption2;
+    
+    function initBtUsBankAccount(token) {
+        braintree.client.create({
+            authorization: token
+        }).then(function (clientInstance) {
+            return braintree.usBankAccount.create({
+                client: clientInstance
+            });
+        }).then(bankAccountCheckCallback).catch(function (err) {
+            // Handle component creation error
+            console.log(err);
+        });
+
+    }
+
+</script>
