@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ppApiHelperV1 = require('../helpers/ppApiHelperV1')
+var randomstring = require("randomstring");
 
 // test
 router.get('/', (req, res, next) => {
@@ -21,7 +22,7 @@ router.post('/billing-agreement-token/generate', (req, res, next) => {
   const data = req.body;
   ppApiHelperV1.generateBillingAgreementToken(accessToken, data, (data, error) => {
     if (error) {
-      res.status(500).send(error);
+      res.status(error.response.status || 500).send(error);
       return;
     }
     res.status(200).send(data);
@@ -38,7 +39,7 @@ router.post('/billing-agreement', (req, res, next) => {
 
   ppApiHelperV1.createBillingAgreement(accessToken, data, (data, error) => {
     if (error) {
-      res.status(500).send(error);
+      res.status(error.response.status || 500).send(error);
       return;
     }
     res.status(200).send(data);
@@ -51,7 +52,53 @@ router.post('/billing-agreement', (req, res, next) => {
 router.post('/pay', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
-  const data = req.body;  
+  const data = req.body; 
+  let baId = data.baId;
+  let paymentPayload = {
+    intent: "sale",
+    payer:
+    {
+      payment_method: "PAYPAL",
+      funding_instruments: [
+        {
+          billing:
+          {
+            billing_agreement_id: baId
+          }
+        }]
+    },
+    transactions: [
+      {
+        amount:
+        {
+          currency: "USD",
+          total: "9.00"
+        },
+        description: "Payment with Billing Agreement.",
+        custom: "Payment custom field.",
+        note_to_payee: "RT example.",
+        invoice_number:randomstring.generate(10),
+        item_list:
+        {
+          items: [
+            {
+              sku: "skuitemNo1",
+              name: "ItemNo1",
+              description: "The item description.",
+              quantity: "1",
+              price: "9.00",
+              currency: "USD",
+              tax: "0",
+              url: "https://example.com/"
+            }]
+        }
+      }],
+    redirect_urls:
+    {
+      return_url: "https://example.com/return",
+      cancel_url: "https://example.com/cancel"
+    }
+  }; 
   /*
   expected payload
   {
@@ -101,9 +148,9 @@ router.post('/pay', (req, res, next) => {
 }
   */ 
 
-  ppApiHelperV1.createPayment(accessToken, data, (data, error) => {
+  ppApiHelperV1.createPayment(accessToken, paymentPayload, (data, error) => {
     if (error) {
-      res.status(500).send(error);
+      res.status(error.response.status || 500).send(error);
       return;
     }
     res.status(200).send(data);
@@ -113,14 +160,14 @@ router.post('/pay', (req, res, next) => {
 
 });
 
-router.post('/billing-agreement', (req, res, next) => {
+router.post('/billing-agreement-details', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
-  const billingAgreementId = req.body.baId;  // expecting: {"token_id": "BA-8A802366G0648845Y"}
+  const billingAgreementId = req.body.baId;  // expecting: {"baId": "B-8A802366G0648845Y"}
 
   ppApiHelperV1.getBillingAgreementDetails(accessToken, billingAgreementId, (data, error) => {
     if (error) {
-      res.status(500).send(error);
+      res.status(error.response.status || 500).send(error);
       return;
     }
     res.status(200).send(data);
@@ -130,14 +177,14 @@ router.post('/billing-agreement', (req, res, next) => {
 
 });
 
-router.post('/billing-agreement-token', (req, res, next) => {
+router.post('/billing-agreement-token-details', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
-  const billingAgreementId = req.body.baId;  // expecting: {"token_id": "BA-8A802366G0648845Y"}
+  const billingAgreemenTokentId = req.body.baTokenId;  // expecting: {"baTokenId": "BA-8A802366G0648845Y"}
 
-  ppApiHelperV1.createBillingAgreement(accessToken, billingAgreementId, (data, error) => {
+  ppApiHelperV1.getBillingAgreementTokenDetails(accessToken, billingAgreemenTokentId, (data, error) => {
     if (error) {
-      res.status(500).send(error);
+      res.status(error.response.status || 500).send(error);
       return;
     }
     res.status(200).send(data);
@@ -197,7 +244,7 @@ router.post('/billing-agreement/cancel', (req, res, next) => {
 
   ppApiHelperV1.cancelBillingAgreementDetails(accessToken, billingAgreementId, (data, error) => {
     if (error) {
-      res.status(500).send(error);
+      res.status(error.response.status || 500).send(error);
       return;
     }
     res.status(200).send(data);

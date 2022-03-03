@@ -3,6 +3,7 @@ const test = () => {
   return "hello test"
 }
 
+// #region Auth Functions 
 const generateAccessToken = (callback) =>{
 
   const options = {
@@ -52,6 +53,10 @@ const generateClientToken = (accessToken, callback) =>{
     })
   
 }
+
+// #endregion
+
+// #region Billing Agreement Functions
 
 const generateBillingAgreementToken = (accessToken, data, callback) =>{
 
@@ -159,19 +164,46 @@ const createPayment = (accessToken, data, callback) =>{
   
 }
 
-const getBillingAgreementDetails = (accessToken, beId, callback) =>{
+const getBillingAgreementDetails = (accessToken, baId, callback) =>{
+
+  const config = {
+    headers: {
+      Authorization: accessToken,
+      "Content-Type": "application/json"
+    }
+  };
+  if(!baId) {
+    callback(undefined, "Error: Beeling Agreement Id not not provided");
+  }
+  
+  // generate access token, givven merchant credenials
+  axios.get(`https://api-m.sandbox.paypal.com/v1/billing-agreements/agreements/${baId}`, undefined, config)
+    .then(function (response) {
+      // handle success
+      const data = response.data;
+      callback(data, undefined);
+    })
+    .catch(function (error) {
+      // handle errorx1
+      console.log(error);
+      callback(undefined, error)
+    })
+  
+}
+
+const getBillingAgreementTokenDetails = (accessToken, baTokenId, callback) =>{
 
   const config = {
     headers: {
       Authorization: accessToken,
     }
   };
-  if(!beId) {
+  if(!baTokenId) {
     callback(undefined, "Error: Beeling Agreement Id not not provided");
   }
   
   // generate access token, givven merchant credenials
-  axios.post(`https://api-m.sandbox.paypal.com/v1/billing-agreements/agreements/${baId}`, data, config)
+  axios.get(`https://api-m.sandbox.paypal.com/v1/billing-agreements/agreement-tokens/${baTokenId}`, undefined, config)
     .then(function (response) {
       // handle success
       const data = response.data;
@@ -185,40 +217,14 @@ const getBillingAgreementDetails = (accessToken, beId, callback) =>{
   
 }
 
-const getBillingAgreementTokenDetails = (accessToken, beId, callback) =>{
+const updateBillingAgreementDetails = (accessToken, baId, data, callback) =>{
 
   const config = {
     headers: {
       Authorization: accessToken,
     }
   };
-  if(!beId) {
-    callback(undefined, "Error: Beeling Agreement Id not not provided");
-  }
-  
-  // generate access token, givven merchant credenials
-  axios.post(`https://api-m.sandbox.paypal.com/v1/billing-agreements/agreement-tokens/${baId}`, data, config)
-    .then(function (response) {
-      // handle success
-      const data = response.data;
-      callback(data, undefined);
-    })
-    .catch(function (error) {
-      // handle error
-      console.log(error);
-      callback(undefined, error)
-    })
-  
-}
-
-const updateBillingAgreementDetails = (accessToken, beId, data, callback) =>{
-
-  const config = {
-    headers: {
-      Authorization: accessToken,
-    }
-  };
-  if(!beId) {
+  if(!baId) {
     callback(undefined, "Error: Beeling Agreement Id not not provided");
   }
   
@@ -237,14 +243,14 @@ const updateBillingAgreementDetails = (accessToken, beId, data, callback) =>{
   
 }
 
-const cancelBillingAgreementDetails = (accessToken, beId, callback) =>{
+const cancelBillingAgreementDetails = (accessToken, baId, callback) =>{
 
   const config = {
     headers: {
       Authorization: accessToken,
     }
   };
-  if(!beId) {
+  if(!baId) {
     callback(undefined, "Error: Beeling Agreement Id not not provided");
   }
   
@@ -263,6 +269,7 @@ const cancelBillingAgreementDetails = (accessToken, beId, callback) =>{
   
 }
 
+// #endregion
 
 module.exports = {
   test,

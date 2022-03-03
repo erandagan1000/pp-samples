@@ -1,84 +1,204 @@
-<html>
+<div class="loading" id="loading-button">Loading paypal button...</div>
 
-<head>
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<p>Access token</p>
+<div style="inline-size: 1350px;overflow-wrap: break-word;" id="access-token-container">&nbsp;</div>
+<table>
+  <tr>
+    <td>
+      <button disabled id="ba-generate-token" onclick="generateBaToken()">Generate BA Token</button>
+    </td>
+    <td class="seperator">
+      <div id="ba-token-response"></div>
+      <div><span id="ba-approve-container"></span> </div>
+    </td>
+  </tr>
+  <tr>
+    <td >
+      <button disabled id="ba-generate" onclick="generateBa()">Generate BA</button>
+    </td>
+    <td class="seperator">  
+      <div id="ba-response"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <button disabled id="get-ba-details" onclick="getBaDetails()">Get BA Details</button>
+    </td>
+    <td class="seperator"> 
+      <div id="ba-details-response"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <button disabled id="get-ba-token-details" onclick="getBaTokenDetails()">Get BA Token Details</button>
+    </td>
+    <td class="seperator">
+      <div id="ba-token-details-response"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <button disabled id="ba-pay" onclick="payWithBa()">Pay With BA</button>
+    </td>
+    <td class="seperator">
+      <div id="ba-pay-response"></div>
+    </td>
+  </tr>
+</table>
 
-  <meta charset="utf-8" />
 
-  <!-- Optimal rendering on mobile devices. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<div id="payment-view">
+  <!-- Buttons container -->
+  <div style="padding:10px">
+    <table border="0" align="left" valign="top" bgcolor="#FFFFFF" style="width: 39%">
+      <tr>
+        <td colspan="2">
+          <div id="paypal-button-container"></div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">&nbsp;</td>
+      </tr>
 
-  <!-- Sample CSS styles for demo purposes. You can override these styles to match your web page's branding. -->
-  <link rel="stylesheet" type="text/css"
-    href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/css/cardfields.css" />
-
-</head>
-
-<body>
-  <div class="loading" id="loading-button">Loading paypal button...</div>
-  <!-- JavaScript SDK -->
-  <script
-    src="https://www.paypal.com/sdk/js?components=buttons,hosted-fields&client-id=AY30GJsxw_QS7g7HaAeCW58FcbcSHVL82ixgep50NtkTBgSYqVqTpMD_5VO01ILjH2AdFUAuFm-aJ0CC"
-    data-client-token="eyJicmFpbnRyZWUiOnsiYXV0aG9yaXphdGlvbkZpbmdlcnByaW50IjoiZTgyZDM0NGU5MDVjZDYxZTA4M2JlMzBlZDQwOTliNWI3MDZhYTU2YmRmYjg3MDg3MDhlOGQxYmViOTg3NTczMXxtZXJjaGFudF9pZD1yd3dua3FnMnhnNTZobTJuJnB1YmxpY19rZXk9NjNrdm4zN3Z0MjlxYjRkZiZjcmVhdGVkX2F0PTIwMjItMDItMTRUMTI6MTE6MTAuNjg2WiIsInZlcnNpb24iOiIzLXBheXBhbCJ9LCJwYXlwYWwiOnsiaWRUb2tlbiI6ImV5SnJhV1FpT2lKbE5EQTJOakE0WWpVMFlUazBORGd4WWprMVl6YzFOREkwT0dOak1USXpaaUlzSW5SNWNDSTZJa3BYVkNJc0ltRnNaeUk2SWxKVE1qVTJJbjAuZXlKcGMzTWlPaUpvZEhSd2N6b3ZMMkZ3YVM1ellXNWtZbTk0TG5CaGVYQmhiQzVqYjIwaUxDSmhkRjlvWVhOb0lqb2liSFJFVjNsSlVFc3hNVUUwYkZjMmFWcDJUMmxUZHlJc0luSnZiR1VpT2lKTlJWSkRTRUZPVkNJc0luTmxjM05wYjI1ZmFXNWtaWGdpT2lKclVUUkVkMUZ0U1c1R1gweFpkMHBJUzNremJEVnpiMmcxTW1raUxDSmpiR2xsYm5SZmFXUWlPaUpCV1RNd1IwcHplSGRmVVZNM1p6ZElZVUZsUTFjMU9FWmpZbU5UU0ZaTU9ESnBlR2RsY0RVd1RuUnJWRUpuVTFseFZuRlVjRTFFWHpWV1R6QXhTVXhxU0RKQlpFWlZRWFZHYlMxaFNqQkRReUlzSW1GamNpSTZXeUpqYkdsbGJuUWlYU3dpWVhWa0lqb2lRVmt6TUVkS2MzaDNYMUZUTjJjM1NHRkJaVU5YTlRoR1kySmpVMGhXVERneWFYaG5aWEExTUU1MGExUkNaMU5aY1ZaeFZIQk5SRjgxVms4d01VbE1ha2d5UVdSR1ZVRjFSbTB0WVVvd1EwTWlMQ0poZFhSb1gzUnBiV1VpT2pFMk5EUTROREEyTnpBc0ltRjZJam9pWjJOd0xuTnNZeUlzSW5OamIzQmxjeUk2V3lKQ2NtRnBiblJ5WldVNlZtRjFiSFFpWFN3aVpYaHdJam94TmpRME9EUXhOVGN4TENKcFlYUWlPakUyTkRRNE5EQTJOekVzSW1wMGFTSTZJbFV5UVVGTVduTjFhVWR0TXpsQ01rbG5iakpJTUdwV2EwRjVPRWRMTVc1S1JEUlZTMjFoU21ZM05VSnJZbHBuZUV0NGJIaHlhSHBtTkY5bmR6aGFVRUptV1dwaFpVUXhkRzVzVFRoWVJIWkhka2QyWTFoVVUxRlpjMTh0ZWtGTk1reGlTME5mTkhSRmFWRlJhMHh2VkZKRFFUTkdSa3BZZG1FelREUlVMWE5SSW4wLmJ6c1hrV2dNOVVPczIyR2U4bGRzSHNZYWpFQjBZV2pGMDNpRkMyc0phUkRvYlc1bUpGenMxUmhlYnRwUGxHWlh1U0Z5UE96UllJOFlPb1VnRzFCN0lRaDVWRVZPMkxZWmRMYUg3bGtJdkFaaGk2T2pzNEJOMHNPU2kzWlNEWjc0LWxTLWhqNWJTM1VKZS03YmxidG1kSUFjQmtJM3FYdElabkx2cU40WE5tb21MMlRPR0g4Z3RPX2Z1Wk4tU3M2ckE2aFFaYUdmcDVuWGJhSWcxRTYydk4ycHdmdnZpNEZ4cHo2RzlkWVpERVRyT0IzRnZKeFRCcmswcnI4eGIwWmJWV1hJWXdJN1NaYnM2SXhIb3pickY0enpRdDlVbV95bnlWNWFpejRuUGsxMER4bWNVcGhodUZ1czZsVGw3ZUFXc3E3UzNCbkk3WldYeHdOMW8yb00yUSIsImFjY2Vzc1Rva2VuIjoiQTIxQUFKbi1WcXhyc3ZyY3Zzcll2Sno5MVdwdHZuT083a2ZNSXBLRi0yRUVERE83dkpkOUhiRGlaN3lPRlpHdTV3bnVfYWFNZHNWWXBkUzFZQjlQTXVLVWo1Z04xTkhRUSJ9fQ=="></script>
-
-  <div><a href="/">Home</a></div>
-  <h1>{{title}}</h1>
-  <div id="payment-view">
-    <!-- Buttons container -->
-    <div style="padding:10px">
-      <table border="0" align="left" valign="top" bgcolor="#FFFFFF" style="width: 39%">
-        <tr>
-          <td colspan="2">
-            <div id="paypal-button-container"></div>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">&nbsp;</td>
-        </tr>
-        
-      </table>
-    </div>
-   
+    </table>
   </div>
-   <div>
-      <span id="payment-result">&nbsp; </span>
-      <span colspan="2" id="payment-result-cc">&nbsp;</span>
-      
-    </div>
 
+</div>
+<div>
+  <span id="payment-result">&nbsp; </span>
+  <span colspan="2" id="payment-result-cc">&nbsp;</span>
 
-  <!-- Implementation -->
-  <script>
-    $("#loading-button").show();
-    let orderId;
+</div>
+<!-- Implementation -->
+<script>
+  var globalAccessToken = "";
+  var globalClientToken = "";
+  var baTokenId = "";
+  var baId = "";
 
-    // Displays PayPal buttons
-    paypal.Buttons({
-      style: {
-        layout: 'horizontal'
+  $.ajax('ppapi/auth/accesstoken/generate', {
+    type: 'POST',  // http method
+    data: {},  // data to submit
+    success: function (data, status, xhr) {
+      console.log(data);
+      const accesstoken = data.access_token;
+      globalAccessToken = accesstoken;
+      $("#access-token-container").html(globalAccessToken);
+      $("#ba-generate-token").removeAttr('disabled');
+    },
+    error: function (jqXhr, textStatus, errorMessage) {
+      console.log(errorMessage);
+    }
+  });
+
+  function generateBaToken() {
+    $.ajax('/ppapi/rt/billing-agreement-token/generate', {
+      type: 'POST',
+      headers: {
+        'Authorization': `Bearer ${globalAccessToken}`
       },
-      createOrder: function (data, actions) {
-        return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: "1.00"
-            }
-          }]
-        });
-      },
-      onApprove: function (data, actions) {
-        return actions.order.capture().then(function (details) {
-          // window.location.href = '/success.html';
-          $("#payment-result").text(`Payment success: \n ${JSON.stringify(details)}`);
-          document.querySelector("#payment-view").style = 'display: none';
+      data: {},
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#ba-token-response").html(JSON.stringify(data));
+        $("#ba-generate").removeAttr("disabled");
+        $("#get-ba-token-details").removeAttr("disabled");
+        const links = data.links;
+        const approveUrl = links.find((l) => l.rel == "approval_url").href;
+        $("#ba-approve-container").html(`Follow this url to approve BA, before clicking on "Generate BA": <a target='_blank' href="${approveUrl}">Approval Url</a>`);
+        baTokenId = data.token_id;
 
-        });
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
       }
-    }).render("#paypal-button-container").then(() => $("#loading-button").hide());
+    });
 
-  
+  }
+
+  function generateBa() {
+    $.ajax('/ppapi/rt/billing-agreement', {
+      type: 'POST',
+      headers: {
+        'Authorization': `Bearer ${globalAccessToken}`
+      },
+      data: { token_id: baTokenId },
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#ba-response").html(JSON.stringify(data));
+        $("#get-ba-details").removeAttr("disabled");
+        $("#ba-pay").removeAttr("disabled");
+        baId = data.id;
+
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
+    });
+
+  }
+
+  function getBaDetails() {
+    $.ajax('/ppapi/rt/billing-agreement-details', {
+      type: 'POST',
+      headers: {
+        'Authorization': `Bearer ${globalAccessToken}`
+      },
+      data: { baId: baId },
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#ba-details-response").html(JSON.stringify(data));
+
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
+    });
+
+  }
+
+  function getBaTokenDetails() {
+    $.ajax('/ppapi/rt/billing-agreement-token-details', {
+      type: 'POST',
+      headers: {
+        'Authorization': `Bearer ${globalAccessToken}`
+      },
+      data: { baTokenId: baTokenId },
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#ba-token-details-response").html(JSON.stringify(data));
+
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
+    });
+
+  }
+
+  function payWithBa() {
+
     
-  </script>
 
-</body>
+    $.ajax('/ppapi/rt/pay', {
+      type: 'POST',
+      headers: {
+        'Authorization': `Bearer ${globalAccessToken}`
+      },
+      data: {baId},
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#ba-pay-response").html(JSON.stringify(data));
+        
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
+    });
 
-</html>
+  }
+
+
+</script>
