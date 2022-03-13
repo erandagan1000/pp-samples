@@ -47,6 +47,12 @@ router.get('/ppac', function(req, res, next) {
 router.get('/pprt', function(req, res, next) {
   res.render('pprt', { title: 'PP Rest API - Reference Transaction' });
 });
+router.get('/ppvenmo', function(req, res, next) {
+  res.render('ppVenmo', { title: 'PP Rest API - Venmo' });
+});
+router.get('/ppapm', function(req, res, next) {
+  res.render('ppAlternatePaymentMethods', { title: 'PP Rest API - AOM - Alternate Payment Methods' });
+});
 
 
 

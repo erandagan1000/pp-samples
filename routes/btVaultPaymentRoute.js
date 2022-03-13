@@ -4,7 +4,7 @@ var router = express.Router();
 var randomstring = require("randomstring");
 
 // base route: bt/vault/payment
-
+// #region Token Functions
 router.get("/client_token", (req, res) => {
   gateway.clientToken.generate({}).then((response) => {
     // console.log(response);
@@ -19,6 +19,10 @@ router.get("/client_token/:customerid", (req, res) => {
     res.send(response.clientToken);
   });
 });
+
+// #endregion
+
+// #region checkout Functions
 
 router.post("/checkout", (req, res) => {
   var nonceFromTheClient = req.body.paymentMethodNonce;
@@ -72,7 +76,6 @@ router.post('/vault', (req, res, next) => {
 
 });
 
-router.post('/checkout/vault', (req, res, next) => { });
 
 router.post("/checkout/localpaymethod", (req, res) => {
   var nonceFromTheClient = req.body.paymentMethodNonce;   //from client or from webhook 
@@ -108,5 +111,7 @@ router.post("/checkout/localpaymethod", (req, res) => {
     });
 
 });
+
+// #endregion
 
 module.exports = router;
