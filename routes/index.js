@@ -54,8 +54,21 @@ router.get('/ppapm', function(req, res, next) {
   res.render('ppAlternatePaymentMethods', { title: 'PP Rest API - AOM - Alternate Payment Methods' });
 });
 
+router.get('/ppsub', function(req, res, next) {
+  res.render('ppSubscription', { title: 'PP Subscription' });
+});
+router.get('/ppnvpicc', function(req, res, next) {
+  res.render('ppNvpInContextCheckout', { title: 'PP NVP In Context Checkout' });
+});
 
 
+router.get('/ppnvpicc/success', function(req, res, next) {
+  res.render('success', { title: 'NVP Transaction success', token: req.query.token, payer: req.query.PayerID  });
+});
+
+router.get('/ppnvpicc/cancel', function(req, res, next) {
+  res.render('success', { title: 'NVP Transaction cancelled', token: req.query.token });
+});
 
 router.get('/success', function(req, res, next) {
   res.render('success', { title: 'Transaction completed' });

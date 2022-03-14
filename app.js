@@ -18,6 +18,9 @@ var btDropInCheckoutRouter = require('./routes/btDropInCheckoutRoute');
 var btHostedFieldsPaymentRouter = require('./routes/btHostedFieldsPaymentRoute');
 var btVaultPaymentRouter = require('./routes/btVaultPaymentRoute');
 
+//NVP
+var ppNvpApiRouter = require('./routes/ppNvpApiRoute');
+
 var app = express();
 require('dotenv').config();
 
@@ -51,15 +54,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// test
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/ppapi/auth', authRouter);
+
+// bt
 app.use('/bt/di/checkout', btDropInCheckoutRouter);
 app.use('/bt/hf/payment', btHostedFieldsPaymentRouter);
 app.use('/bt/vault/payment', btVaultPaymentRouter);
+// pp rest api
+app.use('/ppapi/auth', authRouter);
 app.use('/ppapi/payment',ppApiPaymentRouter);
 app.use('/ppapi/order',ppApiOrderRouter);
 app.use('/ppapi/rt',ppApiRtRouter);
+
+// nvp
+app.use('/ppnvp',ppNvpApiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
