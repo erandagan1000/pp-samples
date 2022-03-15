@@ -1,11 +1,12 @@
 <div><a href="/">Home</a></div>
 <h1>{{title}}</h1>
-<br/>
+<br />
 <!----------------- drop-in fields example ---------------------->
-<div >
-  <h2>Drop In example - Quick , using tokenization key</h2>
-  
-  <div  id="dropin-wrapper">
+<div>
+  <h2>DropIn Quick - <font color="blue">using tokenization key</font>
+  </h2>
+
+  <div id="dropin-wrapper">
     <div id="checkout-message"></div>
     <div id="dropin-container"></div>
     <button id="submit-button">Submit payment</button>
@@ -16,11 +17,12 @@
 
 <!----------------- client server example with token ------------------>
 <div>
-  <hr>
-  <h2>Client/Server example - using token</h2>
-  <hr>
 
-  <button id="generate-token">generate token</button>
+  <h2>DropIn With Server - <font color="blue">using token</font>
+  </h2>
+
+
+  <button id="generate-token" style="display:none">generate token</button>
   <span id="token"></span>
 
   <form id="payment-form" action="bt/hf/payment/checkout" method="post">
@@ -41,17 +43,29 @@
 
   <div style="width:600px">
     <form action="/bt/hf/payment/checkout" id="my-sample-form" method="post">
-      <label for="card-number">Card Number</label>
-      <div id="card-number"></div>
+      <div style="padding:10px">
+        <label for="card-number" style="padding:5px;margin-top:5px">Card Number</label>
+        <div id="card-number" style="height:30px;border-style:solid;border-color:lightgray"></div>
 
-      <label for="cvv">CVV</label>
-      <div id="cvv"></div>
+      </div>
+      <div style="padding:10px">
+        <label for="cvv" style="margin-top:5px">CVV</label>
+        <div id="cvv" style="height:30px;border-style:solid;border-color:lightgray"></div>
 
-      <label for="expiration-date">Expiration Date</label>
-      <div id="expiration-date"></div>
+      </div>
+
+      <div style="padding:10px">
+        <label for="expiration-date" style="margin-top:5px">Expiration Date</label>
+        <div id="expiration-date" style="height:30px;border-style:solid;border-color:lightgray"></div>
+
+      </div>
+
       <input type="hidden" id="hf-nonce" name="payment_method_nonce" />
 
-      <input type="submit" value="Pay" id="pay" disabled />
+      <div style="padding:10px">
+        <input type="submit" value="Pay" id="pay" disabled />
+      </div>
+
     </form>
   </div>
 
@@ -60,18 +74,16 @@
 <!-- test card -->
 <div style="color:gray">
   <p>test card</p>
-  <ul>
-    <li>Card number: 4111 1111 1111 1111</li>
-    <li>Expiry: 09/23</li>
-    <li>CVV: 400</li>
-    <li>Postal Code: 40000</li>
-  </ul>
+  <div>
+    Card number: 4111 1111 1111 1111 | Expiry: 09/23 | CVV: 400 | Postal Code: 40000
+  </div>
 
 </div>
 <!-- includes the Braintree JS client SDK -->
 
 <!-- Load the PayPal JS SDK with your PayPal Client ID-->
-<script src="https://www.paypal.com/sdk/js?client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk"></script>
+<script
+  src="https://www.paypal.com/sdk/js?client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk"></script>
 
 <!-- dropin -->
 <script src="https://js.braintreegateway.com/web/dropin/1.32.1/js/dropin.min.js"></script>
@@ -176,6 +188,7 @@
     });
 
   });
+  button1.click();
 
   // -----------------------------------------------------------------
 

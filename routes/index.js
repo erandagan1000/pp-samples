@@ -60,8 +60,14 @@ router.get('/ppsub', function(req, res, next) {
 router.get('/ppnvpicc', function(req, res, next) {
   res.render('ppNvpInContextCheckout', { title: 'PP NVP In Context Checkout' });
 });
+router.get('/ppnvprt', function(req, res, next) {
+  res.render('ppNvpRT', { title: 'PP NVP Reference Transaction Checkout Before Purchase' });
+});
+router.get('/ppnvprtco', function(req, res, next) {
+  res.render('ppNvpCheckoutRT', { title: 'PP NVP Reference Transaction Checkout During Purchase' });
+});
 
-
+// result pages
 router.get('/ppnvpicc/success', function(req, res, next) {
   res.render('success', { title: 'NVP Transaction success', token: req.query.token, payer: req.query.PayerID  });
 });

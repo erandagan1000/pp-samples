@@ -1,5 +1,34 @@
 <div><a href="/">Home</a></div>
 <h2>{{title}}</h2>
 <p>Details</p>
-<p>Token: {{token}}</p>
-<p>PayerID: {{payer}}</p>
+<p>Token: <span id="token-container">{{token}}</span></p>
+
+<p>PayerID: <span id="payer-id-container">{{payer}}</span></p>
+
+<p id="checkout-message"></p>
+
+<script>
+    const tokenContainer = $("#token-container");
+    const token = tokenContainer.text();
+    const payerIdContainer = $("#payer-id-container");
+    const payerId = payerIdContainer.text();
+    if (token) {
+        console.log(token);
+
+        $.ajax({
+            type: 'POST',
+            url: '/ppnvp/rt/ba',
+            data: { 'token': token, 'payerId': payerId }
+        }).done(function (result) {
+
+            if (result.success) {
+                $('#checkout-message').html('<h1>Success</h1><p>RT transaction succeeded</h1>');
+            } else {
+                // console.log(result);
+                $('#checkout-message').html('<h1>Success</h1><p>RT transaction succeeded</h1>');
+            }
+        });
+    }
+
+
+</script>
