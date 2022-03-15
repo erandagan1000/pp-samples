@@ -20,12 +20,20 @@
             url: '/ppnvp/rt/ba',
             data: { 'token': token, 'payerId': payerId }
         }).done(function (result) {
+                
 
-            if (result.success) {
-                $('#checkout-message').html('<h1>Success</h1><p>RT transaction succeeded</h1>');
+            if (result.data) {
+                const arr = result.data;
+                let html ='';
+                for(var i=0;i < arr.length; i++){
+                    html = html + `<div>${arr[i].replace('%2d','-')}</div>`;
+
+                }
+                
+                $('#checkout-message').html('<h1>Success</h1><p>RT transaction succeeded</h1>'+html);
             } else {
-                // console.log(result);
-                $('#checkout-message').html('<h1>Success</h1><p>RT transaction succeeded</h1>');
+                console.log(result);
+                $('#checkout-message').html('<h1>Failed</h1><p>RT transaction failed</h1>');
             }
         });
     }

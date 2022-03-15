@@ -189,7 +189,7 @@ const createBillingAgreement = (token, payerId, callback) => {
 }
 
 const capturePurchase = (token, payerId, amount, callback) => {
-
+  console.log(globalRepo);
   const config = {
     headers: {}
   };
@@ -211,7 +211,10 @@ const capturePurchase = (token, payerId, amount, callback) => {
     .then(function (response) {
       // handle success
       const data = response.data;
-      callback(data, undefined);
+      const arr = data.split("&");
+      const responseData = {data: arr};
+      
+      callback(responseData, undefined);
     })
     .catch(function (error) {
       // handle error
