@@ -4,7 +4,11 @@
 <h1>{{title}}</h1>
 <p>Access token</p>
 <div style="inline-size: 1350px;overflow-wrap: break-word;" id="access-token-container">&nbsp;</div>
-<table>
+<table style="margin-top:15px">
+  <tr>
+    <th>ACTION</th>
+    <th>RESPONSE</th>
+  </tr>
   <tr>
     <td>
       <button disabled id="ba-generate-token" onclick="generateBaToken()">Generate BA Token</button>
@@ -15,10 +19,10 @@
     </td>
   </tr>
   <tr>
-    <td >
+    <td>
       <button disabled id="ba-generate" onclick="generateBa()">Generate BA</button>
     </td>
-    <td class="seperator">  
+    <td class="seperator">
       <div id="ba-response"></div>
     </td>
   </tr>
@@ -26,7 +30,7 @@
     <td>
       <button disabled id="get-ba-details" onclick="getBaDetails()">Get BA Details</button>
     </td>
-    <td class="seperator"> 
+    <td class="seperator">
       <div id="ba-details-response"></div>
     </td>
   </tr>
@@ -180,18 +184,18 @@
 
   function payWithBa() {
 
-    
+
 
     $.ajax('/ppapi/rt/pay', {
       type: 'POST',
       headers: {
         'Authorization': `Bearer ${globalAccessToken}`
       },
-      data: {baId},
+      data: { baId },
       success: function (data, status, xhr) {
         console.log(data);
         $("#ba-pay-response").html(JSON.stringify(data));
-        
+
       },
       error: function (jqXhr, textStatus, errorMessage) {
         console.log(errorMessage);

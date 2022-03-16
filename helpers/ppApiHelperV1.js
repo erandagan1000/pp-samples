@@ -177,14 +177,14 @@ const getBillingAgreementDetails = (accessToken, baId, callback) =>{
   }
   
   // generate access token, givven merchant credenials
-  axios.get(`https://api-m.sandbox.paypal.com/v1/billing-agreements/agreements/${baId}`, undefined, config)
+  axios.get(`https://api-m.sandbox.paypal.com/v1/billing-agreements/agreements/${baId}`, config)
     .then(function (response) {
       // handle success
       const data = response.data;
       callback(data, undefined);
     })
     .catch(function (error) {
-      // handle errorx1
+      // handle error
       console.log(error);
       callback(undefined, error)
     })
@@ -203,7 +203,7 @@ const getBillingAgreementTokenDetails = (accessToken, baTokenId, callback) =>{
   }
   
   // generate access token, givven merchant credenials
-  axios.get(`https://api-m.sandbox.paypal.com/v1/billing-agreements/agreement-tokens/${baTokenId}`, undefined, config)
+  axios.get(`https://api-m.sandbox.paypal.com/v1/billing-agreements/agreement-tokens/${baTokenId}`, config)
     .then(function (response) {
       // handle success
       const data = response.data;
@@ -255,7 +255,7 @@ const cancelBillingAgreementDetails = (accessToken, baId, callback) =>{
   }
   
   // generate access token, givven merchant credenials
-  axios.post(`https://api-m.sandbox.paypal.com/v1/billing-agreements/agreements/${baId}/cancel`, undefined, config)
+  axios.post(`https://api-m.sandbox.paypal.com/v1/billing-agreements/agreements/${baId}/cancel`, config)
     .then(function (response) {
       // handle success
       const data = response.data;
