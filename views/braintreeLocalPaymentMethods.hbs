@@ -157,7 +157,8 @@
                 $('#checkout-result').html('<h1 style="color:green">Success</h1><p>BT Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
 
                 var serverResultDiv = document.querySelector('#server-result');
-                serverResultDiv.innerHTML = JSON.stringify(result.transaction);
+                 serverResultDiv.innerHTML = JSON.stringify(result.transaction);
+                //$("#server-result").jsonViewer(result.transaction);
               } else {
                 console.log(result);
                 $('#checkout-result').html('<h1 style="color:red">Error</h1><p>Check your console.</p>');

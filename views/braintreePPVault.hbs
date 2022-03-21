@@ -141,7 +141,8 @@
                 $('#checkout-message').html('<h1>Success</h1><p>Vault Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
 
                 var serverResultDiv = document.querySelector('#checkout-result');
-                serverResultDiv.innerHTML = JSON.stringify(result);
+                // serverResultDiv.innerHTML = JSON.stringify(result);
+                $("#checkout-result").jsonViewer(result);
               } else {
                 console.log(result);
                 $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
