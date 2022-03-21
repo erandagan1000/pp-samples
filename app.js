@@ -12,6 +12,7 @@ var authRouter = require('./routes/ppApiAuthRoute');
 var ppApiPaymentRouter = require('./routes/ppApiPaymentRoute');
 var ppApiOrderRouter = require('./routes/ppApiOrderRoute');
 var ppApiRtRouter = require('./routes/ppApiReferenceTransactionRoute');
+var ppApiPayoutRouter = require('./routes/ppApiPayoutRoute');
 
 //braintree
 var btDropInCheckoutRouter = require('./routes/btDropInCheckoutRoute');
@@ -67,7 +68,7 @@ app.use('/ppapi/auth', authRouter);
 app.use('/ppapi/payment',ppApiPaymentRouter);
 app.use('/ppapi/order',ppApiOrderRouter);
 app.use('/ppapi/rt',ppApiRtRouter);
-
+app.use('/ppapi/payout',ppApiPayoutRouter);
 // nvp
 app.use('/ppnvp',ppNvpApiRouter);
 
