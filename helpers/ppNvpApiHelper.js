@@ -22,7 +22,7 @@ const setExpressCheckout = (data, callback) => {
   };
   if (!data) {
     data = "METHOD=SetExpressCheckout" +
-      "&VERSION=124.0" +
+      "&VERSION=50.0" +
       "&USER=sb-fdhqv12110699_api1.business.example.com" +
       "&PWD=LVLCW8JQRMTKAWVV" +
       "&SIGNATURE=AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB" +
@@ -50,7 +50,7 @@ const setExpressCheckout = (data, callback) => {
 
 const setupBillingAgreementWithPayment = (data, callback) => {
 
-  const amount = "13.00";
+  const amount = "555.00";
   globalRepo.amount = amount;
   const config = {
     headers: {}
@@ -93,7 +93,7 @@ const setupBillingAgreementWithPayment = (data, callback) => {
 }
 
 const setupBillingAgreementBeforePayment = (data, callback) => {
-
+  // amount = 0 , no charge yet
   const config = {
     headers: {}
   };
@@ -104,7 +104,7 @@ const setupBillingAgreementBeforePayment = (data, callback) => {
       "&PWD=LVLCW8JQRMTKAWVV" +
       "&SIGNATURE=AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB" +
       "&PAYMENTREQUEST_0_PAYMENTACTION=AUTHORIZATION" +  // #Payment authorization
-      "&PAYMENTREQUEST_0_AMT=25.00" + // #The amount authorized
+      "&PAYMENTREQUEST_0_AMT=00.00" + // #The amount authorized
       "&PAYMENTREQUEST_0_CURRENCYCODE=USD" + //#The currency, e.g. US dollars
       "&L_BILLINGTYPE0=MerchantInitiatedBilling" + // #The type of billing agreement
       "&L_BILLINGAGREEMENTDESCRIPTION0=ClubUsage" + // #The description of the billing agreement

@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 const ppNvpApiHelper = require('../helpers/ppNvpApiHelper');
 
-
+// set express checkout
 router.post('/', (req, res, next) => {
 
   const data = undefined // req.body;
@@ -19,6 +19,7 @@ router.post('/', (req, res, next) => {
   });
 });
 
+// setup BillAgree. before payment
 router.post('/rt', (req, res, next) => {
 
   const data = undefined // req.body;
@@ -33,6 +34,7 @@ router.post('/rt', (req, res, next) => {
   });
 });
 
+// setup BillAgree. with payment
 router.post('/rtco', (req, res, next) => {
 
   const data = undefined // req.body;
@@ -47,6 +49,7 @@ router.post('/rtco', (req, res, next) => {
   });
 });
 
+// create BillAgree. with given token and payerID
 router.post('/rt/ba', (req, res, next) => {
 
   const token = req.body.token;
