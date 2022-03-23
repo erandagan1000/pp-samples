@@ -13,7 +13,7 @@ const btConfigEcbtUK = {
   accessToken: "access_token$sandbox$dc95jmkxp82n6wxj$eec6c23d7ae7a481677df772631d4aa4"
 }
 
-// BT Integration
+// BT full Integration
 const btConfig = {
   environment: braintree.Environment.Sandbox,
   merchantId: "8n5hz5rwnb656jks",
@@ -31,8 +31,20 @@ const btConfig = {
 //   privateKey: process.env.BT_PRIVSTE_KEY // "26303b7ff60ab3ebe401e22b172d972e",
 // };
 
-
+const getMerchantAccountIdByCurrency = function (currency) {
+  let merchantAccountId = undefined;
+  if(currency){
+    console.log(currency);
+    merchantAccountId = currency == 'EUR' ? "eranltd-europe" : "eranltd"; 
+  } 
+  console.log(merchantAccountId);
+  return merchantAccountId;
+}
 
 const gateway = new braintree.BraintreeGateway(btConfig);
 
-module.exports = gateway;
+module.exports = {
+  gateway,
+  getMerchantAccountIdByCurrency
+
+};

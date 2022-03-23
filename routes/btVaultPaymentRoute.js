@@ -1,12 +1,12 @@
 var express = require("express");
-var gateway = require("../helpers/braintreeHelper");
+var btHelper = require("../helpers/braintreeHelper");
 var router = express.Router();
 var randomstring = require("randomstring");
 
 // base route: bt/vault/payment
 // #region Token Functions
 router.get("/client_token", (req, res) => {
-  gateway.clientToken.generate({}).then((response) => {
+  btHelper.gateway.clientToken.generate({}).then((response) => {
     // console.log(response);
     res.send(response.clientToken);
   });
@@ -14,7 +14,7 @@ router.get("/client_token", (req, res) => {
 
 router.get("/client_token/:customerid", (req, res) => {
   const customerId = req.params.customerid;
-  gateway.clientToken.generate({ customerId: customerId }).then((response) => {
+  btHelper.gateway.clientToken.generate({ customerId: customerId }).then((response) => {
     // console.log(response);
     res.send(response.clientToken);
   });
@@ -27,11 +27,16 @@ router.get("/client_token/:customerid", (req, res) => {
 router.post("/checkout", (req, res) => {
   var nonceFromTheClient = req.body.paymentMethodNonce;
   var amount = req.body.amount;
+  const selectedCurrency = req.body.currency;
 
-  gateway.transaction.sale(
+  // set merchantAccountId by selected presntment currency
+  const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
+
+  btHelper.gateway.transaction.sale(
     {
       amount,
       paymentMethodNonce: nonceFromTheClient,
+      merchantAccountId: merchantAccountId,  //if ommitted the default MID (configured on BT console) will be used
       options: {
         submitForSettlement: true,
       },
@@ -46,9 +51,14 @@ router.post("/checkout", (req, res) => {
 
 router.post('/vault', (req, res, next) => {
 
+  const selectedCurrency = req.body.currency;
+  // set merchantAccountId by selected presntment currency
+  const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
+
   const saleRequest = {
     amount: req.body.amount,
     paymentMethodNonce: req.body.paymentMethodNonce,
+    merchantAccountId: merchantAccountId,
     deviceData: req.body.deviceData || '',
     orderId: randomstring.generate(7), //"Mapped to PayPal Invoice Number",
     options: {
@@ -61,7 +71,7 @@ router.post('/vault', (req, res, next) => {
     }
   };
 
-  gateway.transaction.sale(saleRequest).then(result => {
+  btHelper.gateway.transaction.sale(saleRequest).then(result => {
     if (result.success) {
       console.log("Success! Transaction ID: " + result.transaction.id);
       res.status(200).send(result);
@@ -82,11 +92,15 @@ router.post("/checkout/localpaymethod", (req, res) => {
   var amount = req.body.amount;
   var orderId = randomstring.generate(5);
   var descriptorName = "Eran Merchant US";
+  const selectedCurrency = req.body.currency;
+  // set merchantAccountId by selected presntment currency
+  const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
 
-  gateway.transaction.sale(
+  btHelper.gateway.transaction.sale(
     {
       amount,
       paymentMethodNonce: nonceFromTheClient,
+      merchantAccountId: merchantAccountId,
       orderId,
       //descriptorName: descriptorName,
       options: {
@@ -94,14 +108,14 @@ router.post("/checkout/localpaymethod", (req, res) => {
       },
     }).then(result => {
       if (result.success) {
-        
+
         const message = "Success! Transaction ID: " + result.transaction.id;
-        const response = {message, success: result.success, transaction: result.transaction};
+        const response = { message, success: result.success, transaction: result.transaction };
         console.log(response);
         res.status(200).send(response);
       } else {
         const errMessage = "Error:  " + result.message;
-        const errResponse = {message: errMessage, success: result.success, transaction: undefined};
+        const errResponse = { message: errMessage, success: result.success, transaction: undefined };
         console.log(errResponse);
         res.status(400).send(errResponse);
       }
