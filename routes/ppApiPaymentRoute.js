@@ -1,6 +1,9 @@
-// This backend code, can be used when merchant wants to combine using PP SDK 
-// together with merchant API, the client will call merchant API onCreate or onAprove instead of using the builtin createOrder function in the SDK
-// full details here: https://developer.paypal.com/docs/checkout/standard/upgrade-integration/
+// This backend code will be used when merchant wants to use 
+// the AS2 (Authorize/Capture) or AS1 (Order/authorize/Capture) pp settlements model. 
+// full details here: https://developer.paypal.com/docs/archive/payments/orders/
+// Use the Payments REST API to create a PayPal order, which is a purchase that a customer 
+// consents to but for which funds are not placed on hold.
+// typical to merchants that sell physical goods - so they need to check inventory and ship before they charge the customer
 
 const { default: axios } = require('axios');
 const express = require('express');
