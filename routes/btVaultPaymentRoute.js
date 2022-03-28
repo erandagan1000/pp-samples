@@ -4,6 +4,7 @@ var router = express.Router();
 var randomstring = require("randomstring");
 
 // base route: bt/vault/payment
+
 // #region Token Functions
 router.get("/client_token", (req, res) => {
   btHelper.gateway.clientToken.generate({}).then((response) => {

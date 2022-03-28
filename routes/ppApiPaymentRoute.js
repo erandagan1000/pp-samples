@@ -28,8 +28,8 @@ router.get('/create-payment', (req, res, next) => {
       }],
     redirect_urls:
     {
-      return_url: 'https://example.com',
-      cancel_url: 'https://example.com'
+      return_url: 'http://localhost:3000/success',
+      cancel_url: 'http://localhost:3000/cancel'
     }
   }
 

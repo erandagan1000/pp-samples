@@ -44,6 +44,9 @@ router.get('/ppccm', function(req, res, next) {
 router.get('/ppac', function(req, res, next) {
   res.render('ppac', { title: 'PP Rest API - Advanced Checkout' });
 });
+router.get('/ppcort', function(req, res, next) {
+  res.render('ppcoRT', { title: 'PP Rest API - Advanced Checkout With RT',ec_token: req.query.token, ba_token: req.query.ba_token  });
+});
 router.get('/pprt', function(req, res, next) {
   res.render('pprt', { title: 'PP Rest API - Reference Transaction' });
 });
@@ -77,6 +80,10 @@ router.get('/ppnvpicc/cancel', function(req, res, next) {
 });
 
 router.get('/success', function(req, res, next) {
-  res.render('success', { title: 'Transaction completed' });
+  res.render('success', { title: 'Transaction Succeeded' });
+});
+
+router.get('/cancel', function(req, res, next) {
+  res.render('cancel', { title: 'Transaction Cancelled' });
 });
 module.exports = router;

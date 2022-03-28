@@ -86,9 +86,9 @@ const generateBillingAgreementToken = (accessToken, data, callback) => {
         "type": "MERCHANT_INITIATED_BILLING",
         "merchant_preferences":
         {
-          "return_url": "https://example.com/return",
-          "cancel_url": "https://example.com/cancel",
-          "notify_url": "https://example.com/notify",
+          "return_url": "http://localhost:3000/pprt",
+          "cancel_url": "http://localhost:3000/cancel",
+          "notify_url": "http://localhost:3000/pprt",
           "accepted_pymt_type": "INSTANT",
           "skip_shipping_address": false,
           "immutable_shipping_address": true

@@ -95,8 +95,8 @@ router.post('/pay', (req, res, next) => {
       }],
     redirect_urls:
     {
-      return_url: "https://example.com/return",
-      cancel_url: "https://example.com/cancel"
+      return_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel"
     }
   }; 
   /*
@@ -253,5 +253,77 @@ router.post('/billing-agreement/cancel', (req, res, next) => {
   });
 
 });
+
+// full rt flow: generate AccesToken => create BA token  
+router.post('/flow/start', (req, res, next) => {
+
+  ppApiHelperV1.generateAccessToken((data, error) => {
+
+    const accessToken = `Bearer ${data.access_token}`;
+
+    const paymentData = {
+      "description": "Billing Agreement with Rest API",
+      "payer":
+      {
+        "payment_method": "PAYPAL"
+      },
+      "plan":
+      {
+        "type": "MERCHANT_INITIATED_BILLING",
+        "merchant_preferences":
+        {
+          "return_url": "http://localhost:3000/ppcort",
+          "cancel_url": "http://localhost:3000/cancel",
+          "notify_url": "http://localhost:3000/ppcort",
+          "accepted_pymt_type": "INSTANT",
+          "skip_shipping_address": true,
+          "immutable_shipping_address": true
+        }
+      }
+    };
+
+    ppApiHelperV1.generateBillingAgreementToken(accessToken, paymentData, (data, error) => {
+      if (error) {
+        res.status(error.response.status || 500).send(error);
+        return;
+      }
+      console.log(`Billing Agreement Token is: ${data.token_id}`);
+      res.status(200).send(data);
+      return;
+  
+    });
+
+  }); 
+
+  
+
+});
+
+router.post('/flow/create-billing-agreement', (req, res, next) => {
+  
+  const reqData = req.body;  // expecting: {"token_id": "BA-8A802366G0648845Y"}
+
+  ppApiHelperV1.generateAccessToken((data, error) => {
+
+    const accessToken = `Bearer ${data.access_token}`;
+    
+
+    ppApiHelperV1.createBillingAgreement(accessToken, reqData, (data, error) => {
+      if (error) {
+        res.status(error.response.status || 500).send(error);
+        return;
+      }
+      console.log(data);
+      res.status(200).send(data);
+      return;
+  
+    });
+
+  }); 
+
+  
+
+});
+
 
 module.exports = router;
