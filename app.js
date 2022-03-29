@@ -73,8 +73,20 @@ app.use('/ppapi/payout',ppApiPayoutRouter);
 app.use('/ppnvp',ppNvpApiRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function(req, res, next) {  
   next(createError(404));
+});
+
+app.use((req, res, next) => {
+  res.set({
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+      "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+      "Content-Security-Policy": "script-src 'nonce*' 'self' 'unsafe-eval'",
+      "X-Content-Security-Policy": "default-src *",
+      "X-WebKit-CSP": "default-src *"
+  })
+  next();
 });
 
 // error handler
