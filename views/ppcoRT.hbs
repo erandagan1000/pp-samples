@@ -6,129 +6,141 @@
 {{!-- PP Rest API simple --}}
 {{!-- client-id=AeGY.. #App: MerchantApp | Account: eran.m.il@merchant.com (BusinessPro) --}}
 
-<div id="pp-ba-approve-result">
+{{!-- This DIV is relevant if doing manual integration with page redirect- NOT RECOMENDED --}}
+{{!-- <div id="pp-ba-approve-result">
   <p>Details</p>
   <p>EC Token: <span id="ec-token-container">{{ec_token}}</span></p>
   <p>Billing Agreement Token: <span id="ba-id-container">{{ba_token}}</span></p>
   <p><button id="ba-generate" onclick="generateBa()">Generate BA</button></p>
   <p>Billing agreement Create Result:</p>
   <p id="ba-response"></p>
-  <hr>
+</div> --}}
+<p>OnApprove Result - data to send to merchant server</p>
+<div id="pp-rtco-result"></div>
+<hr>
 
-  <script
-    src="https://www.paypal.com/sdk/js?client-id=AeGYWEKwAbpNAOQaBkUyNXAalNwEZ5ialX-niqRbbcdZkLY8t-YuOMBLhDJUTP1JWKmJMMCFAeOWUSzF&currency=USD&components=buttons&vault=true">
-    </script>
+{{!-------------------------------------------------------------------------------}}
+<script
+  src="https://www.paypal.com/sdk/js?client-id=AeGYWEKwAbpNAOQaBkUyNXAalNwEZ5ialX-niqRbbcdZkLY8t-YuOMBLhDJUTP1JWKmJMMCFAeOWUSzF&currency=USD&components=buttons&vault=true">
+  </script>
 
-  <script>
-    var globalAccessToken = "";
-    var globalClientToken = "";
-    var baTokenId = "";
-    var baId = "";
+<script>
+  var globalAccessToken = "";
+  var globalClientToken = "";
+  var baTokenId = "";
+  var baId = "";
 
-    $("#loading-button").show();
+  $("#loading-button").show();
+  paypal.Buttons({
+    style: {
+      layout: "vertical",
+      color: "gold",
+      shape: "rect",
+      label: "paypal",
+      tagline: false,
+      height: 55
+    },
+    createBillingAgreement: function (data, actions) {
+      return baTokenId;
+    },
+    onApprove: function (data, actions) {
+      console.log("The customer approved the Billing Agreement in the PayPal Checkout Flow", { data, actions });
+     
+      $("#pp-rtco-result").jsonViewer(data);
+      // Here we can call the merchant api and save the BA to the merchant DB to gether with the user
+    },
+    onCancel: function () {
+      console.log("The customer cancelled the PayPal Checkout Flow");
+    },
+    onError: function () {
+      console.log("An error occurred.")
+    }
+  }).render('#paypal-button-container').then(function () {
+    $("#loading-button").hide();
+  });
+
+  function generateBaToken() {
+    $.ajax('ppapi/rt/flow/start', {
+      type: 'POST',
+      data: {},
+      success: function (data, status, xhr) {
+        console.log(data);
+        baTokenId = data.token_id;
+        // const approvalUrl = data.links.find(l => l.rel == 'approval_url').href;
+        // if (approvalUrl) {
+        //   window.open(approvalUrl);
+        //  }
+
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
+    });
+  }
+  //start
+  generateBaToken();
+
+
+  // #region Integration using page redirect - NOT RECOMENDED 
+  /* // Integration using page redirect - NOT RECOMENDED
+    
     paypal.Buttons({
-      style: {
-        layout: "vertical",
-        color: "gold",
-        shape: "rect",
-        label: "paypal",
-        tagline: false,
-        height: 55
-      },
-      createBillingAgreement: function (data, actions) {
-        return baTokenId;
-      },
-      onApprove: function (data, actions) {
-        console.log("The customer approved the Billing Agreement in the PayPal Checkout Flow", { data, actions });
-        // Here we can call the merchant api and save the BA to the merchant DB to gether with the user
-      },
-      onCancel: function () {
-        console.log("The customer cancelled the PayPal Checkout Flow");
-      },
-      onError: function () {
-        console.log("An error occurred.")
+  
+      // Sets up the transaction when a payment button is clicked
+      createOrder: function (data, actions) {
+  
+        $.ajax('ppapi/rt/flow/start', {
+          type: 'POST',
+          data: {},
+          success: function (data, status, xhr) {
+            console.log(data);
+            const approvalUrl = data.links.find(l => l.rel == 'approval_url').href;
+            if (approvalUrl) {
+              window.open(approvalUrl);
+            }
+  
+          },
+          error: function (jqXhr, textStatus, errorMessage) {
+            console.log(errorMessage);
+          }
+        });
+  
       }
     }).render('#paypal-button-container').then(function () {
       $("#loading-button").hide();
+    });*/
+
+  function generateBa() {
+    $.ajax('/ppapi/rt/flow/create-billing-agreement', {
+      type: 'POST',
+      data: { token_id: baTokenId },
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#ba-response").html(JSON.stringify(data));
+
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
     });
 
+  }
+  // #endregion
+
+  // #region if manual integration used NOT RECOMENDED
+  // return url after user approve BA
+  // http://localhost:3000/ppcort?token=EC-4H4952447G899934X&ba_token=BA-65L40004CN2398355
+  const spanEcToken = $("#ec-token-container");
+  const spanBaToken = $("#ba-id-container");
+  if (spanEcToken.text().length > 0) {
+    $("#pp-ba-approve-result").css('visibility', 'visible');
+    baTokenId = spanBaToken.text();
+  }
+  else {
+    $("#pp-ba-approve-result").css('visibility', 'hidden');
+  }
+
+    // #endregion
 
 
-    /*
-      paypal.Buttons({
-    
-        // Sets up the transaction when a payment button is clicked
-        createOrder: function (data, actions) {
-    
-          $.ajax('ppapi/rt/flow/start', {
-            type: 'POST',
-            data: {},
-            success: function (data, status, xhr) {
-              console.log(data);
-              const approvalUrl = data.links.find(l => l.rel == 'approval_url').href;
-              if (approvalUrl) {
-                window.open(approvalUrl);
-              }
-    
-            },
-            error: function (jqXhr, textStatus, errorMessage) {
-              console.log(errorMessage);
-            }
-          });
-    
-        }
-      }).render('#paypal-button-container').then(function () {
-        $("#loading-button").hide();
-      });*/
-
-    function generateBaToken() {
-      $.ajax('ppapi/rt/flow/start', {
-            type: 'POST',
-            data: {},
-            success: function (data, status, xhr) {
-              console.log(data);
-              baTokenId = data.token_id;
-              // const approvalUrl = data.links.find(l => l.rel == 'approval_url').href;
-              // if (approvalUrl) {
-             //   window.open(approvalUrl);
-            //  }
-    
-            },
-            error: function (jqXhr, textStatus, errorMessage) {
-              console.log(errorMessage);
-            }
-          });
-    }
-    
-    function generateBa() {
-      $.ajax('/ppapi/rt/flow/create-billing-agreement', {
-        type: 'POST',
-        data: { token_id: baTokenId },
-        success: function (data, status, xhr) {
-          console.log(data);
-          $("#ba-response").html(JSON.stringify(data));
-
-        },
-        error: function (jqXhr, textStatus, errorMessage) {
-          console.log(errorMessage);
-        }
-      });
-
-    }
-
-    //start
-    generateBaToken();
-    
-    // return url after user approve BA
-    // http://localhost:3000/ppcort?token=EC-4H4952447G899934X&ba_token=BA-65L40004CN2398355
-    const spanEcToken = $("#ec-token-container");
-    const spanBaToken = $("#ba-id-container");
-    if (spanEcToken.text().length > 0) {
-      $("#pp-ba-approve-result").css('visibility', 'visible');
-      baTokenId = spanBaToken.text();
-    }
-    else {
-      $("#pp-ba-approve-result").css('visibility', 'hidden');
-    }
-
-  </script>
+</script>
