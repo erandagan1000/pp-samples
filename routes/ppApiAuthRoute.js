@@ -27,6 +27,7 @@ router.post('/accesstoken/generate', (req, res, next) => {
         res.status(500).send(error);
         return;
       }
+      data.merchantName = process.env.PP_MERCHANT_NAME
       res.status(200).send(data);
       return;
 

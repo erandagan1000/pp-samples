@@ -44,6 +44,9 @@ router.get('/ppccm', function(req, res, next) {
 router.get('/ppac', function(req, res, next) {
   res.render('ppac', { title: 'PP Rest API - Advanced Checkout' });
 });
+router.get('/ppac3ds', function(req, res, next) {
+  res.render('ppac3ds', { title: 'PP Rest API - 3D Secure' });
+});
 router.get('/ppcort', function(req, res, next) {
   res.render('ppcoRT', { title: 'PP Rest API - Advanced Checkout With RT',ec_token: req.query.token, ba_token: req.query.ba_token  });
 });
