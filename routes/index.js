@@ -44,6 +44,10 @@ router.get('/ppccm', function(req, res, next) {
 router.get('/ppac', function(req, res, next) {
   res.render('ppac', { title: 'PP Rest API - Advanced Checkout' });
 });
+router.get('/ppacdls', function(req, res, next) {
+  res.render('ppacLoadSdkOnRuntime', { title: 'PP Rest API - Advanced Checkout - Load Client SDK on runtime' });
+});
+
 router.get('/ppac3ds', function(req, res, next) {
   res.render('ppac3ds', { title: 'PP Rest API - 3D Secure' });
 });

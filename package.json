@@ -6,7 +6,9 @@
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www"
   },
+  
   "dependencies": {
+    "@paypal/paypal-js": "^5.0.3",
     "axios": "^0.25.0",
     "braintree": "^3.8.0",
     "cookie-parser": "~1.4.4",
