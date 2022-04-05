@@ -8,11 +8,30 @@
   <link rel="stylesheet" type="text/css" href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/css/cardfields.css"/>
 
   <!-- includes jQuery -->
-  <script src="http://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+  <script src="//code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
    <script src="/scripts/jquery.json-viewer.js"></script>
   <link href="/stylesheets/jquery.json-viewer.css" type="text/css" rel="stylesheet">
 
 </head>
+<style>
+  .apple-pay-set-up-button {
+    height: 70px;
+    width:200px;
+    display: inline-block;
+    -webkit-appearance: -apple-pay-button;
+    -apple-pay-button-type: set-up;
+}
+.apple-pay-set-up-button-black {
+    -apple-pay-button-style: black;
+}
+.apple-pay-set-up-button-white {
+    -apple-pay-button-style: white;
+}
+.apple-pay-setup-button-white-with-line {
+    -apple-pay-button-style: white-outline;
+}
+
+</style>
 {{!-- <style>
   #card-number {
     width: 150px;

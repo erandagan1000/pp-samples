@@ -32,6 +32,9 @@ router.get('/btvenmo', function(req, res, next) {
 router.get('/btach', function(req, res, next) {
   res.render('braintreeAchDirectDebit', { title: 'BrainTree ACH Direct Debit' });
 });
+router.get('/btap', function(req, res, next) {
+  res.render('braintreeApplePay', { title: 'BrainTree Apple Pay' });
+});
 router.get('/ppsc', function(req, res, next) {
   res.render('ppsc', { title: 'PP Rest API - Standard Checkout' });
 });

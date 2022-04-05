@@ -1,0 +1,183 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<hr>
+<!---------------- Apple Pay Button ------------------>
+<div>
+  <div id="apple-pay-button" class="apple-pay-set-up-button apple-pay-setup-button-white-with-line">&nbsp;
+  </div>
+  <div id="support-apple-pay">&nbsp;</div>
+
+</div>
+
+
+<div>
+  {{!-- <button id="generate-token">Generate Access Token</button> --}}
+  <div class="loading" id="loading-token">Generating access token...</div>
+  <div style="inline-size: 1350px;overflow-wrap: break-word; ">
+    <p>Access token: </p>
+    <div id="token" style="font-size: 6pt;"></div>
+  </div>
+
+
+  <div class="loading" id="loading-button">Loading paypal button...</div>
+
+</div>
+<!-------------------- results -------------------->
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>onpaymentauthorized payload: </p>
+  <div id="payment-authorized-payload">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>BT Tokenize message: </p>
+  <div id="bt-tokenize-message">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>Checkout Server result: </p>
+  <div id="checkout-result">&nbsp;</div>
+</div>
+
+<!-- includes the Braintree JS client SDK -->
+<script src="https://js.braintreegateway.com/web/3.85.2/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.85.2/js/apple-pay.min.js"></script>
+
+<script>
+
+  var selectedCurrency = 'USD'   // e.g. EUR or USD
+  var tokenSpan = document.querySelector('#token')
+  var token = undefined;
+  $("#apple-pay-button").hide();
+
+  (function () {
+    $.ajax({
+      type: 'GET',
+      url: '/bt/vault/payment/client_token'
+    }).done(function (result) {
+      // console.log(result);
+      token = result;
+      tokenSpan.innerHTML = `${token}`;
+      $("#loading-token").hide();
+
+      initApplePayCheckout(token);
+    });
+  }());
+
+  // -----------------------------------------------------------------
+
+  // paypal checkout
+  function initApplePayCheckout(token) {
+    $("#loading-button").show();
+    // promise style
+    // Create a client.
+    const applePaySupport = `window.ApplePaySession: ${window.ApplePaySession},ApplePaySession.supportsVersion(3): ${window.ApplePaySession?.supportsVersion(3)}, ApplePaySession.canMakePayments(): ${window.ApplePaySession?.canMakePayments()}`;
+    console.log(applePaySupport);
+    $("#support-apple-pay").text(applePaySupport);
+    if (window.ApplePaySession && window.ApplePaySession.supportsVersion(3) && window.ApplePaySession.canMakePayments()) {
+      // This device supports version 3 of Apple Pay.
+      if (!window.ApplePaySession) {
+        console.error('This device does not support Apple Pay');
+      }
+
+      if (!ApplePaySession.canMakePayments()) {
+        console.error('This device is not capable of making Apple Pay payments');
+      }
+
+      braintree.client.create({
+        authorization: token
+      }).then(function (clientInstance) {
+        return braintree.applePay.create({
+          client: clientInstance
+        });
+      }).then(function (applePayInstance) {
+        // Set up your Apple Pay button here
+        var paymentRequest = applePayInstance.createPaymentRequest({
+          total: {
+            label: 'My Store',
+            amount: '19.99'
+          },
+
+          // We recommend collecting billing address information, at minimum
+          // billing postal code, and passing that billing postal code with
+          // all Apple Pay transactions as a best practice.
+          requiredBillingContactFields: ["postalAddress"]
+        });
+        console.log(paymentRequest.countryCode);
+        console.log(paymentRequest.currencyCode);
+        console.log(paymentRequest.merchantCapabilities);
+        console.log(paymentRequest.supportedNetworks);
+
+        var button = document.querySelector('#apple-pay-button');
+
+        button.addEventListener('click', function (event) {
+
+          event.preventDefault();
+          var session = new ApplePaySession(3, paymentRequest);
+
+          session.onvalidatemerchant = function (event) {
+            applePayInstance.performValidation({
+              validationURL: event.validationURL,
+              displayName: 'My Store'
+            }).then(function (merchantSession) {
+              session.completeMerchantValidation(merchantSession);
+            }).catch(function (validationErr) {
+              // You should show an error to the user, e.g. 'Apple Pay failed to load.'
+              console.error('Error validating merchant:', validationErr);
+              session.abort();
+            });
+          };
+
+          session.onpaymentauthorized = function (event) {
+            var msg = `Your shipping address is: ${event.payment.shippingContact}`;
+            $("#payment-authorized-payload").text(msg);
+            console.log(msg);
+
+            applePayInstance.tokenize({
+              token: event.payment.token
+            }).then(function (payload) {
+              // Send payload.nonce to your server.
+              var msg1 = `nonce: ${payload.nonce}`;
+              console.log(msg1);
+              msg1 = msg1 + `billingPostalCode: ${event.payment.billingContact.postalCode}`;
+
+              // If requested, address information is accessible in event.payment
+              // and may also be sent to your server.
+              console.log('billingPostalCode:', event.payment.billingContact.postalCode);
+              $("#bt-tokenize-message").text(msg1);
+              // After you have transacted with the payload.nonce,
+              // call `completePayment` to dismiss the Apple Pay sheet.
+              session.completePayment(ApplePaySession.STATUS_SUCCESS);
+            }).catch(function (tokenizeErr) {
+              var errMsg = `'Error tokenizing Apple Pay' ${tokenizeErr}`;
+              $("#bt-tokenize-message").text(errMsg);
+              console.error(errMsg);
+              session.completePayment(ApplePaySession.STATUS_FAILURE);
+            });
+          };
+
+
+          session.begin();
+        });
+
+
+
+        console.log(applePayInstance);
+        $("#apple-pay-button").show();
+        $("#loading-button").hide();
+
+
+
+      }).catch(function (err) {
+        // Handle error
+      });
+    }
+    else {
+      $("#apple-pay-button").show();
+      $("#loading-button").hide();
+
+    }
+
+  }
+
+
+</script>
