@@ -23,8 +23,11 @@ router.get('/btvrc', function(req, res, next) {
 router.get('/btlpm', function(req, res, next) {
   res.render('braintreeLocalPaymentMethods', { title: 'BrainTree Local Payment Methods' });
 });
-router.get('/bt', function(req, res, next) {
-  res.render('braintree', { title: 'BrainTree Dropin + Hosted Fields' });
+router.get('/btdihf', function(req, res, next) {
+  res.render('braintreeDropinAndHostedFields', { title: 'BrainTree Dropin + Hosted Fields' });
+});
+router.get('/bt3ds', function(req, res, next) {
+  res.render('braintree3DS', { title: 'BrainTree Dropin + Hosted Fields' });
 });
 router.get('/btvenmo', function(req, res, next) {
   res.render('braintreeVenmo', { title: 'BrainTree Venmo' });
