@@ -39,7 +39,8 @@ router.post('/billing-agreement', (req, res, next) => {
 
   ppApiHelperV1.createBillingAgreement(accessToken, data, (data, error) => {
     if (error) {
-      res.status(error.response.status || 500).send(error);
+      const errorMessage = `API Message: ${error.response.data.details[0].message }`;
+      res.status(200).send();
       return;
     }
     res.status(200).send(data);

@@ -109,7 +109,7 @@
         $("#get-ba-token-details").removeAttr("disabled");
         const links = data.links;
         const approveUrl = links.find((l) => l.rel == "approval_url").href;
-        $("#ba-approve-container").html(`Follow this url to approve BA, before clicking on "Generate BA": <a target='_blank' href="${approveUrl}">Approval Url</a>`);
+        $("#ba-approve-container").html(`<p><b>Follow this url to approve BA, before clicking on "Generate BA": <a target='_blank' href="${approveUrl}">Approval Url</a></b></p>`);
         baTokenId = data.token_id;
 
       },

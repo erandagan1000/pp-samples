@@ -63,6 +63,9 @@ router.get('/ppcort', function(req, res, next) {
 router.get('/pprt', function(req, res, next) {
   res.render('pprt', { title: 'PP Rest API - Reference Transaction' });
 });
+router.get('/pprtrc', function(req, res, next) {
+  res.render('ppRTReturningCustomer', { title: 'PP Rest API - Returning Customer' });
+});
 router.get('/ppvenmo', function(req, res, next) {
   res.render('ppVenmo', { title: 'PP Rest API - Venmo' });
 });

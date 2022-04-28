@@ -54,6 +54,29 @@ const generateClientToken = (accessToken, callback) => {
 
 }
 
+const generateClientTokenWithBillingAgreementId = (accessToken,baId, callback) => {
+
+  const config = {
+    headers: {
+      Authorization: accessToken,
+    }
+  };
+  const data = {"billing_agreement_id": baId};
+  // generate access token, givven merchant credenials
+  axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, config)
+    .then(function (response) {
+      // handle success
+      const data = response.data;
+      callback(data, undefined);
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+      callback(undefined, error)
+    })
+
+}
+
 // #endregion
 
 // #region Billing Agreement Functions
@@ -348,6 +371,7 @@ module.exports = {
   generateAccessToken,
   generateClientToken,
   generateBillingAgreementToken,
+  generateClientTokenWithBillingAgreementId,
   createBillingAgreement,
   createPayment,
   getBillingAgreementDetails,

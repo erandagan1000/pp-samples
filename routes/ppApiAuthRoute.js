@@ -60,5 +60,22 @@ router.post('/clienttoken/generate', (req, res, next) => {
 
 });
 
+// generate client_token with billing-agreement
+router.post('/clienttoken/generate/baid', (req, res, next) => {
+
+  const accessToken = req.headers["authorization"];
+  const baId = req.body.baId;
+  ppApiHelperV1.generateClientTokenWithBillingAgreementId(accessToken,baId, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+
+});
+
 
 module.exports = router;
