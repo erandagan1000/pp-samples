@@ -6,6 +6,7 @@ const test = () => {
 // #region Auth Functions 
 const generateAccessToken = (callback) => {
 
+  console.log(process.env.PP_API_CLIENT_ID);
   const options = {
     auth: {
       username: process.env.PP_API_CLIENT_ID,
