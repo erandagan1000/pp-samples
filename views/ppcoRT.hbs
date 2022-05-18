@@ -83,6 +83,10 @@
 
   // #region Integration using page redirect - NOT RECOMENDED 
   /* // Integration using page redirect - NOT RECOMENDED
+     // When merchant use his own button and create the order by calling his API, and from there make a call to PP Rest API (server2Server).
+     // he procide the return URL and once buyer approve the purchase using his PP account, the page redirect to the return URL with the
+     // EC Token EC=xxxx in queryparameter. Then merchant code needs to take this EC token and send it to server to complete payment
+     // this can be done also in server while user see the loading indicator until all flow completed.  
     
     paypal.Buttons({
   
@@ -127,8 +131,10 @@
   }
   // #endregion
 
-  // #region if manual integration used NOT RECOMENDED
-  // return url after user approve BA
+  // #region MANUAL INTEGRATION - NOT RECOMENDED
+  // When merchant does not want to use the smart button but his own button and call the server to create order or billing agreement and sending the return URL
+  // After user approves, in response he gets the return url (provided by caller) with EC-token and BA-token , in this example it is returned to client, but the return URL can be 
+  // another endpoint which can read the query parameter and complete the transaction (server2Server)
   // http://localhost:3000/ppcort?token=EC-4H4952447G899934X&ba_token=BA-65L40004CN2398355
   const spanEcToken = $("#ec-token-container");
   const spanBaToken = $("#ba-id-container");
