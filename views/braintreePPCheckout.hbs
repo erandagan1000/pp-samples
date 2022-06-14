@@ -2,6 +2,8 @@
 <h1>{{title}}</h1>
 <hr>
 <!---------------- Paypal Button ------------------>
+<div>Amount: <input type="text" id="input-amount" style="width:100px" value="10"></div>
+<div>Currency: <input type="text" id="input-currency" style="width:100px" value="EUR"></div>
 <div>
   <div id="paypal-button"></div>
 </div>
@@ -49,12 +51,33 @@
 
 
 <script>
-  var selectedCurrency = 'USD'   // e.g. EUR or USD
+  
+  var selectedCurrency = 'EUR'   // e.g. EUR or USD
   var tokenSpan = document.querySelector('#token')
   var token = undefined;
-  $("#paypal-button").hide();
+
+  var amountElement = $("#input-amount");
+  var amount = amountElement.val();
+  var currencyElement = $("#input-currency");
+  var currency = currencyElement.val();
+  amountElement.change(function () {
+    amount = amountElement.val();
+    console.log(amount);
+    
+
+  });
+
+   currencyElement.change(function () {
+    selectedCurrency = currencyElement.val();
+    console.log(selectedCurrency);
+    generatePayPalButton();  // required if currency was changed
+
+  });
+
   
-  (function () {
+  $("#paypal-button").hide();
+
+  function generatePayPalButton() {
     $.ajax({
       type: 'GET',
       url: '/bt/vault/payment/client_token'
@@ -66,10 +89,13 @@
 
       initBtPaypalCheckout(token);
     });
-  }());
-  
+  }
+
+  generatePayPalButton();
+
+
   // -----------------------------------------------------------------
-  
+
   // paypal checkout
   function initBtPaypalCheckout(token) {
     $("#loading-button").show();
@@ -88,15 +114,15 @@
         intent: 'capture'
       });
     }).then(function (paypalCheckoutInstance) {
-    
-      
+
+
       return paypal.Buttons({
         fundingSource: paypal.FUNDING.PAYPAL,
 
         createOrder: function () {
           return paypalCheckoutInstance.createPayment({
             flow: 'checkout', // Required
-            amount: '33.00', // Required
+            amount: amount, // Required
             currency: selectedCurrency, // Required, must match the currency passed in with loadPayPalSDK
             intent: 'capture', // Must match the intent passed in with loadPayPalSDK
 
@@ -116,6 +142,7 @@
         },
 
         onApprove: function (data, actions) {
+          
           return paypalCheckoutInstance.tokenizePayment(data).then(function (payload) {
             // Submit `payload.nonce` to your server
             $.ajax({
@@ -123,7 +150,7 @@
               url: '/bt/vault/payment/checkout',
               data: {
                 'paymentMethodNonce': payload.nonce,
-                'amount': '55.00',
+                'amount': amount,
                 'currency': selectedCurrency
 
               }
@@ -138,8 +165,8 @@
                 var serverResultDiv = document.querySelector('#checkout-result');
                 // serverResultDiv.innerHTML = JSON.stringify(result);
                 $("#checkout-result").jsonViewer(result);
-                
-              
+
+
               } else {
                 console.log(result);
                 $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
@@ -165,6 +192,6 @@
       $("#loading-button").hide();
     });
   }
-  
+
 
 </script>

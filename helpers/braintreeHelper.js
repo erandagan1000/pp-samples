@@ -35,7 +35,7 @@ const getMerchantAccountIdByCurrency = function (currency) {
   let merchantAccountId = undefined;
   if(currency){
     console.log(currency);
-    merchantAccountId = currency == 'EUR' ? "eranltd-europe" : "eranltd"; 
+    merchantAccountId = currency == 'EUR' ? "eranltd_EUR" : "eranltd"; 
   } 
   console.log(merchantAccountId);
   return merchantAccountId;
