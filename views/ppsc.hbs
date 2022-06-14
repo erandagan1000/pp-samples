@@ -1,5 +1,6 @@
 <div><a href="/">Home</a></div>
 <h1>{{title}}</h1>
+<div>Amount: <input type="text" id="input-amount" style="width:100px"></div>
 <div class="loading" id="loading-button">Loading paypal button...</div>
 <div id="paypal-button-container"></div>
 <div id="paypal-result-container"></div>
@@ -10,6 +11,16 @@
   </script>
 
 <script>
+  var amountElement = $("#input-amount");
+  var amount = amountElement.val();
+  amountElement.change(function () {
+    
+    amount = amountElement.val();
+    
+    console.log(amount);
+
+  });
+
   $("#loading-button").show();
   paypal.Buttons({
 
@@ -18,7 +29,7 @@
       return actions.order.create({
         purchase_units: [{
           amount: {
-            value: '300.00' // Can reference variables or functions. Example: `value: document.getElementById('...').value`
+            value: amount // Can reference variables or functions. Example: `value: document.getElementById('...').value`
           }
         }]
       });
@@ -40,7 +51,7 @@
         // Or go to another URL:  actions.redirect('thank_you.html');
       });
     }
-  }).render('#paypal-button-container').then(function() {
+  }).render('#paypal-button-container').then(function () {
     $("#loading-button").hide();
   });
 
