@@ -1,6 +1,8 @@
 <div><a href="/">Home</a></div>
 <h1>{{title}}</h1>
-<br />
+<h2><a href="https://developer.paypal.com/braintree/docs/reference/general/testing#valid-card-numbers" target="_blank">Valid Test Cards</a>
+</h2>
+<br/>
 <!----------------- drop-in fields example ---------------------->
 <div>
   <h2>DropIn Quick - <font color="blue">using tokenization key</font>
@@ -213,26 +215,7 @@
   });
 
   // -----------------------------------------------------------------
-
-  // paypal basic checkout
-  {{!-- function createInitializeComponentPaypalCheckout(token) {
-    // promise style
-    // Create a client.
-    braintree.client.create({
-      authorization: token
-    }).then(function (clientInstance) {
-      // Create a PayPal Checkout component.
-      return braintree.paypalCheckout.create({
-        client: clientInstance
-      });
-    }).then(function (paypalCheckoutInstance) {
-      console.log("PayPal SDK Loaded Successfully!!!");
-      // Load the PayPal JS SDK (see Load the PayPal JS SDK section)
-    }).catch(function (err) {
-      // Handle component creation error
-      console.log("Error!!!! Loading PayPal SDK");
-    });
-  } --}}
+ 
   // Hosted fields example
   function createHostedFieldBraintreeInstance(token) {
 
@@ -302,7 +285,7 @@
             // send the nonce to your server.
             alert('Got a nonce: ' + payload.nonce);
             document.getElementById('hf-nonce').value = payload.nonce;
-            document.getElementById('hf_save_for_next_purchase').value =  $("#save-for-next-purchase").val() =='on';
+            document.getElementById('hf_save_for_next_purchase').value =  $("#save-for-next-purchase")[0].checked;
             form.submit();
 
           });
