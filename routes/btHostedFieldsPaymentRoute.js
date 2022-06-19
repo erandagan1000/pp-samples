@@ -32,8 +32,7 @@ router.post("/checkout", (req, res) => {
       },
     },
     (err, result) => {
-      console.log(result.status);
-      const fullResult = `<div><a href="/">Home</a></div><br/><h2>CUSTOMER ID: ${result.transaction.customer.id}</h2><div>${JSON.stringify(result)}</div>`
+        const fullResult = `<div><a href="/">Home</a></div><br/><h2>CUSTOMER ID: ${result.transaction.customer.id}</h2><div>${JSON.stringify(result)}</div>`
         res.send(fullResult);
       
     }

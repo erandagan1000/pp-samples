@@ -26,7 +26,7 @@
 
   <button id="generate-token" style="display:none">generate token</button>
   <span id="token"></span>
-  <div><input type="checkbox" id="use-stored-card" name="use-stored-card">Use Stored Card (customerId: 894738055)</div>
+  <div><input type="checkbox" id="use-stored-card" name="use-stored-card">Use Stored Card (Create clinet token with customerId)<input type="text" style="width: 180px" name="customer-id" id="customer-id" value="894738055"></div>
   <form id="payment-form" action="bt/hf/payment/checkout" method="post">
     <!-- Putting the empty container you plan to pass to
       `braintree.dropin.create` inside a form will make layout and flow
@@ -150,7 +150,12 @@
   // -----------------------------------------------------------------
   // client server example
   // -----------------------------------------------------------------
-  var customerId = '894738055';  // customerId with saved credit card as payment method in vault
+  var customerInput =  $("#customer-id")   // customerId with saved credit card as payment method in vault
+  customerInput.keyup(function() {
+    customerId = customerInput.val();
+    console.log("key up");
+    console.log(customerId);
+  });
   var tokenSpan = document.querySelector('#token')
   var token = undefined;
   var button1 = document.querySelector('#generate-token');
@@ -204,6 +209,7 @@
 
   var checkBoxUseStoredCard = $("#use-stored-card");
   checkBoxUseStoredCard.change(function(event){
+    console.log("checkboxChanged");
     var generateClientTokenWithCustomerId = checkBoxUseStoredCard[0].checked;
     if(generateClientTokenWithCustomerId) {
       generateClientTokenUrl = `/bt/vault/payment/client_token/${customerId}`
