@@ -11,14 +11,12 @@ router.get("/client_token", (req, res) => {
 
 router.post("/checkout", (req, res) => {
   var nonceFromTheClient = req.body.payment_method_nonce;
+  var storeInVault =  (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || false; 
 
   // set merchantAccountId by selected presntment currency
   const selectedCurrency = req.body.currency;
-  let merchantAccountId = undefined;
-  if(selectedCurrency){
-    console.log(selectedCurrency);
-    merchantAccountId = selectedCurrency == 'EUR' ? "eranltd-europe" : "eranltd"; 
-  } 
+  const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
+ 
   console.log(merchantAccountId);
 
   btHelper.gateway.transaction.sale(
@@ -27,8 +25,10 @@ router.post("/checkout", (req, res) => {
       paymentMethodNonce: nonceFromTheClient,
       merchantAccountId: merchantAccountId,  //if ommitted the default MID (configured on BT console) will be used
       // deviceData: deviceDataFromTheClient,
+      
       options: {
         submitForSettlement: true,
+        storeInVaultOnSuccess: storeInVault,
       },
     },
     (err, result) => {

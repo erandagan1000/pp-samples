@@ -69,7 +69,8 @@ router.post('/vault', (req, res, next) => {
         customField: "PayPal custom field",
         description: "Description for PayPal email receipt",
       },
-    }
+    },
+    customer: {}
   };
 
   btHelper.gateway.transaction.sale(saleRequest).then(result => {

@@ -32,7 +32,7 @@ const btConfig = {
 // };
 
 const getMerchantAccountIdByCurrency = function (currency) {
-  let merchantAccountId = undefined;
+  let merchantAccountId =  "eranltd";
   if(currency){
     console.log(currency);
     merchantAccountId = currency == 'EUR' ? "eranltd_EUR" : "eranltd"; 
