@@ -30,10 +30,10 @@ router.get('/creditcard/:id', (req, res, next) => {
     expirationDate: '06/2024',
     cvv: '100'
   };
-  btHelper.creditCardCreate(creditCardParams).then(function (data) {
+  btHelper.creditCardCreate(creditCardParams).then(function (savedCard) {
     
-    console.log(data);
-    res.status(200).send(data);
+    console.log(savedCard);
+    res.status(200).send(savedCard);
   })
     .catch(function (error) {
       // handle error
