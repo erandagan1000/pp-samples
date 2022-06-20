@@ -34,17 +34,30 @@ const btConfig = {
 const getMerchantAccountIdByCurrency = function (currency) {
   let merchantAccountId =  "eranltd";
   if(currency){
-    console.log(currency);
     merchantAccountId = currency == 'EUR' ? "eranltd_EUR" : "eranltd"; 
   } 
-  console.log(merchantAccountId);
   return merchantAccountId;
 }
+
+const getCustomerById = function (customerId) {
+   
+  return gateway.customer.find(customerId);
+}
+
+const creditCardCreate = function (creditCardParams) {
+   
+  return gateway.creditCard.create(creditCardParams);
+}
+
+
+
 
 const gateway = new braintree.BraintreeGateway(btConfig);
 
 module.exports = {
   gateway,
-  getMerchantAccountIdByCurrency
+  getMerchantAccountIdByCurrency,
+  getCustomerById,
+  creditCardCreate
 
 };

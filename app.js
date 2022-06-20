@@ -15,6 +15,7 @@ var ppApiRtRouter = require('./routes/ppApiReferenceTransactionRoute');
 var ppApiPayoutRouter = require('./routes/ppApiPayoutRoute');
 
 //braintree
+var btCommonRouter = require('./routes/btCommonRoute');
 var btDropInCheckoutRouter = require('./routes/btDropInCheckoutRoute');
 var btHostedFieldsPaymentRouter = require('./routes/btHostedFieldsPaymentRoute');
 var btVaultPaymentRouter = require('./routes/btVaultPaymentRoute');
@@ -60,6 +61,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 // bt
+app.use('/bt', btCommonRouter);
 app.use('/bt/di/checkout', btDropInCheckoutRouter);
 app.use('/bt/hf/payment', btHostedFieldsPaymentRouter);
 app.use('/bt/vault/payment', btVaultPaymentRouter);

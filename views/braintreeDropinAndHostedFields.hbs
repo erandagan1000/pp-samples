@@ -151,6 +151,7 @@
   // client server example
   // -----------------------------------------------------------------
   var customerInput =  $("#customer-id")   // customerId with saved credit card as payment method in vault
+  var customerId = customerInput.val();
   customerInput.keyup(function() {
     customerId = customerInput.val();
     console.log("key up");
