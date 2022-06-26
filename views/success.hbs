@@ -21,34 +21,47 @@
     if (token) {
         console.log(token);
         let apiMethodUrl = '';
-        if (isRt && payerId) {
-            apiMethodUrl = '/ppnvp/rt/ba';
-        }
-        else {
+        let runServerCall = true;
+
+        if (!isRt) {
             apiMethodUrl = '/ppnvp/doec';
         }
+        else if (isRt && payerId) {
+            apiMethodUrl = '/ppnvp/rt/ba';
+        }
 
-        $.ajax({
-            type: 'POST',
-            url: apiMethodUrl,
-            data: { 'token': token, 'payerId': payerId }
-        }).done(function (result) {
+        else {
+            runServerCall = false;
+            $('#checkout-message').html('<h1>Success</h1><p>NVP transaction succeeded</h1>');
 
-            debugger;
-            if (result.data) {
-                const arr = result.data;
-                let html = '';
-                for (var i = 0; i < arr.length; i++) {
-                    html = html + `<div>${arr[i].replace('%2d', '-')}</div>`;
+        }
 
+        if (runServerCall) {
+            $.ajax({
+                type: 'POST',
+                url: apiMethodUrl,
+                data: { 'token': token, 'payerId': payerId }
+            }).done(function (result) {
+
+                debugger;
+                if (result.data) {
+                    const arr = result.data;
+                    let html = '';
+                    for (var i = 0; i < arr.length; i++) {
+                        html = html + `<div>${arr[i].replace('%2d', '-')}</div>`;
+
+                    }
+
+                    $('#checkout-message').html('<h1>Success</h1><p>NVP transaction succeeded</h1>' + html);
+                } else {
+                    console.log(result);
+                    $('#checkout-message').html('<h1>Failed</h1><p>NVP transaction failed</h1>');
                 }
+            });
 
-                $('#checkout-message').html('<h1>Success</h1><p>NVP transaction succeeded</h1>' + html);
-            } else {
-                console.log(result);
-                $('#checkout-message').html('<h1>Failed</h1><p>NVP transaction failed</h1>');
-            }
-        });
+        }
+
+
 
 
 
