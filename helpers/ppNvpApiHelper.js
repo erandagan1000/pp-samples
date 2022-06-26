@@ -67,7 +67,7 @@ const setupBillingAgreementWithPayment = (data, callback) => {
       "&PAYMENTREQUEST_0_AMT=" + amount + // #The amount authorized
       "&PAYMENTREQUEST_0_CURRENCYCODE=USD" + //#The currency, e.g. US dollars
       "&L_BILLINGTYPE0=MerchantInitiatedBilling" + // #The type of billing agreement
-      "&L_BILLINGAGREEMENTDESCRIPTION0=ClubUsage" + // #The description of the billing agreement
+      "&L_BILLINGAGREEMENTDESCRIPTION0=This is the description of the Billing Agreement " + // #The description of the billing agreement
       "&cancelUrl=http://localhost:3000/ppnvpicc/cancel" + // #For use if the consumer decides not to proceed with payment
       "&returnUrl=http://localhost:3000/ppnvpicc/success?rt=1"; // #For use if the consumer proceeds with payment
 
@@ -109,7 +109,7 @@ const setupBillingAgreementBeforePayment = (data, callback) => {
       "&PAYMENTREQUEST_0_AMT=00.00" + // #The amount authorized
       "&PAYMENTREQUEST_0_CURRENCYCODE=USD" + //#The currency, e.g. US dollars
       "&L_BILLINGTYPE0=MerchantInitiatedBilling" + // #The type of billing agreement
-      "&L_BILLINGAGREEMENTDESCRIPTION0=ClubUsage" + // #The description of the billing agreement
+      "&L_BILLINGAGREEMENTDESCRIPTION0=This is the description of the Billing Agreement" + // #The description of the billing agreement
       "&cancelUrl=http://localhost:3000/ppnvpicc/cancel" + // #For use if the consumer decides not to proceed with payment
       "&returnUrl=http://localhost:3000/ppnvpicc/success?rt=1"; // #For use if the consumer proceeds with payment
 
@@ -134,7 +134,7 @@ const setupBillingAgreementBeforePayment = (data, callback) => {
 
 const createBillingAgreement = (token, payerId, callback) => {
   console.log(globalRepo);
-
+  var amount = globalRepo.amount || 0; 
   const config = {
     headers: {}
   };
@@ -144,22 +144,27 @@ const createBillingAgreement = (token, payerId, callback) => {
     "&USER=sb-fdhqv12110699_api1.business.example.com" +
     "&PWD=LVLCW8JQRMTKAWVV" +
     "&SIGNATURE=AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB" +
-    "&AMT=444" +
+    "&AMT=" + amount +
     "&TOKEN=" + token;
-
-
-
-
 
   // NVP setExpressCheckout 
   axios.post('https://api-3t.sandbox.paypal.com/nvp', data, config)
     .then(function (response) {
       // handle success
-      const data = response.data; // e.g. data = BILLINGAGREEMENTID=B%2d7FB31251F28061234&ACK=Success
-      const arr = data.split('&');
-      // const baId = arr[0].split('=')[1];
+      const baResult = response.data; // e.g. data = BILLINGAGREEMENTID=B%2d7FB31251F28061234&ACK=Success
+     
       console.log(globalRepo);
-      capturePurchase(token, payerId, globalRepo.amount, callback);
+      console.log(baResult);
+      if(payerId) {
+        capturePurchase(token, payerId, globalRepo.amount, callback);
+      }
+      else{
+        
+      const arr = baResult.split("&");
+      const responseData = {data: arr};
+        callback(responseData);
+      }
+      
 
     })
     .catch(function (error) {

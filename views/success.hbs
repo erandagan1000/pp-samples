@@ -21,7 +21,6 @@
     if (token) {
         console.log(token);
         let apiMethodUrl = '';
-        let runServerCall = true;
 
         if (!isRt) {
             apiMethodUrl = '/ppnvp/doec';
@@ -31,35 +30,33 @@
         }
 
         else {
-            runServerCall = false;
-            $('#checkout-message').html('<h1>Success</h1><p>NVP transaction succeeded</h1>');
-
+            apiMethodUrl = '/ppnvp/rt/ba';
         }
 
-        if (runServerCall) {
-            $.ajax({
-                type: 'POST',
-                url: apiMethodUrl,
-                data: { 'token': token, 'payerId': payerId }
-            }).done(function (result) {
 
-                debugger;
-                if (result.data) {
-                    const arr = result.data;
-                    let html = '';
-                    for (var i = 0; i < arr.length; i++) {
-                        html = html + `<div>${arr[i].replace('%2d', '-')}</div>`;
+        $.ajax({
+            type: 'POST',
+            url: apiMethodUrl,
+            data: { 'token': token, 'payerId': payerId }
+        }).done(function (result) {
 
-                    }
+            
+            if (result.data) {
+                const arr = result.data;
+                let html = '';
+                for (var i = 0; i < arr.length; i++) {
+                    html = html + `<div>${arr[i].replace('%2d', '-')}</div>`;
 
-                    $('#checkout-message').html('<h1>Success</h1><p>NVP transaction succeeded</h1>' + html);
-                } else {
-                    console.log(result);
-                    $('#checkout-message').html('<h1>Failed</h1><p>NVP transaction failed</h1>');
                 }
-            });
 
-        }
+                $('#checkout-message').html('<h1>Success</h1><p>NVP transaction succeeded</h1>' + html);
+            } else {
+                console.log(result);
+                $('#checkout-message').html('<h1>Failed</h1><p>NVP transaction failed</h1>');
+            }
+        });
+
+
 
 
 
