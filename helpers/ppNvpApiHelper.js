@@ -16,6 +16,8 @@ const test = () => {
 
 // #region Checkout Functions
 const setExpressCheckout = (data, callback) => {
+  const amount = "444.00";
+  globalRepo.amount = amount;
 
   const config = {
     headers: {}
@@ -26,7 +28,7 @@ const setExpressCheckout = (data, callback) => {
       "&USER=sb-fdhqv12110699_api1.business.example.com" +
       "&PWD=LVLCW8JQRMTKAWVV" +
       "&SIGNATURE=AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB" +
-      "&AMT=33" +
+      "&AMT=" + amount +
       "&cancelUrl=http://localhost:3000/ppnvpicc/cancel" +
       "&returnUrl=http://localhost:3000/ppnvpicc/success";
 
@@ -67,7 +69,7 @@ const setupBillingAgreementWithPayment = (data, callback) => {
       "&L_BILLINGTYPE0=MerchantInitiatedBilling" + // #The type of billing agreement
       "&L_BILLINGAGREEMENTDESCRIPTION0=ClubUsage" + // #The description of the billing agreement
       "&cancelUrl=http://localhost:3000/ppnvpicc/cancel" + // #For use if the consumer decides not to proceed with payment
-      "&returnUrl=http://localhost:3000/ppnvpicc/success"; // #For use if the consumer proceeds with payment
+      "&returnUrl=http://localhost:3000/ppnvpicc/success?rt=1"; // #For use if the consumer proceeds with payment
 
 
   }
@@ -109,7 +111,7 @@ const setupBillingAgreementBeforePayment = (data, callback) => {
       "&L_BILLINGTYPE0=MerchantInitiatedBilling" + // #The type of billing agreement
       "&L_BILLINGAGREEMENTDESCRIPTION0=ClubUsage" + // #The description of the billing agreement
       "&cancelUrl=http://localhost:3000/ppnvpicc/cancel" + // #For use if the consumer decides not to proceed with payment
-      "&returnUrl=http://localhost:3000/ppnvpicc/success"; // #For use if the consumer proceeds with payment
+      "&returnUrl=http://localhost:3000/ppnvpicc/success?rt=1"; // #For use if the consumer proceeds with payment
 
 
 
@@ -142,6 +144,7 @@ const createBillingAgreement = (token, payerId, callback) => {
     "&USER=sb-fdhqv12110699_api1.business.example.com" +
     "&PWD=LVLCW8JQRMTKAWVV" +
     "&SIGNATURE=AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB" +
+    "&AMT=444" +
     "&TOKEN=" + token;
 
 
@@ -169,6 +172,7 @@ const createBillingAgreement = (token, payerId, callback) => {
 
 const capturePurchase = (token, payerId, amount, callback) => {
   console.log(globalRepo);
+  if(amount == 0 || !amount) { amount = globalRepo.amount};
   const config = {
     headers: {}
   };
@@ -210,7 +214,8 @@ module.exports = {
   setExpressCheckout,
   setupBillingAgreementWithPayment,
   setupBillingAgreementBeforePayment,
-  createBillingAgreement
+  createBillingAgreement,
+  capturePurchase
 
 
 };

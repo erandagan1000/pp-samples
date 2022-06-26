@@ -4,21 +4,19 @@
 
 <script>
   window.paypalCheckoutReady = function () {
+    // BVKWTJDWMSX48 -> accountId as it appears in PP developer portal -> account (business) details -> profile
     paypal.checkout.setup('BVKWTJDWMSX48', {
       environment: 'sandbox',
       locale: 'en_US',
-      buttons: [
-        { container: 'my-container', type: 'checkout', color: 'gold' }
-
-      ],
-      // container: 'my-container',
+      buttons: [{ container: 'my-container', type: 'checkout', color: 'gold' }],
       click: function (event) {
         event.preventDefault();
         paypal.checkout.initXO();
+      
         $.support.cors = true;
 
         $.ajax({
-          url: "/ppnvp",
+          url: "/ppnvp/ec",  //setExpressCheckout
           type: "POST",
           data: undefined,  //'&ajax=1&onlytoken=1',
           async: true,
@@ -28,6 +26,7 @@
           success: function (token) {
             var url = paypal.checkout.urlPrefix + token;
             //Loading Mini browser with redirect url, true for async AJAX calls
+            console.log("NVP Success Url:" + url);
             paypal.checkout.startFlow(url);
           },
           error: function (responseData, textStatus, errorThrown) {

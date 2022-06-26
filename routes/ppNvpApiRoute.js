@@ -3,7 +3,7 @@ const router = express.Router();
 const ppNvpApiHelper = require('../helpers/ppNvpApiHelper');
 
 // set express checkout
-router.post('/', (req, res, next) => {
+router.post('/ec', (req, res, next) => {
 
   const data = undefined // req.body;
   ppNvpApiHelper.setExpressCheckout(data ,(data, error) => {
@@ -16,6 +16,23 @@ router.post('/', (req, res, next) => {
 
   });
 });
+
+router.post('/doec', (req, res, next) => {
+
+  const payload = req.body;
+  var amount = 0 ;
+  ppNvpApiHelper.capturePurchase(payload.token, payload.payerId, amount ,(data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
+
+
 
 // setup BillAgree. before payment
 router.post('/rt', (req, res, next) => {

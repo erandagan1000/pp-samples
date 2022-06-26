@@ -5,37 +5,53 @@
 
 <p>PayerID: <span id="payer-id-container">{{payer}}</span></p>
 <hr>
-<p id="checkout-message"><font style="font-size:18pt">Waiting for results...</font></p>
+<p id="checkout-message">
+    <font style="font-size:18pt">Waiting for results...</font>
+</p>
 
 <script>
     const tokenContainer = $("#token-container");
     const token = tokenContainer.text();
     const payerIdContainer = $("#payer-id-container");
     const payerId = payerIdContainer.text();
+    console.log(window.location.href);
+    var isRt = window.location.href.indexOf("?rt=1") > -1;
+
+
     if (token) {
         console.log(token);
+        let apiMethodUrl = '';
+        if (isRt && payerId) {
+            apiMethodUrl = '/ppnvp/rt/ba';
+        }
+        else {
+            apiMethodUrl = '/ppnvp/doec';
+        }
 
         $.ajax({
             type: 'POST',
-            url: '/ppnvp/rt/ba',
+            url: apiMethodUrl,
             data: { 'token': token, 'payerId': payerId }
         }).done(function (result) {
-                
 
+            debugger;
             if (result.data) {
                 const arr = result.data;
-                let html ='';
-                for(var i=0;i < arr.length; i++){
-                    html = html + `<div>${arr[i].replace('%2d','-')}</div>`;
+                let html = '';
+                for (var i = 0; i < arr.length; i++) {
+                    html = html + `<div>${arr[i].replace('%2d', '-')}</div>`;
 
                 }
-                
-                $('#checkout-message').html('<h1>Success</h1><p>RT transaction succeeded</h1>'+html);
+
+                $('#checkout-message').html('<h1>Success</h1><p>NVP transaction succeeded</h1>' + html);
             } else {
                 console.log(result);
-                $('#checkout-message').html('<h1>Failed</h1><p>RT transaction failed</h1>');
+                $('#checkout-message').html('<h1>Failed</h1><p>NVP transaction failed</h1>');
             }
         });
+
+
+
     }
 
 
