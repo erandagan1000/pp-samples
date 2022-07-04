@@ -33,6 +33,10 @@
   <div id="bt-tokenize-message">&nbsp;</div>
 </div>
 
+<!-------------------- log -------------------->
+<div id="log">&nbsp;</div>
+
+
 <div style="inline-size: 1350px;overflow-wrap: break-word; ">
   <p>Checkout Server result: </p>
   <div id="checkout-result">&nbsp;</div>
@@ -45,8 +49,10 @@
 <script>
 
   var selectedCurrency = 'USD'   // e.g. EUR or USD
+  var amount = '25.22';
   var tokenSpan = document.querySelector('#token')
   var token = undefined;
+  var logElem = $("#log");
   $("#apple-pay-button").hide();
 
   (function () {
@@ -70,17 +76,19 @@
     $("#loading-button").show();
     // promise style
     // Create a client.
-    const applePaySupport = `window.ApplePaySession: ${window.ApplePaySession},ApplePaySession.supportsVersion(3): ${window.ApplePaySession?.supportsVersion(3)}, ApplePaySession.canMakePayments(): ${window.ApplePaySession?.canMakePayments()}`;
-    console.log(applePaySupport);
-    $("#support-apple-pay").text(applePaySupport);
+    const applePaySupport = `window.ApplePaySession: ${window.ApplePaySession},<br/>ApplePaySession.supportsVersion(3): ${window.ApplePaySession?.supportsVersion(3)}, <br/>ApplePaySession.canMakePayments(): ${window.ApplePaySession?.canMakePayments()}`;
+    logElem.append(`<div>${applePaySupport}</div>`);
+    // $("#support-apple-pay").text(applePaySupport);
     if (window.ApplePaySession && window.ApplePaySession.supportsVersion(3) && window.ApplePaySession.canMakePayments()) {
       // This device supports version 3 of Apple Pay.
       if (!window.ApplePaySession) {
         console.error('This device does not support Apple Pay');
+        logElem.append(`<font color="red">This device does not support Apple Pay</font>`);
       }
 
       if (!ApplePaySession.canMakePayments()) {
         console.error('This device is not capable of making Apple Pay payments');
+        logElem.append(`<font color="red">This device is not capable of making Apple Pay payments</font>`);
       }
 
       braintree.client.create({
@@ -93,8 +101,8 @@
         // Set up your Apple Pay button here
         var paymentRequest = applePayInstance.createPaymentRequest({
           total: {
-            label: 'My Store',
-            amount: '19.99'
+            label: 'My Amazing Store',
+            amount: amount
           },
 
           // We recommend collecting billing address information, at minimum
@@ -102,10 +110,12 @@
           // all Apple Pay transactions as a best practice.
           requiredBillingContactFields: ["postalAddress"]
         });
-        console.log(paymentRequest.countryCode);
-        console.log(paymentRequest.currencyCode);
-        console.log(paymentRequest.merchantCapabilities);
-        console.log(paymentRequest.supportedNetworks);
+        
+        logElem.append(`<div>CountryCode: ${paymentRequest.countryCode}</div>`);;
+        logElem.append(`<div>CurrencyCode: ${paymentRequest.currencyCode}</div>`);
+        logElem.append(`<div>Merchant Capabilities: ${paymentRequest.merchantCapabilities}</div>`);
+        logElem.append(`<div>Supported Networks: ${paymentRequest.supportedNetworks}</div>`);
+      
 
         var button = document.querySelector('#apple-pay-button');
 
@@ -135,24 +145,56 @@
             applePayInstance.tokenize({
               token: event.payment.token
             }).then(function (payload) {
-              // Send payload.nonce to your server.
-              var msg1 = `nonce: ${payload.nonce}`;
-              console.log(msg1);
-              msg1 = msg1 + `billingPostalCode: ${event.payment.billingContact.postalCode}`;
 
+              // print callback payload.
+              var msg1 = `nonce: ${payload.nonce}`;
+              msg1 = msg1 + `billingPostalCode: ${event.payment.billingContact.postalCode}`;
+              logElem.append(`<div>${msg1}</div>`);
               // If requested, address information is accessible in event.payment
               // and may also be sent to your server.
-              console.log('billingPostalCode:', event.payment.billingContact.postalCode);
+             
               $("#bt-tokenize-message").text(msg1);
-              // After you have transacted with the payload.nonce,
-              // call `completePayment` to dismiss the Apple Pay sheet.
-              session.completePayment(ApplePaySession.STATUS_SUCCESS);
-            }).catch(function (tokenizeErr) {
-              var errMsg = `'Error tokenizing Apple Pay' ${tokenizeErr}`;
-              $("#bt-tokenize-message").text(errMsg);
-              console.error(errMsg);
-              session.completePayment(ApplePaySession.STATUS_FAILURE);
+
+              // Send payload.nonce to your server.
+              $.ajax({
+                type: 'POST',
+                url: '/bt/vault/payment/checkout',
+                data: {
+                  'paymentMethodNonce': payload.nonce,
+                  'amount': amount,
+                  'currency': selectedCurrency
+
+                }
+              }).done(function (result) {
+
+                if (result.success) {
+
+                  $('#checkout-message').html('<h1>Success</h1><p><a href="/">Home</a></p>');
+
+                  var serverResultDiv = document.querySelector('#checkout-result');
+                  $("#checkout-result").jsonViewer(result);
+
+
+                } else {
+                  logElem.append(`<div>Result Error: ${result}</div>`);
+                  $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+                  $("#checkout-result").jsonViewer(result);
+                }
+
+                // After you have transacted with the payload.nonce,
+                // call `completePayment` to dismiss the Apple Pay sheet.
+                session.completePayment(ApplePaySession.STATUS_SUCCESS);
+              }).catch(function (tokenizeErr) {
+                var errMsg = `'Error tokenizing Apple Pay' ${tokenizeErr}`;
+                $("#bt-tokenize-message").text(errMsg);
+                console.error(errMsg);
+                session.completePayment(ApplePaySession.STATUS_FAILURE);
+              });
+
+
             });
+
+
           };
 
 

@@ -49,7 +49,15 @@ const creditCardCreate = function (creditCardParams) {
   return gateway.creditCard.create(creditCardParams);
 }
 
+const customerCreate = function (customer) {
+   
+  return gateway.customer.create(customer);
+}
 
+const paymentMetohdCreate = function (pmMethoParams) {
+   
+  return gateway.paymentMethod.create(pmMethoParams);
+}
 
 
 const gateway = new braintree.BraintreeGateway(btConfig);
@@ -58,6 +66,9 @@ module.exports = {
   gateway,
   getMerchantAccountIdByCurrency,
   getCustomerById,
-  creditCardCreate
+  creditCardCreate,
+  customerCreate,
+  paymentMetohdCreate
+
 
 };

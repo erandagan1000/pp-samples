@@ -6,11 +6,11 @@ const btHelper = require("../helpers/braintreeHelper");
 // base route: /bt
 
 router.get('/customer/:id', (req, res, next) => {
-  
+
   const customerId = req.params.id;
   btHelper.getCustomerById(customerId).then(function (customer) {
-    
-    
+
+
     res.status(200).send(customer);
   })
     .catch(function (error) {
@@ -22,7 +22,7 @@ router.get('/customer/:id', (req, res, next) => {
 });
 
 router.get('/creditcard/:id', (req, res, next) => {
-  
+
   const customerId = req.params.id;
   let creditCardParams = {
     customerId,
@@ -31,7 +31,7 @@ router.get('/creditcard/:id', (req, res, next) => {
     cvv: '100'
   };
   btHelper.creditCardCreate(creditCardParams).then(function (savedCard) {
-    
+
     console.log(savedCard);
     res.status(200).send(savedCard);
   })
@@ -40,6 +40,41 @@ router.get('/creditcard/:id', (req, res, next) => {
       console.log(error);
       res.status(500).send(error);
     })
+
+});
+
+router.post('/vault/customer', (req, res, next) => {
+
+  const nonce = req.body.paymentMethodNonce;
+  var customer = {
+    firstName: "Jen",
+    lastName: "Smith",
+    company: "Braintree",
+    email: "jen@example.com",
+    phone: "312.555.1234",
+    fax: "614.555.5678",
+    website: "www.example.com"
+  };
+  btHelper.customerCreate(customer).then(function (savedCustomer) {
+
+    console.log(savedCustomer);
+    btHelper.paymentMetohdCreate({
+      customerId: savedCustomer.customer.id,
+      paymentMethodNonce: nonce
+    }).then(function (savedPaymentMethod) {
+      res.status(200).send(savedPaymentMethod);
+
+    }).catch(function (error) {
+      // handle error
+      console.log(error);
+      res.status(500).send(error);
+    });
+  })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+      res.status(500).send(error);
+    });
 
 });
 

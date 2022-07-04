@@ -126,10 +126,9 @@
 
             $.ajax({
               type: 'POST',
-              url: '/bt/vault/payment/vault',
+              url: '/bt/vault/customer',
               data: {
-                'paymentMethodNonce': payload.nonce,
-                'amount': '55.00'
+                'paymentMethodNonce': payload.nonce                
 
               }
             }).done(function (result) {
