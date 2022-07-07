@@ -16,7 +16,9 @@
   <p id="ba-response"></p>
 </div> --}}
 <p>OnApprove Result - data to send to merchant server</p>
-<div id="pp-rtco-result"></div>
+<div id="pp-rtco-on-approve-result"></div>
+<p>Server Result - response from merchant server - post BA creation</p>
+<div id="pp-rtco-server-result"></div>
 <hr>
 
 {{!-------------------------------------------------------------------------------}}
@@ -41,13 +43,36 @@
       height: 55
     },
     createBillingAgreement: function (data, actions) {
+      console.log(data, baTokenId) ;
       return baTokenId;
     },
     onApprove: function (data, actions) {
       console.log("The customer approved the Billing Agreement in the PayPal Checkout Flow", { data, actions });
-     
-      $("#pp-rtco-result").jsonViewer(data);
-      // Here we can call the merchant api and save the BA to the merchant DB to gether with the user
+
+      $("#pp-rtco-on-approve-result").jsonViewer(data);
+
+      // Here we can call the merchant api and save the BA to the merchant DB together with the user.
+      let authStr = globalAccessToken;
+      if (globalAccessToken.indexOf('Bearer') == -1) {
+        authStr = `Bearer ${globalAccessToken}`;
+      }
+
+      console.log('data.billingToken',data.billingToken);
+      $.ajax('/ppapi/rt/billing-agreement', {
+        type: 'POST',
+        headers: {'Authorization': authStr},
+        // headers: undefined,
+        data: { token_id: data.billingToken },
+        success: function (data, status, xhr) {
+          console.log(data);
+          $("#pp-rtco-server-result").jsonViewer(data);
+
+        },
+        error: function (jqXhr, textStatus, errorMessage) {
+          console.log(errorMessage);
+        }
+      });
+
     },
     onCancel: function () {
       console.log("The customer cancelled the PayPal Checkout Flow");
@@ -66,6 +91,7 @@
       success: function (data, status, xhr) {
         console.log(data);
         baTokenId = data.token_id;
+        globalAccessToken = data.accessToken;
         // const approvalUrl = data.links.find(l => l.rel == 'approval_url').href;
         // if (approvalUrl) {
         //   window.open(approvalUrl);

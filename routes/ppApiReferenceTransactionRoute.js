@@ -34,7 +34,7 @@ router.post('/billing-agreement-token/generate', (req, res, next) => {
 
 router.post('/billing-agreement', (req, res, next) => {
 
-  const accessToken = req.headers["authorization"];
+  const accessToken = req.headers ? req.headers["authorization"] : undefined;
   const data = req.body;  // expecting: {"token_id": "BA-8A802366G0648845Y"}
 
   ppApiHelperV1.createBillingAgreement(accessToken, data, (data, error) => {
@@ -53,6 +53,7 @@ router.post('/billing-agreement', (req, res, next) => {
 router.post('/pay', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
+  
   const data = req.body; 
   let baId = data.baId;
   let paymentPayload = {
@@ -289,6 +290,7 @@ router.post('/flow/start', (req, res, next) => {
         return;
       }
       console.log(`Billing Agreement Token is: ${data.token_id}`);
+      data.accessToken = accessToken;
       res.status(200).send(data);
       return;
   

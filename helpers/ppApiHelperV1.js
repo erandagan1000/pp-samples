@@ -1,4 +1,5 @@
 const axios = require('axios').default;
+
 const test = () => {
   return "hello test"
 }
@@ -55,14 +56,14 @@ const generateClientToken = (accessToken, callback) => {
 
 }
 
-const generateClientTokenWithBillingAgreementId = (accessToken,baId, callback) => {
+const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) => {
 
   const config = {
     headers: {
       Authorization: accessToken,
     }
   };
-  const data = {"billing_agreement_id": baId};
+  const data = { "billing_agreement_id": baId };
   // generate access token, givven merchant credenials
   axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, config)
     .then(function (response) {
@@ -138,7 +139,7 @@ const generateBillingAgreementToken = (accessToken, data, callback) => {
 
 const createBillingAgreement = (accessToken, data, callback) => {
 
-  const config = {
+  let config = {
     headers: {
       Authorization: accessToken,
     }
@@ -147,24 +148,51 @@ const createBillingAgreement = (accessToken, data, callback) => {
     callback(undefined, "Error: Billing Agreement Token Not provided");
   }
 
-  // generate access token, givven merchant credenials
-  axios.post('https://api-m.sandbox.paypal.com/v1/billing-agreements/agreements', data, config)
-    .then(function (response) {
-      // handle success
-      const data = response.data;
-      callback(data, undefined);
-    })
-    .catch(function (error) {
-      // handle error
-      console.log(error);
-      callback(undefined, error)
-    })
+  if (!accessToken) {
+    generateAccessToken((data, error) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
+      data.merchantName = process.env.PP_MERCHANT_NAME;
+      console.log("generateAccessToken Response Payload:", data)
+      const data1 = config;
+      config.headers.Authorization = `Bearer ${data.access_token}`;
+      axios.post('https://api-m.sandbox.paypal.com/v1/billing-agreements/agreements', data1, config)
+        .then(function (response) {
+          // handle success
+          const respData = response.data;
+          callback(respData, undefined);
+        })
+        .catch(function (error) {
+          // handle error
+          console.log(error.response.data);
+          callback(undefined, error)
+        });
+
+    });
+
+  }
+  else {  //access token sent from client - it is in some examples 
+    axios.post('https://api-m.sandbox.paypal.com/v1/billing-agreements/agreements', data, config)
+      .then(function (response) {
+        // handle success
+        const data = response.data;
+        callback(data, undefined);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        callback(undefined, error)
+      });
+  }
+
 
 }
 
 const createPayment = (accessToken, data, callback) => {
 
-  const config = {
+  let config = {
     headers: {
       Authorization: accessToken,
     }
@@ -173,7 +201,7 @@ const createPayment = (accessToken, data, callback) => {
     callback(undefined, "Error: Payment data not provided");
   }
 
-  // generate access token, givven merchant credenials
+
   axios.post('https://api-m.sandbox.paypal.com/v1/payments/payment', data, config)
     .then(function (response) {
       // handle success
@@ -184,7 +212,7 @@ const createPayment = (accessToken, data, callback) => {
       // handle error
       console.log(error.response.data);
       callback(undefined, error)
-    })
+    });
 
 }
 
