@@ -33,14 +33,14 @@ const generateAccessToken = (callback) => {
 
 }
 
-const generateClientToken = (accessToken, callback) => {
+const generateClientToken = (accessToken, payload, callback) => {
 
   const config = {
     headers: {
       Authorization: accessToken,
     }
   };
-  const data = {};
+  const data = payload ? payload: {};
   // generate access token, givven merchant credenials
   axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, config)
     .then(function (response) {

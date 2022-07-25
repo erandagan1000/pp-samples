@@ -10,28 +10,27 @@
 <body>
 
   <div class="loading" id="loading-button">Loading paypal button...</div>
-
+  
   <div><a href="/">Home</a></div>
   <h1>{{title}}</h1>
-  <h2>Note</h2>
-  <p>This example uses a hard coded Billing Agreement: B-4B919317MY292943T, in order to demo the returning user UX</p>
-  <p>A real merchant will generally get the BA as a property of the user profile</p>
-  <br><a href="https://developer.paypal.com/limited-release/pay-later-billing-agreements-sdk/returning-buyer/">
-    Link to docs</a>
+ <h2>Note</h2>
+  <p>This example saves buyers payment method during transaction with the JS SDK</p>
+<br><a href="https://developer.paypal.com/limited-release/vault-payment-methods/vault-sdk/">
+Link to docs</a>
 
   <div id="payment-view">
     <!-- Buttons container -->
     <div style="padding:10px">
       <table border="0" align="left" valign="top" bgcolor="#FFFFFF" style="width: 39%">
         <tr>
-          <td>
+          <td >
             <div id="paypal-button-container"></div>
           </td>
         </tr>
       </table>
     </div>
 
-
+    
 
   </div>
   <div>
@@ -39,22 +38,8 @@
     <span colspan="2" id="payment-result-cc">&nbsp;</span>
   </div>
 
-  <!-- FraudNet -->
-  <script type="application/json" fncls="fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99">
-    {
-        "f":"90e11051-90a7-463b-a636-8b11b0701a75",
-        "s":"ERAN_M_US",   
-        "sandbox": true
-    }
-  </script>
-  <script type="text/javascript" src="https://c.paypal.com/da/r/fb.js"></script>
-
-
   <!-- Implementation -->
   <script src="https://unpkg.com/@paypal/paypal-js@5.0.3/dist/iife/paypal-js.min.js"></script>
-
-
-  {{!-- Page Logic --}}
   <script>
 
     $("#loading-button").show();
@@ -68,7 +53,7 @@
       myDataClientPromise.then((data) => {
         console.log("reolved client token:", data);
         window.paypalLoadScript({
-          "client-id": "AY30GJsxw_QS7g7HaAeCW58FcbcSHVL82ixgep50NtkTBgSYqVqTpMD_5VO01ILjH2AdFUAuFm-aJ0CC",
+          "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk",
           "data-user-id-token": globalUserIdToken,
           "components": "buttons,hosted-fields"
         }).then((pp) => {
@@ -104,12 +89,12 @@
           console.log(data);
           const accesstoken = data.access_token;
 
-          $.ajax('ppapi/auth/clienttoken/generate/baid', {
+          $.ajax('/ppapi/auth/clienttoken/generate/customerid', {
             type: 'POST',
             headers: {
               'Authorization': `Bearer ${accesstoken}`
             },
-            data: { baId: "B-3AW98749960582156" },
+            data: {customer_id: "customer_1234"},
             success: function (data, status, xhr) {
               console.log(data.client_token);
               globalUserIdToken = data.id_token;
@@ -141,7 +126,7 @@
           return actions.order.create({
             purchase_units: [{
               amount: {
-                value: "1.00"
+                value: "121.00"
               }
             }]
           });
@@ -162,8 +147,6 @@
 
     }
   </script>
-
-
 
 </body>
 

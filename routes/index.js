@@ -76,6 +76,11 @@ router.get('/ppapm', function(req, res, next) {
 router.get('/ppsub', function(req, res, next) {
   res.render('ppSubscription', { title: 'PP Subscription' });
 });
+
+router.get('/ppvault', function(req, res, next) {
+  res.render('ppVault', { title: 'PP Vault - Limited release' });
+}); 
+
 router.get('/ppnvpicc', function(req, res, next) {
   res.render('ppNvpInContextCheckout', { title: 'PP NVP In Context Checkout' });
 });

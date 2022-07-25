@@ -48,7 +48,24 @@ router.post('/accesstoken/generate', (req, res, next) => {
 router.post('/clienttoken/generate', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
-  ppApiHelperV1.generateClientToken(accessToken, (data, error) => {
+  ppApiHelperV1.generateClientToken(accessToken, undefined, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+
+});
+
+// generate client_token
+router.post('/clienttoken/generate/customerid', (req, res, next) => {
+
+  const accessToken = req.headers["authorization"];
+  const payload= req.body;
+  ppApiHelperV1.generateClientToken(accessToken, payload, (data, error) => {
     if (error) {
       res.status(500).send(error);
       return;
