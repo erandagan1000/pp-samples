@@ -53,8 +53,8 @@ router.post('/billing-agreement', (req, res, next) => {
 router.post('/pay', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
-  
   const data = req.body; 
+  const clientMetaDataId = data.fnGuid;
   let baId = data.baId;
   let paymentPayload = {
     intent: "sale",
@@ -150,7 +150,7 @@ router.post('/pay', (req, res, next) => {
 }
   */ 
 
-  ppApiHelperV1.createPayment(accessToken, paymentPayload, (data, error) => {
+  ppApiHelperV1.createPayment(accessToken, paymentPayload,clientMetaDataId, (data, error) => {
     if (error) {
       res.status(error.response.status || 500).send(error);
       return;

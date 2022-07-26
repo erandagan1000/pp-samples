@@ -1,5 +1,6 @@
 <div><a href="/">Home</a></div>
 <h1>{{title}}</h1>
+<h3>Clicking on smart button will trigger a flow to create BA token, followed by creating BA</h3>
 <div class="loading" id="loading-button">Loading paypal button...</div>
 <div id="paypal-button-container"></div>
 <div id="paypal-result-container"></div>
@@ -15,22 +16,39 @@
   <p>Billing agreement Create Result:</p>
   <p id="ba-response"></p>
 </div> --}}
-<p>OnApprove Result - data to send to merchant server</p>
+<p>OnApprove Result - data to send to merchant server (BA token)</p>
 <div id="pp-rtco-on-approve-result"></div>
 <p>Server Result - response from merchant server - post BA creation</p>
+<div id="pp-pay-with-ba-button" name="pp-pay-with-ba-button" style="visibility:hidden">
+  <button onclick="payWithBillingAgreement()">Pay with BA</button>
+  
+</div>
 <div id="pp-rtco-server-result"></div>
 <hr>
+<p>Server Payment Result - Fraudnet data can be verified</p>
+<div id="pp-rtco-server-pay-result"></div>
 
-{{!-------------------------------------------------------------------------------}}
+
+
+{{!---------------------------------SCRIPTS------------------------------------------}}
+
+
+
+{{!-- PayPal --}}
 <script
   src="https://www.paypal.com/sdk/js?client-id=AeGYWEKwAbpNAOQaBkUyNXAalNwEZ5ialX-niqRbbcdZkLY8t-YuOMBLhDJUTP1JWKmJMMCFAeOWUSzF&currency=USD&components=buttons&vault=true">
   </script>
 
+<script src="https://www.paypalobjects.com/api/checkout.js" async></script>
+
+
+{{!-- PAGE LOGIC --}}
 <script>
   var globalAccessToken = "";
   var globalClientToken = "";
   var baTokenId = "";
   var baId = "";
+  let guid = "035a09d3-5b09-43e3-b434-6cae697a11f2";
 
   $("#loading-button").show();
   paypal.Buttons({
@@ -43,7 +61,7 @@
       height: 55
     },
     createBillingAgreement: function (data, actions) {
-      console.log(data, baTokenId) ;
+      console.log(data, baTokenId);
       return baTokenId;
     },
     onApprove: function (data, actions) {
@@ -51,21 +69,23 @@
 
       $("#pp-rtco-on-approve-result").jsonViewer(data);
 
-      // Here we can call the merchant api and save the BA to the merchant DB together with the user.
       let authStr = globalAccessToken;
       if (globalAccessToken.indexOf('Bearer') == -1) {
         authStr = `Bearer ${globalAccessToken}`;
       }
 
-      console.log('data.billingToken',data.billingToken);
+      console.log('data.billingToken', data.billingToken);
+      // call merchant api and create BA using PP server SDK , the returned BA can be saved to DB assigned to the customer 
       $.ajax('/ppapi/rt/billing-agreement', {
         type: 'POST',
-        headers: {'Authorization': authStr},
+        headers: { 'Authorization': authStr },
         // headers: undefined,
         data: { token_id: data.billingToken },
         success: function (data, status, xhr) {
           console.log(data);
           $("#pp-rtco-server-result").jsonViewer(data);
+          $("#pp-pay-with-ba-button").css('visibility', 'visible');
+          baId = data.id;
 
         },
         error: function (jqXhr, textStatus, errorMessage) {
@@ -102,6 +122,28 @@
         console.log(errorMessage);
       }
     });
+  }
+
+  function payWithBillingAgreement() {
+    const payload = { baId, fnGuid: guid };
+    console.log(payload);
+
+    $.ajax('/ppapi/rt/pay', {
+      type: 'POST',
+      headers: { 'Authorization': globalAccessToken },
+      // headers: undefined,
+      data: payload,
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#pp-rtco-server-pay-result").jsonViewer(data);
+
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
+    });
+
+
   }
   //start
   generateBaToken();
@@ -177,3 +219,55 @@
 
 </script>
 
+{{!-- Fraudnet - STATIC --}}
+<script type="application/json" fncls="fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99">
+    {
+        "f":guid,
+        "s":"ERAN_M_US_PAYPAL_CHECKOUT_VAULT",        
+        "sandbox": true
+    }
+   
+</script>
+<script type="text/javascript" src="https://c.paypal.com/da/r/fb.js"></script>
+
+{{!-- FRAUDNET - DYNAMIC (not working, corrId != pp-meta-data-id => fhit=o)--}}
+<script>
+
+  function _injectConfig(options) {
+    console.log("inject");
+    var script = document.getElementById('fconfig');
+    if (script) {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    }
+    script = document.createElement('script');
+    script.id = 'fconfig';
+    script.type = 'application/json';
+    script.src = options.fnUrl;
+    script.setAttribute('fncls', 'fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99');
+    // const uuid = require('uuid');
+    guid = uuidv4();
+
+    var configuration = {
+      'f': guid,
+      's': "ERAN_M_US_PAYPAL_RT"
+    };
+    script.text = JSON.stringify(configuration);
+    document.body.appendChild(script);
+  }
+
+  function uuidv4() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+
+
+  const options = { fnUrl: "https://c.paypal.com/da/r/fb.js" };
+  // _injectConfig(options);
+
+  /*if (paypal.asyncData && typeof paypal.asyncData.initAndCollect === 'function') {
+    paypal.asyncData.initAndCollect()
+  } */
+</script>

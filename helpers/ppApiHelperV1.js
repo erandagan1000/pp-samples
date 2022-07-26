@@ -190,11 +190,12 @@ const createBillingAgreement = (accessToken, data, callback) => {
 
 }
 
-const createPayment = (accessToken, data, callback) => {
+const createPayment = (accessToken, data, clientMetaDataId, callback) => {
 
   let config = {
     headers: {
-      Authorization: accessToken,
+      "Authorization": accessToken,
+      "PAYPAL-CLIENT-METADATA-ID": clientMetaDataId
     }
   };
   if (!data) {
