@@ -39,59 +39,6 @@
 <script src="https://www.paypalobjects.com/api/checkout.js" async></script>
 
 
-{{!-- Fraudnet - STATIC --}}
-<script type="application/json" fncls="fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99">
-    {
-        "f":"035a09d3-5b09-43e3-b434-6cae697a11f2",
-        "s":"ERAN_M_US_PAYPAL_CHECKOUT_VAULT",        
-        "sandbox": true
-    }
-   
-</script>
-<script type="text/javascript" src="https://c.paypal.com/da/r/fb.js"></script>
-
-{{!-- FRAUDNET - DYNAMIC (not working, corrId != pp-meta-data-id => fhit=o)--}}
-<script>
-
-  function _injectConfig(options) {
-    console.log("inject");
-    var script = document.getElementById('fconfig');
-    if (script) {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    }
-    script = document.createElement('script');
-    script.id = 'fconfig';
-    script.type = 'application/json';
-    script.src = options.fnUrl;
-    script.setAttribute('fncls', 'fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99');
-    // const uuid = require('uuid');
-    guid = uuidv4();
-
-    var configuration = {
-      'f': guid,
-      's': "ERAN_M_US_PAYPAL_RT"
-    };
-    script.text = JSON.stringify(configuration);
-    document.body.appendChild(script);
-  }
-
-  function uuidv4() {
-    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    );
-  }
-
-
-  const options = { fnUrl: "https://c.paypal.com/da/r/fb.js" };
-  // _injectConfig(options);
-
-  /*if (paypal.asyncData && typeof paypal.asyncData.initAndCollect === 'function') {
-    paypal.asyncData.initAndCollect()
-  } */
-</script>
-
 {{!-- PAGE LOGIC --}}
 <script>
   var globalAccessToken = "";
@@ -266,4 +213,63 @@
 
     // #endregion
 
+</script>
+
+{{!-- Fraudnet - STATIC --}}
+{{!-- <script type="application/json" fncls="fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99">
+    {
+        "f":"035a09d3-5b09-43e3-b434-6cae697a11f2",
+        "s":"ERAN_M_US_PAYPAL_CHECKOUT_VAULT",        
+        "sandbox": true
+    }
+   
+</script>
+<script type="text/javascript" src="https://c.paypal.com/da/r/fb.js"></script> --}}
+
+{{!-- FRAUDNET - DYNAMIC --}}
+<script>
+
+  function _injectConfig(options) {
+    console.log("inject");
+    var script = document.getElementById('fconfig');
+    if (script) {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    }
+    script = document.createElement('script');
+    script.id = 'fconfig';
+    script.type = 'application/json';
+    script.setAttribute('fncls', 'fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99');
+    guid = uuidv4();
+
+    var configuration = {
+      'f': guid,
+      's': "ERAN_M_US_PAYPAL_RT"
+    };
+    script.text = JSON.stringify(configuration);
+    document.body.appendChild(script);
+    
+    _loadBeaconJS(options);
+  }
+
+  function uuidv4() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+  
+  function _loadBeaconJS(options) {
+    var script = document.createElement('script');
+    script.src = options.fnUrl;
+    document.body.appendChild(script);
+
+  }
+
+  const options = { fnUrl: "https://c.paypal.com/da/r/fb.js" };
+  _injectConfig(options);
+
+  if (paypal.asyncData && typeof paypal.asyncData.initAndCollect === 'function') {
+    paypal.asyncData.initAndCollect()
+  } 
 </script>
