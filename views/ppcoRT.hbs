@@ -16,16 +16,16 @@
   <p>Billing agreement Create Result:</p>
   <p id="ba-response"></p>
 </div> --}}
-<p>OnApprove Result - data to send to merchant server (BA token)</p>
+<h2>OnApprove Result - data to send to merchant server (BA token)</h2>
 <div id="pp-rtco-on-approve-result"></div>
-<p>Server Result - response from merchant server - post BA creation</p>
+<h2>Server Result - response from merchant server - post BA creation</h2>
 <div id="pp-pay-with-ba-button" name="pp-pay-with-ba-button" style="visibility:hidden">
   <button onclick="payWithBillingAgreement()">Pay with BA</button>
 
 </div>
 <div id="pp-rtco-server-result"></div>
 <hr>
-<p>Server Payment Result - Fraudnet data can be verified</p>
+<h2>Server Payment Result - Fraudnet data can be verified</h2>
 <div id="pp-rtco-server-pay-result"></div>
 
 
@@ -45,7 +45,7 @@
   var globalClientToken = "";
   var baTokenId = "";
   var baId = "";
-  let guid = "035a09d3-5b09-43e3-b434-6cae697a11f2";
+  let guid = "a9b8501c-a70a-4968-84d3-1711e33bef3f";
 
   $("#loading-button").show();
   paypal.Buttons({
@@ -64,7 +64,7 @@
     onApprove: function (data, actions) {
       console.log("The customer approved the Billing Agreement in the PayPal Checkout Flow", { data, actions });
 
-      $("#pp-rtco-on-approve-result").jsonViewer(data);
+      $("#pp-rtco-on-approve-result").jsonViewer(data,{collapsed: true, bigNumbers: true});
 
       let authStr = globalAccessToken;
       if (globalAccessToken.indexOf('Bearer') == -1) {
@@ -80,7 +80,7 @@
         data: { token_id: data.billingToken },
         success: function (data, status, xhr) {
           console.log(data);
-          $("#pp-rtco-server-result").jsonViewer(data);
+          $("#pp-rtco-server-result").jsonViewer(data, {collapsed: true, bigNumbers: true});
           $("#pp-pay-with-ba-button").css('visibility', 'visible');
           baId = data.id;
 
@@ -132,7 +132,7 @@
       data: payload,
       success: function (data, status, xhr) {
         console.log(data);
-        $("#pp-rtco-server-pay-result").jsonViewer(data);
+        $("#pp-rtco-server-pay-result").jsonViewer(data,{collapsed: true, bigNumbers: true});
 
       },
       error: function (jqXhr, textStatus, errorMessage) {
@@ -218,7 +218,7 @@
 {{!-- Fraudnet - STATIC --}}
 {{!-- <script type="application/json" fncls="fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99">
     {
-        "f":"035a09d3-5b09-43e3-b434-6cae697a11f2",
+        "f":"a9b8501c-a70a-4968-84d3-1711e33bef3f",
         "s":"ERAN_M_US_PAYPAL_CHECKOUT_VAULT",        
         "sandbox": true
     }
@@ -250,7 +250,7 @@
     script.text = JSON.stringify(configuration);
     document.body.appendChild(script);
     
-    _loadBeaconJS(options);
+     _loadBeaconJS(options);
   }
 
   function uuidv4() {
@@ -267,9 +267,9 @@
   }
 
   const options = { fnUrl: "https://c.paypal.com/da/r/fb.js" };
-  _injectConfig(options);
+   _injectConfig(options);
 
   if (paypal.asyncData && typeof paypal.asyncData.initAndCollect === 'function') {
-    paypal.asyncData.initAndCollect()
+     paypal.asyncData.initAndCollect()
   } 
 </script>
