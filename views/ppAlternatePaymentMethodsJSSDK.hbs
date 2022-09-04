@@ -1,0 +1,75 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+
+<div class="loading" id="loading-button">Loading paypal button...</div>
+<div id="paypal-button-container"></div>
+<div id="paypal-result-container"></div>
+<div id="sofort-container"></div>
+<div id="sofort-mark"></div>
+{{!-- PP Rest API simple --}}
+
+{{!-- client-id=AeGY.. #App: MerchantApp | Account: eran.m.uk@merchant.com (BusinessPro) --}}
+<script
+  src="https://www.paypal.com/sdk/js?client-id=AY30GJsxw_QS7g7HaAeCW58FcbcSHVL82ixgep50NtkTBgSYqVqTpMD_5VO01ILjH2AdFUAuFm-aJ0CC&components=buttons,payment-fields,marks,funding-eligibility&enable-funding=sofort&currency=EUR">
+  </script>
+
+<script>
+  $("#loading-button").show();
+  paypal.Buttons(
+    {
+      fundingSource: paypal.FUNDING.SOFORT,
+      style: {
+        label: "pay",
+      },
+      createOrder(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              currency: 'GBP',
+              value: '99.99'
+            }
+          }]
+        });
+      },
+      onApprove(data, actions) {
+        console.log(data);
+        fetch(`/ppapi/order/${data.orderID}/capture`, {
+          method: "post",
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((err) => console.error(err));
+      },
+      onCancel(data, actions) {
+        console.log(`Order Canceled - ID: ${data.orderID}`);
+      },
+      onError(err) {
+        console.error(err);
+      }
+    }).render('#paypal-button-container').then(function () {
+      $("#loading-button").hide();
+
+    });
+/*
+  paypal.PaymentFields({
+    fundingSource: paypal.FUNDING.SOFORT,
+    style: {
+      // style object (optional)
+    },
+    fields: {
+      // fields prefil info (optional)
+      name: {
+        value: "John Doe",
+      },
+    }
+  })
+    .render("#sofort-container");
+*/
+ 
+ /* paypal.Marks({
+    fundingSource: paypal.FUNDING.SOFORT
+  }).render('#sofort-mark');
+  */
+</script>

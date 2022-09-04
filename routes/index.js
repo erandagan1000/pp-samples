@@ -27,7 +27,7 @@ router.get('/btdihf', function(req, res, next) {
   res.render('braintreeDropinAndHostedFields', { title: 'BrainTree Dropin + Hosted Fields' });
 });
 router.get('/bt3ds', function(req, res, next) {
-  res.render('braintree3DS', { title: 'BrainTree Dropin + Hosted Fields' });
+  res.render('braintree3DS', { title: 'BrainTree Dropin + Hosted Fields (3DS)' });
 });
 router.get('/btvenmo', function(req, res, next) {
   res.render('braintreeVenmo', { title: 'BrainTree Venmo' });
@@ -69,9 +69,13 @@ router.get('/pprtrc', function(req, res, next) {
 router.get('/ppvenmo', function(req, res, next) {
   res.render('ppVenmo', { title: 'PP Rest API - Venmo' });
 });
-router.get('/ppapm', function(req, res, next) {
-  res.render('ppAlternatePaymentMethods', { title: 'PP Rest API - AOM - Alternate Payment Methods' });
+router.get('/ppapmov2', function(req, res, next) {
+  res.render('ppAlternatePaymentMethodsOrdersV2', { title: 'PP Rest API - APM - Orders V2' });
 });
+router.get('/ppapmjssdk', function(req, res, next) {
+  res.render('ppAlternatePaymentMethodsJSSDK', { title: 'PP Rest API - APM - JSSDK' });
+});
+
 
 router.get('/ppsub', function(req, res, next) {
   res.render('ppSubscription', { title: 'PP Subscription' });
@@ -107,4 +111,9 @@ router.get('/success', function(req, res, next) {
 router.get('/cancel', function(req, res, next) {
   res.render('cancel', { title: 'Transaction Cancelled' });
 });
+
+router.get('/lpm/success', function(req, res, next) {
+  res.render('success', { title: 'LPM Transaction success', token: req.query.token  });
+});
+
 module.exports = router;

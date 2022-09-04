@@ -1,11 +1,14 @@
 const ppApiHelperV1 = require('../helpers/ppApiHelperV1')
 const axios = require('axios').default;
+const { v4: uuidv4 } = require('uuid');
+
+
 const test = () => {
   return "hello test"
 }
 
 
-const createOrder = (callback) =>{
+const createOrder = (guid, data, callback) =>{
 
   ppApiHelperV1.generateAccessToken((result, error) => {
     
@@ -16,21 +19,12 @@ const createOrder = (callback) =>{
     const config = {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",      
+        "Content-Type": "application/json",
+        "PayPal-Request-Id" : guid      
       }
     };
     
-    const data = {
-      intent: "CAPTURE",
-      purchase_units: [
-        {
-          amount: {
-            currency_code: "GBP",
-            value: "100.00"
-          }
-        }
-      ]
-    };
+    
     
     axios.post('https://api-m.sandbox.paypal.com/v2/checkout/orders', data, config)
       .then(function (response) {
@@ -79,9 +73,9 @@ const captureOrder = (orderId, callback) =>{
 }
 
 
-
 module.exports = {
   test,
   createOrder,
-  captureOrder
+  captureOrder,
+  uuidv4
 };
