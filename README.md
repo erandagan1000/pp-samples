@@ -1,25 +1,42 @@
 # Paypal and Braintree sample integrationd (jQuery + Node.js)
 Live demo for various payapl/braintree integrations:
  - ### Braintree 
-    - Dropin UI + Hosted Fields
     - Paypal Checkout
     - Paypal Checkout + Vault
     - Paypal Vault
-    - Paypal Data Collector
-    - Paypal Returning Customer
+    - Paypal Vault + Data Collector
+    - Paypal Vault Returning Customer
+    - Dropin UI + Hosted Fields
+    - Dropin UI + Hosted Fields + 3DSecure
     - Local Payment Methods
+    - LPMs
     - Venmo
     - ACH Direct Debit
+    - Apple Pay
  
  <br/>    
  
  - ### ACDC - A.K.A Rest API (Orders v2)
-    - Paypal Standard Checkout
-    - Paypal Custom Checkout With Shipping
-    - Paypal Custom Checkout Other Payment Methods (marks)
-    - Paypal Advanced Checkout
+    - Standard Checkout
+    - Custom Checkout With Shipping
+    - Advanced Checkout - Buttons + ACDC
+    - Advanced Checkout - Buttons + ACDC - Load JS SDK on runtime
+    - Advanced Checkout (ACDC) - 3D Secure (SDK)
+    - RT - Smart Button Checkour (+ Fraudnet)
+    - RT - Server side Integration (Sever2Server)
+    - RT - Returning Customer
+    - Venmo
+    - APMs JSSDK
+    - APMS - Orders V2
+    - Subscription
+    - PP Vault- Vault API
   
- - More to come...
+ <br/>
+ 
+  - ### NVP/SOAP
+    - In Context Checkout
+    - RT Checkout - Before Purchase
+    - RT Checkout - Curing Purchase
  
  <br/>
 
