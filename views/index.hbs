@@ -3,8 +3,8 @@
 <hr>
 
 <ul>
-  <li>Braintree
-    <ul>
+  <li>Braintree <a onclick="toggleList('bt')" style="font-size:80%">Show/Hide</a>
+    <ul name="bt-list" id="bt-list">
       <li><a href="/btco">Paypal Checkout</a></li>
       <li><a href="/btcov">Paypal Checkout + Vault</a></li>
       <li><a href="/btv">Paypal Vault</a></li>
@@ -20,8 +20,8 @@
 
     </ul>
   </li>
-  <li>Rest API - Payments V1 & Orders V2
-    <ul>
+  <li>Rest API - Payments V1 & Orders V2 <a onclick="toggleList('pp')" style="font-size:80%">Show/Hide</a>
+    <ul name="pp-list" id="pp-list">
       <li><a href="/ppsc">Standard Checkout</a></li>
       <li><a href="/ppccs">Custom Checkout With Shipping</a></li>
       <li><a href="/ppac">Advanced Checkout (Button + ACDC) </a></li>
@@ -33,19 +33,70 @@
       <li><a href="/ppvenmo">Venmo</a></li>
       <li><a href="/ppapmjssdk">APMs - JSSDK</a></li>
       <li><a href="/ppapmov2">APMs - Orders V2</a></li>
-      {{!-- <li><a href="/ppccm">Custom Checkout Other Payment Methods (Marks) </a><span style="color: red">**WIP**</span></li> --}}
+      {{!-- <li><a href="/ppccm">Custom Checkout Other Payment Methods (Marks) </a><span
+          style="color: red">**WIP**</span></li> --}}
       <li><a href="/ppsub">Subscription</a></li>
       <li><a href="/ppvault">PP Vault - Limited Release</a></li>
 
     </ul>
   </li>
 
-  <li>MVP/SOAP
-    <ul>
+  <li>MVP/SOAP <a onclick="toggleList('nvp')" style="font-size:80%">Show/Hide</a>
+    <ul name="nvp-list" id="nvp-list">
       <li><a href="/ppnvpicc">In Context Checkout</a></li>
       <li><a href="/ppnvprt">RT Checkout Before Purchase</a></li>
       <li><a href="/ppnvprtco">RT Checkout During Purchase</a></li>
     </ul>
-  </li> 
+  </li>
 
 </ul>
+
+<script>
+
+  var btListHidden = false;
+  var ppListHidden = false;
+  var nvpListHidden = false;
+  var btListElem = $("#bt-list");
+  var ppListElem = $("#pp-list");
+  var nvpListElem = $("#nvp-list");
+
+  function toggleList(listName) {
+
+    switch (listName) {
+      case 'bt':
+        if (btListHidden) {
+          btListElem.show();
+          btListHidden = false;
+        }
+        else {
+          btListElem.hide()
+          btListHidden = true;
+        }
+        break;
+      case 'pp':
+        if (ppListHidden) {
+          ppListElem.show();
+          ppListHidden = false;
+        }
+        else {
+          ppListElem.hide()
+          ppListHidden = true;
+        }
+        break;
+      case 'nvp':
+        if (nvpListHidden) {
+          nvpListElem.show();
+          nvpListHidden = false;
+        }
+        else {
+          nvpListElem.hide()
+          nvpListHidden = true;
+        }
+        break;
+
+    }
+
+
+  }
+
+</script>

@@ -34,9 +34,11 @@ router.post("/checkout", (req, res) => {
     merchantAccountId = maid;
   }
 
+  const amount = req.body.isDesiredToBeDeclined == 'true' ? "2001.00" : "122.00"
+
   btHelper.gateway.transaction.sale(
     {
-      amount: "20.00",
+      amount,
       paymentMethodNonce: nonceFromTheClient,
       merchantAccountId: merchantAccountId,  //if ommitted the default MID (configured on BT console) will be used
       // deviceData: deviceDataFromTheClient,

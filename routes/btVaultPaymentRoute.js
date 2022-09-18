@@ -29,6 +29,7 @@ router.post("/checkout", (req, res) => {
   var nonceFromTheClient = req.body.paymentMethodNonce;
   var amount = req.body.amount;
   const selectedCurrency = req.body.currency;
+  var storeInVault =  (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || false; 
 
   // set merchantAccountId by selected presntment currency
   const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
@@ -40,6 +41,7 @@ router.post("/checkout", (req, res) => {
       merchantAccountId: merchantAccountId,  //if ommitted the default MID (configured on BT console) will be used
       options: {
         submitForSettlement: true,
+        storeInVaultOnSuccess: storeInVault,
       },
     },
     (err, result) => {

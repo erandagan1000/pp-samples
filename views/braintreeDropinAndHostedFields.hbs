@@ -27,6 +27,7 @@
   <button id="generate-token" style="display:none">generate token</button>
   <span id="token"></span>
   <div><input type="checkbox" id="use-stored-card" name="use-stored-card">Use Stored Card (Create clinet token with customerId)<input type="text" style="width: 180px" name="customer-id" id="customer-id" value="894738055"></div>
+  <div><input type="checkbox" id="force-issuer-decline" name="force-issuer-decline">Force Issuer decline (will setup the decline amount in server)</div>
   <form id="payment-form" action="bt/hf/payment/checkout" method="post">
     <!-- Putting the empty container you plan to pass to
       `braintree.dropin.create` inside a form will make layout and flow
@@ -69,6 +70,7 @@
       </div>
       <input type="hidden" id="hf-nonce" name="payment_method_nonce" />
       <input type="hidden" id="hf_save_for_next_purchase" name="hf_save_for_next_purchase" />
+      <input type="hidden" id="isDesiredToBeDeclined" name="isDesiredToBeDeclined" />
       
 
       <div style="padding:10px">
@@ -122,7 +124,7 @@
         $.ajax({
           type: 'POST',
           url: '/bt/di/checkout',
-          data: { 'paymentMethodNonce': payload.nonce }
+          data: { 'paymentMethodNonce': payload.nonce, isDesiredToBeDeclined : true }
         }).done(function (result) {
           // Tear down the Drop-in UI
           instance.teardown(function (teardownErr) {
@@ -293,12 +295,13 @@
             alert('Got a nonce: ' + payload.nonce);
             document.getElementById('hf-nonce').value = payload.nonce;
             document.getElementById('hf_save_for_next_purchase').value =  $("#save-for-next-purchase")[0].checked;
+            document.getElementById('isDesiredToBeDeclined').value =  $("#force-issuer-decline")[0].checked;
             form.submit();
 
           });
         }, false);
       });
-    });
+    }); 
 
   }
 

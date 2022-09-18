@@ -13,14 +13,15 @@ router.post('/', (req, res, next) => {
     purchase_units: [
       {
         amount: {
-          currency_code: "GBP",
-          value: "100.00"
+          currency_code: "USD",
+          value: "2005.00"
         }
       }
     ]
   };
+  const guid = ppApiHelperV2.uuidv4();
 
-  ppApiHelperV2.createOrder(payload, (data, error) => {
+  ppApiHelperV2.createOrder(guid, payload, (data, error) => {
     if (error) {
       res.status(500).send(error);
       return;

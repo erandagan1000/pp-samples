@@ -5,6 +5,11 @@
 <div>
   <div id="apple-pay-button" class="apple-pay-set-up-button apple-pay-setup-button-white-with-line">&nbsp;
   </div>
+  <br>
+  <div style="color:blue;font-size:12pt;margin-top:10px">
+<input type="checkbox" id="save_for_next_purchase" name="save_for_next_purchase">Save for future payments
+  </div>
+  
   <div id="support-apple-pay">&nbsp;</div>
 
 </div>
@@ -53,6 +58,15 @@
   var tokenSpan = document.querySelector('#token')
   var token = undefined;
   var logElem = $("#log");
+  var savePaymentMethodElem = $("#save_for_next_purchase")[0];
+  var isSavePaymentMethodChecked = savePaymentMethodElem.checked;
+
+  savePaymentMethodElem.addEventListener("click", function() {
+    isSavePaymentMethodChecked = savePaymentMethodElem.checked;
+    // alert(isSavePaymentMethodChecked);
+
+  });
+
   $("#apple-pay-button").hide();
 
   (function () {
@@ -132,6 +146,7 @@
               session.completeMerchantValidation(merchantSession);
             }).catch(function (validationErr) {
               // You should show an error to the user, e.g. 'Apple Pay failed to load.'
+              alert(validationErr);
               console.error('Error validating merchant:', validationErr);
               session.abort();
             });
@@ -155,6 +170,9 @@
              
               $("#bt-tokenize-message").text(msg1);
 
+              msg1 =  "SAVE TO VAULT: " + isSavePaymentMethodChecked;
+              logElem.append(`<div>${msg1}</div>`);
+
               // Send payload.nonce to your server.
               $.ajax({
                 type: 'POST',
@@ -162,7 +180,8 @@
                 data: {
                   'paymentMethodNonce': payload.nonce,
                   'amount': amount,
-                  'currency': selectedCurrency
+                  'currency': selectedCurrency,
+                  'hf_save_for_next_purchase': isSavePaymentMethodChecked   //to store payment method in vault
 
                 }
               }).done(function (result) {
