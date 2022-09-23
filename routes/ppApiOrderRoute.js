@@ -56,8 +56,8 @@ router.post('/lpm/sofort', (req, res, next) => {
     processing_instruction: "ORDER_COMPLETE_ON_PAYMENT_APPROVAL",
     application_context: {
       locale: "en-GB",
-      return_url: "https://0163-147-161-171-4.ngrok.io/lpm/success",
-      cancel_url: "https://0163-147-161-171-4.ngrok.io/cancelUrl"
+      return_url: "https://b2de-94-188-131-64.ngrok.io/lpm/success",
+      cancel_url: "https://b2de-94-188-131-64.ngrok.io/cancelUrl"
     }
   };
 

@@ -5,6 +5,7 @@ const braintree = require("braintree");
 // if using full BT integration, merchant will typically use btConfig (full access to BT console)
 //ECBT - eran.m.us@merchant.com
 const btConfigEcbtUS = {
+  // accessToken: "access_token$sandbox$x466p4f9j62pxtdb$741d28605865c973da8116f68a6f2a36"
   accessToken: "access_token$sandbox$hq7c8r82tfvt3yqw$f2468ab77bd83587c48979083f4ac57e"
   // accessToken: "access_token$sandbox$w8w347gckb2936t4$0924afe9f0493a58fcc9b6c57a0a49f9"  //karins token
 }
