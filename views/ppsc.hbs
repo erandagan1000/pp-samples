@@ -40,7 +40,7 @@
       return actions.order.capture().then(function (orderData) {
         // Successful capture! For dev/demo purposes:
         let resultJson = JSON.stringify(orderData, null, 2);
-        console.log('Capture result', orderData, resultJson);env
+        console.log('Capture result', orderData, resultJson);
         var transaction = orderData.purchase_units[0].payments.captures[0];
         alert('Transaction ' + transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
         $('#paypal-result-container').text(resultJson);

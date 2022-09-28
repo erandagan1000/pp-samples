@@ -21,6 +21,34 @@ router.get('/customer/:id', (req, res, next) => {
 
 });
 
+router.get('/address/create/:customerid', (req, res, next) => {
+
+  const customerId = req.params.customerid;
+  const address = {
+    customerId,
+    firstName: "Jenna",
+    lastName: "Smith",
+    company: "Braintree",
+    streetAddress: "1 E Main St",
+    extendedAddress: "Suite 403",
+    locality: "Chicago",
+    region: "Illinois",
+    postalCode: "60607",
+    countryCodeAlpha2: "US"
+  };
+  btHelper.addressCreate(address).then(function (addResponse) {
+
+
+    res.status(200).send(addResponse);
+  })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+      res.status(500).send(error);
+    })
+
+});
+
 router.get('/creditcard/:id', (req, res, next) => {
 
   const customerId = req.params.id;
