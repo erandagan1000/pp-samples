@@ -91,6 +91,8 @@ router.post('/vault', (req, res, next) => {
   const selectedCurrency = req.body.currency;
   // set merchantAccountId by selected presntment currency
   const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
+  const deviceData = req.body.deviceData || '';
+  console.log("deviceData", deviceData); 
 
   const saleRequest = {
     amount: req.body.amount,
