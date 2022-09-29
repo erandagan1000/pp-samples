@@ -155,9 +155,10 @@
           };
 
           session.onpaymentauthorized = function (event) {
-            var msg = `Your shipping address is: ${event.payment.shippingContact}`;
-            $("#payment-authorized-payload").text(msg);
-            console.log(msg);
+            var msg = `<div style="color:blue;font-size:1.2en"><b>Your shipping address is: ${JSON.stringify(event.payment.billingContact)}</b></div>`;
+            logElem.append(msg);
+            // $("#payment-authorized-payload").text(msg);
+            // console.log(msg);
 
             applePayInstance.tokenize({
               token: event.payment.token
