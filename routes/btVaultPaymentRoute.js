@@ -35,6 +35,13 @@ router.post("/checkout", (req, res) => {
   // set merchantAccountId by selected presntment currency
   const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
 
+  let submitForSettlement = true;
+  if (req.body.isAuthorizeRequest && req.body.isAuthorizeRequest == 'true')
+  {
+    submitForSettlement = false;
+  }
+  console.log("ssubmitForSettlement: ", submitForSettlement);
+
 
   btHelper.gateway.transaction.sale(
     {
@@ -73,7 +80,7 @@ router.post("/checkout", (req, res) => {
         countryCodeAlpha2: "US"
       },
       options: {
-        submitForSettlement: true,
+        submitForSettlement,
         storeInVaultOnSuccess: storeInVault,   
         storeShippingAddressInVault: true    
       },

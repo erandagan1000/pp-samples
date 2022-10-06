@@ -14,7 +14,7 @@ router.post('/', (req, res, next) => {
       {
         amount: {
           currency_code: "USD",
-          value: "2005.00"
+          value: "115.00"
         }
       }
     ]

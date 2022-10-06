@@ -38,10 +38,10 @@
 
 <!-- includes the Braintree JS client SDK -->
 <!-- Load the client component. -->
-<script src="https://js.braintreegateway.com/web/3.85.3/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.87.0/js/client.min.js"></script>
 
 <!-- Load the PayPal Checkout component. -->
-<script src="https://js.braintreegateway.com/web/3.85.3/js/paypal-checkout.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.87.0/js/paypal-checkout.min.js"></script>
 
 
 <!-- Load the PayPal JS SDK with your PayPal Client ID-->
@@ -95,8 +95,9 @@
       });
     }).then(function (paypalCheckoutInstance) {
       return paypalCheckoutInstance.loadPayPalSDK({
+        // 'locale': 'pl_PL',
         dataAttributes: {
-          amount: "100.00"
+          amount: "100.00"          
         }
       });
     }).then(function (paypalCheckoutInstance) {

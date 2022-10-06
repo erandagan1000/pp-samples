@@ -66,6 +66,11 @@ const addressCreate = function (address) {
   return gateway.address.create(address);
 }
 
+const submitForSettlement = function (transactionId) {
+   
+  return gateway.transaction.submitForSettlement(transactionId);
+}
+
 const gateway = new braintree.BraintreeGateway(btConfig);
 
 
@@ -77,7 +82,8 @@ module.exports = {
   creditCardCreate,
   customerCreate,
   paymentMetohdCreate,
-  addressCreate
+  addressCreate,
+  submitForSettlement
 
 
 };
