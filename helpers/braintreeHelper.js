@@ -71,6 +71,11 @@ const submitForSettlement = function (transactionId) {
   return gateway.transaction.submitForSettlement(transactionId);
 }
 
+const find = function (transactionId) {
+   
+  return gateway.transaction.find(transactionId);
+}
+
 const gateway = new braintree.BraintreeGateway(btConfig);
 
 
@@ -83,7 +88,8 @@ module.exports = {
   customerCreate,
   paymentMetohdCreate,
   addressCreate,
-  submitForSettlement
+  submitForSettlement,
+  find
 
 
 };

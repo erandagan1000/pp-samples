@@ -125,6 +125,25 @@ router.get('/capture/:transactionid', (req, res, next) => {
 
 });
 
+router.get('/find/:transactionid', (req, res, next) => {
+
+  const transactionId = req.params.transactionid;
+
+
+  btHelper.find(transactionId).then(function (transaction) {
+
+    console.log(transaction);
+    res.status(200).send(transaction);
+
+  })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+      res.status(500).send(error);
+    });
+
+});
+
 
 
 
