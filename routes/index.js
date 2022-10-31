@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'PayPal Demo' });
 });
 router.get('/btco', function(req, res, next) {
   res.render('braintreePPCheckout', { title: 'BrainTree Paypal Checkout' });
@@ -37,6 +37,9 @@ router.get('/btach', function(req, res, next) {
 });
 router.get('/btap', function(req, res, next) {
   res.render('braintreeApplePay', { title: 'BrainTree Apple Pay' });
+});
+router.get('/btgp', function(req, res, next) {
+  res.render('braintreeGooglePay', { title: 'BrainTree Google Pay' });
 });
 router.get('/ppsc', function(req, res, next) {
   res.render('ppsc', { title: 'PP Rest API - Standard Checkout' });

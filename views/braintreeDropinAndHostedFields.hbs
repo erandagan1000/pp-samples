@@ -1,8 +1,9 @@
 <div><a href="/">Home</a></div>
 <h1>{{title}}</h1>
-<h2><a href="https://developer.paypal.com/braintree/docs/reference/general/testing#valid-card-numbers" target="_blank">Valid Test Cards</a>
+<h2><a href="https://developer.paypal.com/braintree/docs/reference/general/testing#valid-card-numbers"
+    target="_blank">Valid Test Cards</a>
 </h2>
-<br/>
+<br />
 <!----------------- drop-in fields example ---------------------->
 <div>
   <h2>DropIn Quick - <font color="blue">using tokenization key</font>
@@ -26,8 +27,10 @@
 
   <button id="generate-token" style="display:none">generate token</button>
   <span id="token"></span>
-  <div><input type="checkbox" id="use-stored-card" name="use-stored-card">Use Stored Card (Create clinet token with customerId)<input type="text" style="width: 180px" name="customer-id" id="customer-id" value="894738055"></div>
-  <div><input type="checkbox" id="force-issuer-decline" name="force-issuer-decline">Force Issuer decline (will setup the decline amount in server)</div>
+  <div><input type="checkbox" id="use-stored-card" name="use-stored-card">Use Stored Card (Create clinet token with
+    customerId)<input type="text" style="width: 180px" name="customer-id" id="customer-id" value="894738055"></div>
+  <div><input type="checkbox" id="force-issuer-decline" name="force-issuer-decline">Force Issuer decline (will setup the
+    decline amount in server)</div>
   <form id="payment-form" action="bt/hf/payment/checkout" method="post">
     <!-- Putting the empty container you plan to pass to
       `braintree.dropin.create` inside a form will make layout and flow
@@ -65,13 +68,13 @@
       <div style="padding:10px">
         <input id="save-for-next-purchase" type="checkbox">
         <label for="save-for-next-purchase" style="margin-top:5px">Save details for next purchase</label>
-        
+
 
       </div>
       <input type="hidden" id="hf-nonce" name="payment_method_nonce" />
       <input type="hidden" id="hf_save_for_next_purchase" name="hf_save_for_next_purchase" />
       <input type="hidden" id="isDesiredToBeDeclined" name="isDesiredToBeDeclined" />
-      
+
 
       <div style="padding:10px">
         <input type="submit" value="Pay" id="pay" disabled />
@@ -124,7 +127,7 @@
         $.ajax({
           type: 'POST',
           url: '/bt/di/checkout',
-          data: { 'paymentMethodNonce': payload.nonce, isDesiredToBeDeclined : true }
+          data: { 'paymentMethodNonce': payload.nonce, isDesiredToBeDeclined: true }
         }).done(function (result) {
           // Tear down the Drop-in UI
           instance.teardown(function (teardownErr) {
@@ -152,9 +155,9 @@
   // -----------------------------------------------------------------
   // client server example
   // -----------------------------------------------------------------
-  var customerInput =  $("#customer-id")   // customerId with saved credit card as payment method in vault
+  var customerInput = $("#customer-id")   // customerId with saved credit card as payment method in vault
   var customerId = customerInput.val();
-  customerInput.keyup(function() {
+  customerInput.keyup(function () {
     customerId = customerInput.val();
     console.log("key up");
     console.log(customerId);
@@ -166,7 +169,7 @@
   var generateClientTokenUrl = '/bt/hf/payment/client_token';
   $("#pay").hide();
   $("#hosted-fields-submit-button").hide();
-  
+
   button1.addEventListener('click', function () {
     $.ajax({
       type: 'GET',
@@ -211,20 +214,20 @@
   button1.click();
 
   var checkBoxUseStoredCard = $("#use-stored-card");
-  checkBoxUseStoredCard.change(function(event){
+  checkBoxUseStoredCard.change(function (event) {
     console.log("checkboxChanged");
     var generateClientTokenWithCustomerId = checkBoxUseStoredCard[0].checked;
-    if(generateClientTokenWithCustomerId) {
+    if (generateClientTokenWithCustomerId) {
       generateClientTokenUrl = `/bt/vault/payment/client_token/${customerId}`
       $('#dropin-container1').empty();
-      
+
     }
     button1.click();
 
   });
 
   // -----------------------------------------------------------------
- 
+
   // Hosted fields example
   function createHostedFieldBraintreeInstance(token) {
 
@@ -277,6 +280,11 @@
           return;
         }
 
+        // Include this to verify BIN while user typing it
+        hostedFieldsInstance.on('binAvailable', function (event) {
+          console.log("Event Fired: binAvailable ",event.bin) // send bin to 3rd party bin service
+        });
+
         submit.removeAttribute('disabled');
         $("#pay").show();
         $("#hosted-fields-submit-button").show();
@@ -294,14 +302,14 @@
             // send the nonce to your server.
             alert('Got a nonce: ' + payload.nonce);
             document.getElementById('hf-nonce').value = payload.nonce;
-            document.getElementById('hf_save_for_next_purchase').value =  $("#save-for-next-purchase")[0].checked;
-            document.getElementById('isDesiredToBeDeclined').value =  $("#force-issuer-decline")[0].checked;
+            document.getElementById('hf_save_for_next_purchase').value = $("#save-for-next-purchase")[0].checked;
+            document.getElementById('isDesiredToBeDeclined').value = $("#force-issuer-decline")[0].checked;
             form.submit();
 
           });
         }, false);
       });
-    }); 
+    });
 
   }
 

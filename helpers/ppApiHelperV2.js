@@ -20,16 +20,19 @@ const createOrder = (guid, data, callback) =>{
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
-        "PayPal-Request-Id" : guid      
+        "PayPal-Request-Id" : guid,
+        "Prefer": "return=representation"      
       }
     };
     
-    
+    // data.purchase_units[0].soft_descriptor = "MY UPDATED DESCRIPTOR";
     
     axios.post('https://api-m.sandbox.paypal.com/v2/checkout/orders', data, config)
       .then(function (response) {
         // handle success
         const data = response.data;
+        console.log("ppApiHelperV2.createOrder");
+        console.log("ORDER-CREATE:",data);
         callback(data, undefined);
       })
       .catch(function (error) {
@@ -51,7 +54,8 @@ const captureOrder = (orderId, callback) =>{
     const config = {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",      
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"        
       }
     };
     
@@ -61,6 +65,8 @@ const captureOrder = (orderId, callback) =>{
       .then(function (response) {
         // handle success
         const data = response.data;
+        console.log("ppApiHelperV2.captureOrder");
+        console.log("CAPTURE:", data);
         callback(data, undefined);
       })
       .catch(function (error) {
