@@ -3,8 +3,9 @@
 <hr>
 <!---------------- Google Pay Button ------------------>
 <div>
-  <div id="google-pay-button"><button>Google Pay</button>&nbsp;
-  </div>
+  <div id="google-pay-button">
+    <img src="https://styles.redditmedia.com/t5_38ens/styles/communityIcon_84ih8y9d2uz81.png" width="150px" style="border-width:2px;border-style:solid" height="80px">
+    &nbsp;
   <br>
   <div style="color:blue;font-size:12pt;margin-top:10px">
     <input type="checkbox" id="save_for_next_purchase" name="save_for_next_purchase">Save for future payments
@@ -50,6 +51,7 @@
 <script src="https://pay.google.com/gp/p/js/pay.js"></script>
 <script src="https://js.braintreegateway.com/web/3.88.1/js/client.min.js"></script>
 <script src="https://js.braintreegateway.com/web/3.88.1/js/google-payment.min.js"></script>
+
 <script>
 
   var selectedCurrency = 'USD'   // e.g. EUR or USD
@@ -68,6 +70,8 @@
 
   $("#google-pay-button").hide();
 
+  
+  // get access_token
   (function () {
     $.ajax({
       type: 'GET',
@@ -146,9 +150,9 @@
               // print callback payload.
               var msg1 = `nonce: ${result.nonce}`;
               logElem.append(`<div>${msg1}</div>`);
-              msg1 =`Payment Type: ${result.type}-${result.description}`;
+              msg1 = `Payment Type: ${result.type}-${result.description}`;
               logElem.append(`<div>${msg1}</div>`);
-           
+
               // $("#bt-tokenize-message").text(msg1);
 
               msg1 = "SAVE TO VAULT: " + isSavePaymentMethodChecked;
@@ -180,7 +184,7 @@
                   $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
                   $("#checkout-result").jsonViewer(result);
                 }
-                
+
               }).catch(function (tokenizeErr) {
                 var errMsg = `'Error tokenizing Apple Pay' ${tokenizeErr}`;
                 $("#bt-tokenize-message").text(errMsg);
@@ -208,4 +212,5 @@
 
   }
 
+   
 </script>

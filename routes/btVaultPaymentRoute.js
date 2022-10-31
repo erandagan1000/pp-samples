@@ -82,7 +82,7 @@ router.post("/checkout", (req, res) => {
       options: {
         submitForSettlement,
         storeInVaultOnSuccess: storeInVault,   
-        storeShippingAddressInVault: true    
+        storeShippingAddressInVault: storeInVault    
       },
     },
     (err, result) => {

@@ -13,6 +13,7 @@ Live demo for various payapl/braintree integrations:
     - Venmo
     - ACH Direct Debit
     - Apple Pay
+    - Google Pay
  
  <br/>    
  
