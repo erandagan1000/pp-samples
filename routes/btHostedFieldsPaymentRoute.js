@@ -22,9 +22,9 @@ router.get("/client_token", (req, res) => {
 
 router.post("/checkout", (req, res) => {
   var nonceFromTheClient = req.body.payment_method_nonce;
-  var storeInVault =  (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || false; 
+  var storeInVaultOnsuccess =  (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || false; 
   var maid = req.body.maid;
-  console.log("storeInVault" ,storeInVault);
+  console.log("storeInVaultOnsuccess" ,storeInVaultOnsuccess);
   // set merchantAccountId by selected presntment currency
   const selectedCurrency = req.body.currency;
   const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
@@ -35,7 +35,9 @@ router.post("/checkout", (req, res) => {
   }
 
   const amount = req.body.isDesiredToBeDeclined == 'true' ? "2001.00" : "122.00"
-
+  
+  storeInVaultOnsuccess = false;
+  console.log(storeInVaultOnsuccess);
   btHelper.gateway.transaction.sale(
     {
       amount,
@@ -75,8 +77,8 @@ router.post("/checkout", (req, res) => {
       },
       options: {
         submitForSettlement: true,
-        storeInVaultOnSuccess: storeInVault,   
-        storeShippingAddressInVault: true    
+        storeInVaultOnSuccess: storeInVaultOnsuccess,   
+        // storeShippingAddressInVault: true    
       }
             
     },

@@ -131,6 +131,7 @@
 
       return paypal.Buttons({
         fundingSource: paypal.FUNDING.PAYPAL,
+        commit: false, // Continue button, default is true - PayNow button
 
         createOrder: function () {
           return paypalCheckoutInstance.createPayment({
