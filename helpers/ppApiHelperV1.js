@@ -29,7 +29,7 @@ const generateAccessToken = (callback) => {
       // handle error
       console.log(error);
       callback(undefined, error);
-    })
+    });
 
 }
 

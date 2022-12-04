@@ -1,6 +1,7 @@
 
 const { default: axios } = require('axios');
 const express = require('express');
+const { route } = require('.');
 const router = express.Router();
 const ppApiHelperV2 = require('../helpers/ppApiHelperV2')
 
@@ -100,6 +101,56 @@ router.post('/capture', (req, res, next) => {
     return;
 
   });
+});
+
+//server2server - Card On File / CardOnFile
+
+router.post('/s2s', (req, res, next) => {
+  const payload = {
+    intent: "CAPTURE",
+    purchase_units: [
+      {
+        amount: {
+          currency_code: "USD",
+          value: "115.00"
+        }
+      }
+    ],
+    payment_source: {
+      card: {
+        number: "4032036503389346",
+        expiry: "2026-01",
+        name: "John Doe",
+        billing_address: {
+          address_line_1: "2211 N First Street",
+          address_line_2: "17.3.160",
+          admin_area_1: "CA",
+          admin_area_2: "San Jose",
+          postal_code: "95131",
+          country_code: "US"
+        },
+        attributes: {
+          verification: {
+            method: "SCA_WHEN_REQUIRED"
+          }
+        }
+      }
+    }
+  };
+
+  const guid = ppApiHelperV2.uuidv4();
+
+  ppApiHelperV2.createOrder(guid, payload, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+
+
 });
 
 module.exports = router;
