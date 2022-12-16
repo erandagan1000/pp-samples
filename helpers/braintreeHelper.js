@@ -61,6 +61,11 @@ const paymentMetohdCreate = function (pmMethoParams) {
   return gateway.paymentMethod.create(pmMethoParams);
 }
 
+const paymentMetohdCreateFromPaymentMethodToken = function (pmToken) {
+   
+  return gateway.paymentMethod.create(pmToken);
+}
+
 const addressCreate = function (address) {
    
   return gateway.address.create(address);
@@ -89,7 +94,8 @@ module.exports = {
   paymentMetohdCreate,
   addressCreate,
   submitForSettlement,
-  find
+  find,
+  paymentMetohdCreateFromPaymentMethodToken
 
 
 };
