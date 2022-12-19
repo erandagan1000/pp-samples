@@ -26,12 +26,12 @@ router.get("/client_token", (req, res) => {
 });
 
 router.post("/checkout", (req, res) => {
-  
+
   var useNonce = req.query.dontUseNonce != '1';
   var nonceFromTheClient = req.body.payment_method_nonce;
   var storeInVaultOnsuccess = (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || false;
   var maid = req.body.maid;
-  console.log("nonce: "+ nonceFromTheClient);
+  console.log("nonce: " + nonceFromTheClient);
   console.log("storeInVaultOnsuccess", storeInVaultOnsuccess);
   // set merchantAccountId by selected presntment currency
   const selectedCurrency = req.body.currency;
@@ -43,8 +43,8 @@ router.post("/checkout", (req, res) => {
   }
 
   const amount = req.body.isDesiredToBeDeclined == 'true' ? "2001.00" : "122.00"
- 
-  if(useNonce){
+
+  if (useNonce) {
     btHelper.gateway.transaction.sale(
       {
         amount,
@@ -87,18 +87,18 @@ router.post("/checkout", (req, res) => {
           storeInVaultOnSuccess: storeInVaultOnsuccess,
           // storeShippingAddressInVault: true    
         }
-  
+
       },
       (err, result) => {
-  
+
         const fullResult = `<div><a href="/">Home</a></div><br/><h2>CUSTOMER ID: ${storeInVaultOnsuccess ? result.transaction.customer.id : "None"}</h2><div>${JSON.stringify(result)}</div>`
         res.send(fullResult);
-  
+
       }
     );
 
   }
-  
+
 });
 
 router.post("/forward/pp", (req, res) => {
@@ -122,7 +122,7 @@ router.post("/forward/pp", (req, res) => {
       password: process.env.BT_PRIVATE_KEY
     }
   };
-  
+
   accessToken = "Bearer A21AAJPtcE_iPE6Yr7UxsHLYDAsfdmSWO3og849fPL3x-mhjRAvH7dPKp6PF9W9Neu3jSiUrGrLOhCuPfxGsaNtZlyfyp-9sg";
   clientMetaDataId = ppApiHelperV2.uuidv4();
   let config = {
@@ -181,9 +181,23 @@ router.post("/forward/pp", (req, res) => {
     });
 });
 
+/* 
+URL: http://localhost:3000/bt/hf/payment/forward/uat
+payload:
+{"cvvOnlyNonce": "tokencc_bh_8mbhqt_m6zjq2_nys52g_x4f5d5_8q5",
+ "hwUserToken": "usr-81e6c0aa-23de-4fdc-898f-6e86559050b4"
+  }
+*/
 router.post("/forward/uat", (req, res) => {
-  
+
   const cvvOnlyNonce = req.body.cvvOnlyNonce;
+  const hwUserToken = req.body.hwUserToken;
+  const vaultPaymentMethodToken = req.body.vaultPaymentMethodToken;
+
+  if(!cvvOnlyNonce || !hwUserToken)
+  {
+    res.status(500).send("Bad request. Expecting the following keys in payload: {cvvOnlyNonce, hwUserToken, vaultPaymentMethodToken}.  \n For example {'cvvOnlyNonce': 'tokencc_bh_8mbhqt_m6zjq2_nys52g_x4f5d5_8q5','hwUserToken': 'usr-81e6c0aa-23de-4fdc-898f-6e86559050b4', 'vaultPaymentMethodToken': 'b9ww88ss'}");
+  }
   //headers
   const options = {
     auth: {
@@ -193,46 +207,47 @@ router.post("/forward/uat", (req, res) => {
   };
 
   //payload to the target API
-  hwUserToken ="usr-945b1789-30a4-4e6a-9fa8-b1ed87c80787";
-
+  
   //setup:
-  // 1- take cutomer from vault, obtain his payment_method_token
+  // 1- take customer from vault, obtain his payment_method_token
   // 2- create a CVV-only nonce with client SDK (dont use it in transaction.sale) - use this: http://localhost:3000/bthfcvvon
   // 3- build the forward-api call as it appears here: https://developer.paypal.com/braintree/docs/guides/extend/forward-api/examples#cvv-with-vaulted-card-data 
 
   data = {
     merchant_id: process.env.BT_MERCHANT_ID,
-    payment_method_token: "kykgpd8f",   //braintree_payment_method_token
+    payment_method_token: vaultPaymentMethodToken,   //braintree_vault_payment_method_token
     payment_method_nonce: cvvOnlyNonce, // a CVV only nonce 
     sensitive_data: {
-        user: process.env.Hyperwallet_username,
-        password: process.env.hyperwallet_password,
+      user: process.env.Hyperwallet_username,
+      password: process.env.hyperwallet_password,
     },
-    data:{
-        transferMethodCountry: "GB",
-        transferMethodCurrency: "GBP",
+    data: {
+      transferMethodCountry: "GB",
+      transferMethodCurrency: "GBP",
     },
     url: `https://uat-api.paylution.com/rest/v4/users/${hwUserToken}/bank-cards/`,
     method: "POST",
     configs: [{
-       name: "progressplay_sb_hyperwallet_bankcards",
-       methods: ["POST", "PUT"],
-       url: "^https:\/\/uat-api.paylution.com\/rest\/v4\/users\/.*\/bank-cards\/.*$",
-       request_format: {"/body": "json"},
-       types: ["CreditCard"],
-       transformations: [
-               {"path": "/header/Authorization",
-                   "value": ["join", " ", ["array", "Basic", ["base64", ["join", ":", ["array", "$user", "$password"]]]]]},
-               {"path": "/body/transferMethodCountry", "value": "$transferMethodCountry", "if_defined": "$transferMethodCountry"},
-               {"path": "/body/transferMethodCurrency", "value": "$transferMethodCurrency", "if_defined": "$transferMethodCurrency"},
-               {"path": "/body/type", "value": "BANK_CARD"},
-               {"path": "/body/cardNumber", "value": "$number"},
-               {"path": "/body/dateOfExpiry", "value": ["join","-",["array","$expiration_year","$expiration_month"]]},
-               {"path": "/body/cvv", "value": "$cvv_2"}
-       ]
-   }]  
-}
- 
+      name: "progressplay_sb_hyperwallet_bankcards",
+      methods: ["POST", "PUT"],
+      url: "^https:\/\/uat-api.paylution.com\/rest\/v4\/users\/.*\/bank-cards\/.*$",
+      request_format: { "/body": "json" },
+      types: ["CreditCard"],
+      transformations: [
+        {
+          "path": "/header/Authorization",
+          "value": ["join", " ", ["array", "Basic", ["base64", ["join", ":", ["array", "$user", "$password"]]]]]
+        },
+        { "path": "/body/transferMethodCountry", "value": "$transferMethodCountry", "if_defined": "$transferMethodCountry" },
+        { "path": "/body/transferMethodCurrency", "value": "$transferMethodCurrency", "if_defined": "$transferMethodCurrency" },
+        { "path": "/body/type", "value": "BANK_CARD" },
+        { "path": "/body/cardNumber", "value": "$number" },
+        { "path": "/body/dateOfExpiry", "value": ["join", "-", ["array", "$expiration_year", "$expiration_month"]] },
+        { "path": "/body/cvv", "value": "$cvv_2" }
+      ]
+    }]
+  }
+
 
   axios.post('https://forwarding.sandbox.braintreegateway.com', data, options)
     .then(function (response) {
@@ -245,82 +260,8 @@ router.post("/forward/uat", (req, res) => {
       console.log(error);
       res.send(error.response.data);
     });
-    
-  // btHelper.paymentMetohdCreateFromPaymentMethodToken("kykgpd8f").then((nonceResponse) => {
-    
-  // const nonce = nonceResponse.paymentMethodNonce.nonce;
-  
-  // makeForwardApiCall(nonce);
 
-
-
-  // }).catch(function (error) {
-  //   // handle error
-  //   console.log(error);
-  //   res.send(error);
-  // });
-  
 });
 
-/*
-const makeForwardApiCall = function (nonce) {
 
-  //headers
-  const options = {
-    auth: {
-      username: process.env.BT_PUBLIC_KEY,
-      password: process.env.BT_PRIVATE_KEY
-    }
-  };
-
-  //payload to the target API
-  hwUserToken ="usr-945b1789-30a4-4e6a-9fa8-b1ed87c80787";
-
-  data = {
-    merchant_id: process.env.BT_MERCHANT_ID,
-    payment_method_nonce: nonce,   //braintree_payment_method_token,
-    sensitive_data: {
-        user: process.env.Hyperwallet_username,
-        password: process.env.hyperwallet_password,
-    },
-    data:{
-        transferMethodCountry: "GB",
-        transferMethodCurrency: "GBP",
-    },
-    url: `https://uat-api.paylution.com/rest/v4/users/${hwUserToken}/bank-cards/`,
-    method: "POST",
-    configs: [{
-       name: "progressplay_sb_hyperwallet_bankcards",
-       methods: ["POST", "PUT"],
-       url: "^https:\/\/uat-api.paylution.com\/rest\/v4\/users\/.*\/bank-cards\/.*$",
-       request_format: {"/body": "json"},
-       types: ["CreditCard"],
-       transformations: [
-               {"path": "/header/Authorization",
-                   "value": ["join", " ", ["array", "Basic", ["base64", ["join", ":", ["array", "$user", "$password"]]]]]},
-               {"path": "/body/transferMethodCountry", "value": "$transferMethodCountry", "if_defined": "$transferMethodCountry"},
-               {"path": "/body/transferMethodCurrency", "value": "$transferMethodCurrency", "if_defined": "$transferMethodCurrency"},
-               {"path": "/body/type", "value": "BANK_CARD"},
-               {"path": "/body/cardNumber", "value": "$number"},
-               {"path": "/body/dateOfExpiry", "value": ["join","-",["array","$expiration_year","$expiration_month"]]},
-               {"path": "/body/cvv", "value": "$cvv"}
-       ]
-   }]  
-}
- 
-
-  axios.post('https://forwarding.sandbox.braintreegateway.com', data, options)
-    .then(function (response) {
-      // handle success
-      const data = response.data;
-      res.send(data);
-    })
-    .catch(function (error) {
-      // handle error
-      console.log(error);
-      res.send(error.response.data);
-    });
-
-}
-*/
 module.exports = router;
