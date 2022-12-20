@@ -40,6 +40,8 @@
 
     </form>
   </div>
+  <p>CVV Only Nonce:</p>
+  <div id="nonce-container"></div>
 
 
 </div>
@@ -185,9 +187,11 @@
 
             // If this was a real integration, this is where you would
             // send the nonce to your server.
-            alert('Got a nonce: ' + payload.nonce);
+            // alert('Got a nonce: ' + payload.nonce);
+            document.getElementById('nonce-container').innerHTML = `<h3>${payload.nonce}</h3>`;
             console.log(payload.nonce);
             document.getElementById('hf-nonce').value = payload.nonce;
+
             //document.getElementById('hf_save_for_next_purchase').value = $("#save-for-next-purchase")[0].checked;
             //document.getElementById('isDesiredToBeDeclined').value = $("#force-issuer-decline")[0].checked;
             form.submit();

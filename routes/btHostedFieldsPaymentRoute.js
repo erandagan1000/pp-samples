@@ -91,11 +91,16 @@ router.post("/checkout", (req, res) => {
       },
       (err, result) => {
 
-        const fullResult = `<div><a href="/">Home</a></div><br/><h2>CUSTOMER ID: ${storeInVaultOnsuccess ? result.transaction.customer.id : "None"}</h2><div>${JSON.stringify(result)}</div>`
+        const fullResult = `<div><a href="/">Home</a></div><br/><h2>CUSTOMER ID: ${storeInVaultOnsuccess ? result.transaction.customer.id : "None"}</h2><div>${JSON.stringify(result)}</div>`;
         res.send(fullResult);
 
       }
     );
+
+  }
+  else {
+    const noActionResult = `<div><a href="/">Home</a></div><br/><h2>CVV-Only-Nonce created and unused: <br/> ${nonceFromTheClient}</h2></div>`;
+    res.send(noActionResult);
 
   }
 
