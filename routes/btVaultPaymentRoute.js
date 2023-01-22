@@ -40,7 +40,7 @@ router.post("/checkout", (req, res) => {
   {
     submitForSettlement = false;
   }
-  console.log("ssubmitForSettlement: ", submitForSettlement);
+  console.log("submitForSettlement: ", submitForSettlement);
 
 
   btHelper.gateway.transaction.sale(

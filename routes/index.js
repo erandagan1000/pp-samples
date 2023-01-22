@@ -6,7 +6,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'PayPal Demo' });
 });
 router.get('/btco', function(req, res, next) {
-  res.render('braintreePPCheckout', { title: 'BrainTree Paypal Checkout' });
+  res.render('braintreePPCheckout', { title: 'BrainTree Paypal Checkout + Auth/Capture' });
 });
 router.get('/btcov', function(req, res, next) {
   res.render('braintreePPCheckoutVault', { title: 'BrainTree Paypal Checkout Vault' });
