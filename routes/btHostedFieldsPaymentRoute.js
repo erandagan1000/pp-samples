@@ -51,15 +51,16 @@ router.post("/checkout", (req, res) => {
         paymentMethodNonce: nonceFromTheClient,
         merchantAccountId: merchantAccountId,  //if ommitted the default MID (configured on BT console) will be used
         // deviceData: deviceDataFromTheClient,
-        // customer: {
-        //   firstName: "Jen",
-        //   lastName: "Smith",
-        //   company: "Braintree",
-        //   email: "jen@example.com",
-        //   phone: "312.555.1234",
-        //   fax: "614.555.5678",
-        //   website: "www.example.com"
-        // },
+        customer: {
+          firstName: "JenWithCustomField",
+          lastName: "Smith",
+          company: "Braintree",
+          email: "jen@example.com",
+          phone: "312.555.1234",
+          fax: "614.555.5678",
+          website: "www.example.com"
+          
+        },
         // billing: {
         //   firstName: "Paul",
         //   lastName: "Smith",
@@ -86,6 +87,9 @@ router.post("/checkout", (req, res) => {
           submitForSettlement: true,
           storeInVaultOnSuccess: storeInVaultOnsuccess,
           // storeShippingAddressInVault: true    
+        },
+        customFields: {
+          age: 30
         }
 
       },
@@ -199,8 +203,7 @@ router.post("/forward/uat", (req, res) => {
   const hwUserToken = req.body.hwUserToken;
   const vaultPaymentMethodToken = req.body.vaultPaymentMethodToken;
 
-  if(!cvvOnlyNonce || !hwUserToken)
-  {
+  if (!cvvOnlyNonce || !hwUserToken) {
     res.status(500).send("Bad request. Expecting the following keys in payload: {cvvOnlyNonce, hwUserToken, vaultPaymentMethodToken}.  \n For example {'cvvOnlyNonce': 'tokencc_bh_8mbhqt_m6zjq2_nys52g_x4f5d5_8q5','hwUserToken': 'usr-81e6c0aa-23de-4fdc-898f-6e86559050b4', 'vaultPaymentMethodToken': 'b9ww88ss'}");
   }
   //headers
@@ -212,7 +215,7 @@ router.post("/forward/uat", (req, res) => {
   };
 
   //payload to the target API
-  
+
   //setup:
   // 1- take customer from vault, obtain his payment_method_token
   // 2- create a CVV-only nonce with client SDK (dont use it in transaction.sale) - use this: http://localhost:3000/bthfcvvon

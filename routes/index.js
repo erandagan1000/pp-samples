@@ -5,6 +5,9 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'PayPal Demo' });
 });
+
+// ********************  Braintree ************************
+
 router.get('/btco', function(req, res, next) {
   res.render('braintreePPCheckout', { title: 'BrainTree Paypal Checkout + Auth/Capture' });
 });
@@ -44,6 +47,8 @@ router.get('/btap', function(req, res, next) {
 router.get('/btgp', function(req, res, next) {
   res.render('braintreeGooglePay', { title: 'BrainTree Google Pay' });
 });
+
+// ********************  PayPal ************************
 router.get('/ppsc', function(req, res, next) {
   res.render('ppsc', { title: 'PP Rest API - Standard Checkout' });
 });
@@ -90,6 +95,12 @@ router.get('/ppsub', function(req, res, next) {
 router.get('/ppvault', function(req, res, next) {
   res.render('ppVault', { title: 'PP Vault - Limited release' });
 }); 
+
+router.get('/ppvaultv3', function(req, res, next) {
+  res.render('ppVaultV3', { title: 'PP Vault V3 - Limited release' });
+}); 
+
+// ********************  PayPal NVP ************************
 
 router.get('/ppnvpicc', function(req, res, next) {
   res.render('ppNvpInContextCheckout', { title: 'PP NVP In Context Checkout' });

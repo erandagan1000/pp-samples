@@ -54,6 +54,8 @@ router.post('/pay', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
   const data = req.body; 
+  
+  
   const clientMetaDataId = data.fnGuid;
   let baId = data.baId;
   let paymentPayload = {

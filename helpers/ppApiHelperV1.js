@@ -16,6 +16,8 @@ const generateAccessToken = (callback) => {
   };
   const params = new URLSearchParams();
   params.append('grant_type', 'client_credentials');
+  // added according to Vault V3 doc
+  params.append('response_type', 'id_token');
   // console.log(options);
 
   // generate access token, givven merchant credenials
@@ -23,6 +25,7 @@ const generateAccessToken = (callback) => {
     .then(function (response) {
       // handle success
       const data = response.data;
+      console.log(response.data);
       callback(data, undefined);
     })
     .catch(function (error) {

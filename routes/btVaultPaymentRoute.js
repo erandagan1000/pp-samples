@@ -84,6 +84,9 @@ router.post("/checkout", (req, res) => {
         storeInVaultOnSuccess: storeInVault,   
         storeShippingAddressInVault: storeInVault    
       },
+      customFields: {
+        age: 30
+      }
     },
     (err, result) => {
       //const fullResult = JSON.stringify(result)

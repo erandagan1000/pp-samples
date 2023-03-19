@@ -60,7 +60,7 @@
 
   var amountElement = $("#input-amount");
   var amount = amountElement.val();
-  
+
   amountElement.change(function () {
     amount = amountElement.val();
     console.log(amount);
@@ -68,10 +68,10 @@
 
   var currencyElement = $("#input-currency");
   var currency = currencyElement.val();
-  
+
   var authOrCaptureElement = $("#auth-or-capture");
   var authOrCapture = authOrCaptureElement.val();
-  
+
   authOrCaptureElement.change(function () {
     authOrCapture = authOrCaptureElement.val();
     console.log(authOrCapture);
@@ -130,6 +130,12 @@
 
 
       return paypal.Buttons({
+        {{!-- style: {
+          layout: 'vertical',
+          color: 'blue',
+          shape: 'rect',
+          label: 'checkout'
+        }, --}}
         fundingSource: paypal.FUNDING.PAYPAL,
         commit: false, // Continue button, default is true - PayNow button
 
@@ -166,19 +172,19 @@
                 'paymentMethodNonce': payload.nonce,
                 'amount': amount,
                 'currency': selectedCurrency,
-                'isAuthorizeRequest': authOrCapture == 'authorize'   
+                'isAuthorizeRequest': authOrCapture == 'authorize'
 
               }
             }).done(function (result) {
 
               if (result.success) {
                 var approveDiv = document.querySelector('#approve-payload');
-                var captureURl = '',captureHtml ='';
-                if(authOrCapture == 'authorize'){
+                var captureURl = '', captureHtml = '';
+                if (authOrCapture == 'authorize') {
                   captureURl = `http://localhost:3000/bt/capture/${result.transaction.id}`
                   captureHtml = `<div style="margin-top:5px"><h2>Transaction Authorized Successfully.<p><a href='${captureURl}' target=_blank>Click to CAPTURE: ${result.transaction.id}</a></p></h2></div>`;
                 }
-                approveDiv.innerHTML = JSON.stringify(payload)+ '  ' + captureHtml;
+                approveDiv.innerHTML = JSON.stringify(payload) + '  ' + captureHtml;
 
                 $('#checkout-message').html('<h1>Success</h1><p>BT Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
 
@@ -190,7 +196,7 @@
 
               } else {
                 console.log(result);
-                $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');                
+                $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
                 $("#checkout-result").jsonViewer(result);
               }
             });
