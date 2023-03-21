@@ -68,8 +68,8 @@ app.use('/bt/vault/payment', btVaultPaymentRouter);
 
 // pp rest api
 app.use('/ppapi/auth', authRouter);
-app.use('/ppapi/payment',ppApiPaymentRouter);
-app.use('/ppapi/order',ppApiOrderRouter);
+app.use('/ppapi/payment',ppApiPaymentRouter);  //orders v1
+app.use('/ppapi/order',ppApiOrderRouter);  // orders v2
 app.use('/ppapi/rt',ppApiRtRouter);
 app.use('/ppapi/payout',ppApiPayoutRouter);
 // nvp

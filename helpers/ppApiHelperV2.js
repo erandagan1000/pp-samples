@@ -78,10 +78,71 @@ const captureOrder = (orderId, callback) =>{
     
 }
 
+// use the orders api to update an order
+const onShippingChange = (data) => {
+  
+  console.log(data);
+  
+  ppApiHelperV1.generateAccessToken((result, error) => {
+    
+    if(error) {
+      callback(undefined, error);
+    }
+    const accessToken= result.access_token;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"        
+      }
+    };
+
+    let baseAmount = data.baseOrderAmount;
+
+    const totalAmount = parseFloat(baseAmount) + parseFloat(data.selected_shipping_option.amount.value);          
+  return fetch (`https://api-m.paypal.com/v2/checkout/orders/${data.orderID}`, {
+    method: "PATCH",
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify([{
+      op: "replace",
+      path: "/purchase_units/@reference_id=='default'/amount",
+      value: { value: totalAmount.toString(), currency_code: "USD" },
+    }])
+  })
+  .then((response) => response.json());
+    
+
+
+
+
+    
+    
+    axios.post(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`, data, config)
+      .then(function (response) {
+        // handle success
+        const data = response.data;
+        console.log("ppApiHelperV2.captureOrder");
+        console.log("CAPTURE:", data);
+        callback(data, undefined);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        callback(undefined, error)
+      })
+  });
+
+  
+}
+
 
 module.exports = {
   test,
   createOrder,
   captureOrder,
-  uuidv4
+  uuidv4,
+  onShippingChange
 };

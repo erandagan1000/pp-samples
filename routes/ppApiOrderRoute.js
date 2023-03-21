@@ -6,7 +6,7 @@ const router = express.Router();
 const ppApiHelperV2 = require('../helpers/ppApiHelperV2')
 
 // route: /ppapi/order
-
+// create order
 router.post('/', (req, res, next) => {
 
   const payload = {
@@ -23,6 +23,22 @@ router.post('/', (req, res, next) => {
   const guid = ppApiHelperV2.uuidv4();
 
   ppApiHelperV2.createOrder(guid, payload, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
+
+// patch order
+router.patch('/', (req, res, next) => {
+
+  const payload = req.body;
+  
+  ppApiHelperV2.onShippingChange(payload, (data, error) => {
     if (error) {
       res.status(500).send(error);
       return;

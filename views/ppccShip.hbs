@@ -3,9 +3,12 @@
 
 <div class="loading" id="loading-button">Loading paypal button...</div>
 <div id="paypal-button-container"></div>
+<br/>
+<div id="paypal-shipping-container">&nbsp;</div>
+<br/>
 <div id="paypal-result-container"></div>
 {{!-- PP Rest API simple --}}
-{{!-- script query parameters:  --}}
+{{!-- script query parameters: --}}
 {{!-- currency=USD&debug=true&commit=false&enable-funding=venmo&vault=true --}}
 {{!-- components=buttons,hosted-fields,marks,messages --}}
 {{!-- client-id=Abf... #App: ACDC | Account: eran.m.us@merchant.com (BusinessPro) --}}
@@ -14,6 +17,8 @@
   </script>
 
 <script>
+  const baseOrderAmount = "100.00";
+  const shippingContainer = document.querySelector("#paypal-shipping-container");
   $("#loading-button").show();
 
   paypal.Buttons({
@@ -23,7 +28,7 @@
       return actions.order.create({
         purchase_units: [{
           amount: {
-            value: '77.44' // Can reference variables or functions. Example: `value: document.getElementById('...').value`
+            value: baseOrderAmount// Can reference variables or functions. Example: `value: document.getElementById('...').value`
           },
           shipping: {
             options: [
@@ -62,13 +67,50 @@
         }]
       });
     },
+    
+    // how to change the total price based on different shipping options and patch the order with updated amount based on selected shipping method
+    onShippingChange: function (data, actions) {
+      console.log("SELECTED_OPTION", data.selected_shipping_option); // data.selected_shipping_option contains the selected shipping option
+      // NOTE: data.selected_shipping_option_id contains the selected shipping ID
+      // passed to the `actions.order.create()` call
+      data.amount.value =
+        parseFloat(baseOrderAmount, 10) +
+        parseFloat(data.selected_shipping_option.amount.value, 10);
+      // Here you can also check the data.shipping_address (reruned from PP review screen) if it is address your business support shipping to.
+      var shippingContainer = document.querySelector("#paypal-shipping-container");
+      shippingContainer.innerHTML = `<p><b>Shipping address:</b> ${JSON.stringify(data.shipping_address)}</p><p><b>Selected Shipping Method:</b> ${JSON.stringify(data.selected_shipping_option)}</p>`
 
+      // option1:  PATCH the order via the JS SDK using the actions object
+      return actions.order.patch([
+        {
+          op: "replace",
+          path: "/purchase_units/@reference_id=='default'/amount",
+          value: { value: data.amount.value, currency_code: "USD" },
+        },
+      ]);
+
+      // option2:  PATCH the order on the merchant Server
+      /*
+      return fetch("/ppapi/order", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderID: data.orderID,
+          selectedShippingOption: data.selected_shipping_option,
+          baseOrderAmount
+        })
+      });
+      */  
+    },
+    
     // Finalize the transaction after payer approval
     onApprove: function (data, actions) {
       return actions.order.capture().then(function (orderData) {
         // Successful capture! For dev/demo purposes:
         let resultJson = JSON.stringify(orderData, null, 2);
-        console.log('Capture result', orderData, resultJson);
+        {{!-- console.log('Capture result', orderData, resultJson); --}}
         var transaction = orderData.purchase_units[0].payments.captures[0];
         alert('Transaction ' + transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
         $('#paypal-result-container').text(resultJson);
@@ -79,24 +121,7 @@
         // Or go to another URL:  actions.redirect('thank_you.html');
       });
     },
-    onShippingChange: function (data, actions) {
-      console.log("SELECTED_OPTION", data.selected_shipping_option); // data.selected_shipping_option contains the selected shipping option
-      // NOTE: data.selected_shipping_option_id contains the selected shipping ID
-      // passed to the `actions.order.create()` call
-      data.amount.value =
-        parseFloat(baseAmount, 10) +
-        parseFloat(data.selected_shipping_option.amount.value, 10);
-
-      return actions.order.patch([
-        {
-          op: "replace",
-          path: "/purchase_units/@reference_id=='default'/amount",
-          value: { value: data.amount, currency_code: "USD" },
-        },
-      ]);
-
-    }
-  }).render('#paypal-button-container').then( function() {
+  }).render('#paypal-button-container').then(function () {
     $("#loading-button").hide();
   });
 
