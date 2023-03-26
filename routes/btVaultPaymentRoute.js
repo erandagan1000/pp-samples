@@ -7,7 +7,21 @@ var randomstring = require("randomstring");
 
 // #region Token Functions
 router.get("/client_token", (req, res) => {
-  btHelper.gateway.clientToken.generate({}).then((response) => {
+  
+  //Expect payload {merchant_account_id: xxx}  if merchant uses multiple PP account linked to the same BT gateway (MID)
+  // he will need to specify the MAID to use, it should be the one connnected in BT Console where he linked the PP asccount
+  let selectedCurrency = req.query.currency;
+  if(selectedCurrency) {
+    payload = {merchant_account_id: btHelper.getMerchantAccountIdByCurrency(selectedCurrency)};
+  }
+  else {
+    payload = {};
+  }
+
+
+
+
+  btHelper.gateway.clientToken.generate(payload).then((response) => {
     console.log(response);
     res.send(response.clientToken);
   });

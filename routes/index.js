@@ -11,6 +11,12 @@ router.get('/', function(req, res, next) {
 router.get('/btco', function(req, res, next) {
   res.render('braintreePPCheckout', { title: 'BrainTree Paypal Checkout + Auth/Capture' });
 });
+router.get('/btco1', function(req, res, next) {
+  res.render('braintreePPCheckout1', { title: 'BrainTree Paypal Checkout + Auth/Capture V2' });
+});
+router.get('/btco2', function(req, res, next) {
+  res.render('braintreePPCheckoutLoadScriptInScriptTag', { title: 'BrainTree Paypal Checkout + Auth/Capture - With Config' });
+});
 router.get('/btcov', function(req, res, next) {
   res.render('braintreePPCheckoutVault', { title: 'BrainTree Paypal Checkout Vault' });
 });

@@ -124,7 +124,7 @@
       myDataClientPromise.then((data) => {
         console.log("reolved client token:", data);
         window.paypalLoadScript({
-          // "locale": 'pl_PL',
+          "locale": 'en_US',
           "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk",
           "data-client-token": globalClientToken,
           "components": "buttons,hosted-fields"
@@ -198,7 +198,7 @@
           return actions.order.create({
             purchase_units: [{
               amount: {
-                value: "1.00"
+                value: "1000.00"
               }
             }]
           });

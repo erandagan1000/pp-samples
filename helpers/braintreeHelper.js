@@ -36,7 +36,15 @@ const btConfig = {
 const getMerchantAccountIdByCurrency = function (currency) {
   let merchantAccountId =  "eranltd";
   if(currency){
-    merchantAccountId = currency == 'EUR' ? "eranltd_EUR" : "eranltd"; 
+    switch (currency) {
+      case "EUR":
+        return "eranltd_EUR";
+        case "GBP":
+          return "eranltd_GBP";
+        default:
+          return merchantAccountId;
+    }
+    
   } 
   return merchantAccountId;
 }

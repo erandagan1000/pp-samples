@@ -1,0 +1,166 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<hr>
+
+<!---------------- Paypal Button ------------------>
+<div>Amount: <input type="text" id="input-amount" style="width:100px" value="10"></div>
+<div>Currency: <input type="text" id="input-currency" style="width:100px" value="EUR"></div>
+<div>authorize or capture: <input type="text" id="auth-or-capture" style="width:100px" value="capture"></div>
+<div>
+  <div id="paypal-button"></div>
+</div>
+
+
+<div>
+  {{!-- <button id="generate-token">Generate Access Token</button> --}}
+  <div class="loading" id="loading-token">Generating access token...</div>
+  <div style="inline-size: 1350px;overflow-wrap: break-word; ">
+    <p>Access token: </p>
+    <div id="token" style="font-size: 6pt;"></div>
+  </div>
+
+</div>
+<!-------- results -------------------->
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>OnApprove payload: </p>
+  <div id="approve-payload">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>Checkout Server message: </p>
+  <div id="checkout-message">&nbsp;</div>
+</div>
+
+<div style="inline-size: 1350px;overflow-wrap: break-word; ">
+  <p>Checkout Server result: </p>
+  <div id="checkout-result">&nbsp;</div>
+</div>
+
+<!-- includes the Braintree JS client SDK -->
+<script src="https://js.braintreegateway.com/js/braintree-2.32.1.min.js"></script>
+
+<script>
+
+  var selectedCurrency = 'EUR'   // e.g. EUR or USD
+  var tokenSpan = document.querySelector('#token')
+  var token = undefined;
+
+  var amountElement = $("#input-amount");
+  var amount = amountElement.val();
+
+  amountElement.change(function () {
+    amount = amountElement.val();
+    console.log(amount);
+  });
+
+  var currencyElement = $("#input-currency");
+  var currency = currencyElement.val();
+
+  var authOrCaptureElement = $("#auth-or-capture");
+  var authOrCapture = authOrCaptureElement.val();
+
+  authOrCaptureElement.change(function () {
+    authOrCapture = authOrCaptureElement.val();
+    console.log(authOrCapture);
+    initBtPaypalCheckout(token);
+
+
+  });
+
+  currencyElement.change(function () {
+    selectedCurrency = currencyElement.val();
+    console.log(selectedCurrency);
+    generatePayPalButton();  // required if currency was changed
+
+  });
+ 
+
+  function generatePayPalButton() {
+    $.ajax({
+      type: 'GET',
+      url: `/bt/vault/payment/client_token?currency=${selectedCurrency}`
+    }).done(function (result) {
+      // console.log(result);
+      token = result;
+      tokenSpan.innerHTML = `${token}`;
+      $("#loading-token").hide();
+
+      initBtPaypalCheckout(token);
+    });
+  }
+
+  generatePayPalButton();
+
+
+  // -----------------------------------------------------------------
+
+  // paypal checkout
+  function initBtPaypalCheckout(token) {
+    $("#loading-button").show();
+
+    braintree.setup(token, 'custom', {
+      paypal: {
+        container: 'paypal-button',
+        singleUse: true, // Required
+        amount: amount, // Required
+        currency: selectedCurrency, // Required
+        locale: 'en_US',
+        enableShippingAddress: true,
+        shippingAddressOverride: {
+          recipientName: 'Scruff McGruff',
+          streetAddress: '1234 Main St.',
+          extendedAddress: 'Unit 1',
+          locality: 'Chicago',
+          countryCodeAlpha2: 'US',
+          postalCode: '60652',
+          region: 'IL',
+          phone: '123.456.7890',
+          editable: false
+        }
+      },
+      onPaymentMethodReceived: function (obj) {
+        var payload = obj;
+
+        $.ajax({
+          type: 'POST',
+          url: '/bt/vault/payment/checkout',
+          data: {
+            'paymentMethodNonce': payload.nonce,
+            'amount': amount,
+            'currency': selectedCurrency,
+            'isAuthorizeRequest': authOrCapture == 'authorize'
+
+          }
+        }).done(function (result) {
+
+          if (result.success) {
+            var approveDiv = document.querySelector('#approve-payload');
+            var captureURl = '', captureHtml = '';
+            if (authOrCapture == 'authorize') {
+              captureURl = `http://localhost:3000/bt/capture/${result.transaction.id}`
+              captureHtml = `<div style="margin-top:5px"><h2>Transaction Authorized Successfully.<p><a href='${captureURl}' target=_blank>Click to CAPTURE: ${result.transaction.id}</a></p></h2></div>`;
+            }
+            approveDiv.innerHTML = JSON.stringify(payload) + '  ' + captureHtml;
+
+            $('#checkout-message').html('<h1>Success</h1><p>BT Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
+
+            var serverResultDiv = document.querySelector('#checkout-result');
+            // serverResultDiv.innerHTML = JSON.stringify(result);
+
+            $("#checkout-result").jsonViewer(result);
+
+
+          } else {
+            console.log(result);
+            $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+            $("#checkout-result").jsonViewer(result);
+          }
+        });
+
+
+      }
+    })
+  }
+
+
+</script>

@@ -3,7 +3,7 @@
 <hr>
 
 <!---------------- Paypal Button ------------------>
-<div>Amount: <input type="text" id="input-amount" style="width:100px" value="400"></div>
+<div>Amount: <input type="text" id="input-amount" style="width:100px" value="300"></div>
 <div>Currency: <input type="text" id="input-currency" style="width:100px" value="USD"></div>
 <div>authorize or capture: <input type="text" id="auth-or-capture" style="width:100px" value="capture"></div>
 <div>
@@ -38,7 +38,8 @@
   <p>Checkout Server result: </p>
   <div id="checkout-result">&nbsp;</div>
 </div>
-
+<!-- Load the PayPal JS SDK with your PayPal Client ID - Allows more configurations-->
+<script src="https://www.paypal.com/sdk/js?client-id=sb&buyer-country=US"></script>
 <!-- includes the Braintree JS client SDK -->
 <!-- Load the client component. -->
 <script src="https://js.braintreegateway.com/web/3.91.0/js/client.min.js"></script>
@@ -116,26 +117,18 @@
         client: clientInstance
       });
     }).then(function (paypalCheckoutInstance) {
-        console.log(selectedCurrency);
-
-      return paypalCheckoutInstance.loadPayPalSDK({
-        currency: selectedCurrency,
-        intent: authOrCapture, 
-        
-        /* not working 
-        form here: https://braintree.github.io/braintree-web/current/PayPalCheckout.html#loadPayPalSDK
-        dataAttributes: {}
-         */
-
-        // "components": 'buttons,messages', //optional
-
-      });
-    }).then(function (paypalCheckoutInstance) {
 
 
       return paypal.Buttons({
-
-        fundingSource: paypal.FUNDING.PAYPAL,
+        style: {
+          layout: 'vertical',
+          color: 'blue',
+          shape: 'rect',
+          label: 'checkout'
+        }, 
+        // fundingSource: paypal.FUNDING.PAYPAL,
+         // fundingSource: paypal.FUNDING.CREDIT,
+        fundingSource: paypal.FUNDING.PAYLATER,
         commit: false, // Continue button, default is true - PayNow button
 
         createOrder: function () {
