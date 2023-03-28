@@ -11,7 +11,7 @@ router.get("/client_token", (req, res) => {
   //Expect payload {merchant_account_id: xxx}  if merchant uses multiple PP account linked to the same BT gateway (MID)
   // he will need to specify the MAID to use, it should be the one connnected in BT Console where he linked the PP asccount
   let selectedCurrency = req.query.currency;
-  if(selectedCurrency) {
+  if(selectedCurrency && !btHelper.isECBT) {
     payload = {merchant_account_id: btHelper.getMerchantAccountIdByCurrency(selectedCurrency)};
   }
   else {
@@ -47,7 +47,8 @@ router.post("/checkout", (req, res) => {
   console.log("store in vault: ", storeInVault);
 
   // set merchantAccountId by selected presntment currency
-  const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
+  
+  const merchantAccountId = btHelper.isECBT ? undefined : btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
 
   let submitForSettlement = true;
   if (req.body.isAuthorizeRequest && req.body.isAuthorizeRequest == 'true')
@@ -56,9 +57,20 @@ router.post("/checkout", (req, res) => {
   }
   console.log("submitForSettlement: ", submitForSettlement);
 
+  let requestParams = {}
 
-  btHelper.gateway.transaction.sale(
-    {
+  if(btHelper.isECBT) {
+    requestParams = {
+      amount,
+      paymentMethodNonce: nonceFromTheClient,
+      
+      options: {
+        submitForSettlement
+      }
+    }
+  }
+  else {
+    requestParams = {
       amount,
       paymentMethodNonce: nonceFromTheClient,
       merchantAccountId: merchantAccountId,  //if ommitted the default MID (configured on BT console) will be used
@@ -101,7 +113,14 @@ router.post("/checkout", (req, res) => {
       customFields: {
         age: 30
       }
-    },
+    }
+
+  }
+
+
+
+  btHelper.gateway.transaction.sale(
+    requestParams,
     (err, result) => {
       //const fullResult = JSON.stringify(result)
       res.send(result);

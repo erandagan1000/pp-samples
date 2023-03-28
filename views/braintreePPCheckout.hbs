@@ -115,109 +115,108 @@
       return braintree.paypalCheckout.create({
         client: clientInstance
       });
-    }).then(function (paypalCheckoutInstance) {
+    })
+      .then(function (paypalCheckoutInstance) {
         console.log(selectedCurrency);
+      
+        var ppJsSdkOptions = {
+          currency: selectedCurrency,
+          intent: authOrCapture,
+          //// options object here: https://braintree.github.io/braintree-web/current/PayPalCheckout.html#loadPayPalSDK
+          // dataAttributes: {}
+          // "components": 'buttons,messages', //optional
+        };
 
-      return paypalCheckoutInstance.loadPayPalSDK({
-        currency: selectedCurrency,
-        intent: authOrCapture, 
-        
-        /* not working 
-        form here: https://braintree.github.io/braintree-web/current/PayPalCheckout.html#loadPayPalSDK
-        dataAttributes: {}
-         */
-
-        // "components": 'buttons,messages', //optional
-
-      });
-    }).then(function (paypalCheckoutInstance) {
+        return paypalCheckoutInstance.loadPayPalSDK(ppJsSdkOptions);
+      })
+      .then(function (paypalCheckoutInstance) {
 
 
-      return paypal.Buttons({
+        return paypal.Buttons({
 
-        fundingSource: paypal.FUNDING.PAYPAL,
-        commit: false, // Continue button, default is true - PayNow button
+          fundingSource: paypal.FUNDING.PAYPAL,
+          // commit: false, // Continue button, default is true - PayNow button
 
-        createOrder: function () {
-          return paypalCheckoutInstance.createPayment({
-            flow: 'checkout', // Required
-            amount: amount, // Required
-            currency: selectedCurrency, // Required, must match the currency passed in with loadPayPalSDK
-            intent: authOrCapture, // Must match the intent passed in with loadPayPalSDK
+          createOrder: function () {
+            return paypalCheckoutInstance.createPayment({
+              flow: 'checkout', // Required
+              amount: amount, // Required
+              currency: selectedCurrency, // Required, must match the currency passed in with loadPayPalSDK
+              intent: authOrCapture, // Must match the intent passed in with loadPayPalSDK
 
-            //offerCredit: true, //optional - offer Credit option
-            enableShippingAddress: true,
-            shippingAddressEditable: false,
-            shippingAddressOverride: {
-              recipientName: 'Scruff McGruff',
-              line1: '1234 Main St.',
-              line2: 'Unit 1',
-              city: 'Chicago',
-              countryCode: 'US',
-              postalCode: '60652',
-              state: 'IL',
-              phone: '123.456.7890'
-            }
-          });
-        },
-
-        onApprove: function (data, actions) {
-
-          return paypalCheckoutInstance.tokenizePayment(data).then(function (payload) {
-            // Submit `payload.nonce` to your server
-            $.ajax({
-              type: 'POST',
-              url: '/bt/vault/payment/checkout',
-              data: {
-                'paymentMethodNonce': payload.nonce,
-                'amount': amount,
-                'currency': selectedCurrency,
-                'isAuthorizeRequest': authOrCapture == 'authorize'
-
-              }
-            }).done(function (result) {
-
-              if (result.success) {
-                var approveDiv = document.querySelector('#approve-payload');
-                var captureURl = '', captureHtml = '';
-                if (authOrCapture == 'authorize') {
-                  captureURl = `http://localhost:3000/bt/capture/${result.transaction.id}`
-                  captureHtml = `<div style="margin-top:5px"><h2>Transaction Authorized Successfully.<p><a href='${captureURl}' target=_blank>Click to CAPTURE: ${result.transaction.id}</a></p></h2></div>`;
-                }
-                approveDiv.innerHTML = JSON.stringify(payload) + '  ' + captureHtml;
-
-                $('#checkout-message').html('<h1>Success</h1><p>BT Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
-
-                var serverResultDiv = document.querySelector('#checkout-result');
-                // serverResultDiv.innerHTML = JSON.stringify(result);
-
-                $("#checkout-result").jsonViewer(result);
-
-
-              } else {
-                console.log(result);
-                $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
-                $("#checkout-result").jsonViewer(result);
+              //offerCredit: true, //optional - offer Credit option
+              enableShippingAddress: true,
+              shippingAddressEditable: false,
+              shippingAddressOverride: {
+                recipientName: 'Scruff McGruff',
+                line1: '1234 Main St.',
+                line2: 'Unit 1',
+                city: 'Chicago',
+                countryCode: 'US',
+                postalCode: '60652',
+                state: 'IL',
+                phone: '123.456.7890'
               }
             });
-          });
-        },
+          },
 
-        onCancel: function (data) {
-          console.log('PayPal payment cancelled', JSON.stringify(data, 0, 2));
-        },
+          onApprove: function (data, actions) {
 
-        onError: function (err) {
-          console.error('PayPal error', err);
-        }
-      }).render('#paypal-button');
-    }).then(function () {
-      // The PayPal button will be rendered in an html element with the ID
-      // `paypal-button`. This function will be called when the PayPal button
-      // is set up and ready to be used
-      $("#paypal-button").show();
-      $("#loading-button").hide();
-    });
+            return paypalCheckoutInstance.tokenizePayment(data).then(function (payload) {
+              // Submit `payload.nonce` to your server
+              $.ajax({
+                type: 'POST',
+                url: '/bt/vault/payment/checkout',
+                data: {
+                  'paymentMethodNonce': payload.nonce,
+                  'amount': amount,
+                  'currency': selectedCurrency,
+                  'isAuthorizeRequest': authOrCapture == 'authorize'
+
+                }
+              }).done(function (result) {
+
+                if (result.success) {
+                  var approveDiv = document.querySelector('#approve-payload');
+                  var captureURl = '', captureHtml = '';
+                  if (authOrCapture == 'authorize') {
+                    captureURl = `http://localhost:3000/bt/capture/${result.transaction.id}`
+                    captureHtml = `<div style="margin-top:5px"><h2>Transaction Authorized Successfully.<p><a href='${captureURl}' target=_blank>Click to CAPTURE: ${result.transaction.id}</a></p></h2></div>`;
+                  }
+                  approveDiv.innerHTML = JSON.stringify(payload) + '  ' + captureHtml;
+
+                  $('#checkout-message').html('<h1>Success</h1><p>BT Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
+
+                  var serverResultDiv = document.querySelector('#checkout-result');
+                  // serverResultDiv.innerHTML = JSON.stringify(result);
+
+                  $("#checkout-result").jsonViewer(result);
+
+
+                } else {
+                  console.log(result);
+                  $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+                  $("#checkout-result").jsonViewer(result);
+                }
+              });
+            });
+          },
+
+          onCancel: function (data) {
+            console.log('PayPal payment cancelled', JSON.stringify(data, 0, 2));
+          },
+
+          onError: function (err) {
+            console.error('PayPal error', err);
+          }
+        }).render('#paypal-button');
+      }).then(function () {
+        // The PayPal button will be rendered in an html element with the ID
+        // `paypal-button`. This function will be called when the PayPal button
+        // is set up and ready to be used
+        $("#paypal-button").show();
+        $("#loading-button").hide();
+      });
   }
 
 

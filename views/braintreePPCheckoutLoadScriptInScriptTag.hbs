@@ -39,7 +39,7 @@
   <div id="checkout-result">&nbsp;</div>
 </div>
 <!-- Load the PayPal JS SDK with your PayPal Client ID - Allows more configurations-->
-<script src="https://www.paypal.com/sdk/js?client-id=sb&buyer-country=US"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=sb&buyer-country=US&vault=true"></script>
 <!-- includes the Braintree JS client SDK -->
 <!-- Load the client component. -->
 <script src="https://js.braintreegateway.com/web/3.91.0/js/client.min.js"></script>
@@ -122,13 +122,13 @@
       return paypal.Buttons({
         style: {
           layout: 'vertical',
-          color: 'blue',
+          color: 'darkblue',
           shape: 'rect',
           label: 'checkout'
         }, 
         // fundingSource: paypal.FUNDING.PAYPAL,
-         // fundingSource: paypal.FUNDING.CREDIT,
-        fundingSource: paypal.FUNDING.PAYLATER,
+          fundingSource: paypal.FUNDING.CREDIT,
+        // fundingSource: paypal.FUNDING.PAYLATER,
         commit: false, // Continue button, default is true - PayNow button
 
         createOrder: function () {
