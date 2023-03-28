@@ -89,7 +89,7 @@ const find = function (transactionId) {
   return gateway.transaction.find(transactionId);
 }
 
-const gateway = new braintree.BraintreeGateway(btConfigEcbtUS);
+const gateway = new braintree.BraintreeGateway(btConfig);
 const isECBT = true;
 
 module.exports = {
