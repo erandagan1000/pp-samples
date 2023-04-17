@@ -3,7 +3,7 @@
 <hr>
 
 <!---------------- Paypal Button ------------------>
-<div>Amount: <input type="text" id="input-amount" style="width:100px" value="300"></div>
+<div>Amount: <input type="text" id="input-amount" style="width:100px" value="90"></div>
 <div>Currency: <input type="text" id="input-currency" style="width:100px" value="USD"></div>
 <div>authorize or capture: <input type="text" id="auth-or-capture" style="width:100px" value="capture"></div>
 <div>
@@ -39,7 +39,24 @@
   <div id="checkout-result">&nbsp;</div>
 </div>
 <!-- Load the PayPal JS SDK with your PayPal Client ID - Allows more configurations-->
-<script src="https://www.paypal.com/sdk/js?client-id=sb&buyer-country=US&vault=true"></script>
+
+<script>
+  // script settings
+  const integrationSettings = {
+    paypalCredit: { color: 'darkblue', fundingSource: 'credit', vault: true },
+    paypalCheckout: { color: 'gold', fundingSource: 'paypal', vault: false },
+    paypalBuyNowPayLater: { color: 'gold', fundingSource: 'paylater', vault: false }
+
+  }
+  const selectedIntegrationSettings = integrationSettings.paypalBuyNowPayLater;
+  // load PP JS SDK
+  var script = document.createElement('script');
+  script.src = `https://www.paypal.com/sdk/js?client-id=sb&buyer-country=US&vault=${selectedIntegrationSettings.vault}`;
+  document.body.appendChild(script);
+
+</script>
+{{!--
+<script src="https://www.paypal.com/sdk/js?client-id=sb&buyer-country=US"></script> --}}
 <!-- includes the Braintree JS client SDK -->
 <!-- Load the client component. -->
 <script src="https://js.braintreegateway.com/web/3.91.0/js/client.min.js"></script>
@@ -67,19 +84,17 @@
   var authOrCaptureElement = $("#auth-or-capture");
   var authOrCapture = authOrCaptureElement.val();
 
+
   authOrCaptureElement.change(function () {
     authOrCapture = authOrCaptureElement.val();
     console.log(authOrCapture);
     initBtPaypalCheckout(token);
-
-
   });
 
   currencyElement.change(function () {
     selectedCurrency = currencyElement.val();
     console.log(selectedCurrency);
     generatePayPalButton();  // required if currency was changed
-
   });
 
 
@@ -122,13 +137,14 @@
       return paypal.Buttons({
         style: {
           layout: 'vertical',
-          color: 'darkblue',
+          color: selectedIntegrationSettings.color,
           shape: 'rect',
           label: 'checkout'
-        }, 
+        },
+        fundingSource: selectedIntegrationSettings.fundingSource,
         // fundingSource: paypal.FUNDING.PAYPAL,
-          fundingSource: paypal.FUNDING.CREDIT,
         // fundingSource: paypal.FUNDING.PAYLATER,
+        // fundingSource: paypal.FUNDING.CREDIT,
         commit: false, // Continue button, default is true - PayNow button
 
         createOrder: function () {

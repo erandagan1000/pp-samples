@@ -1,0 +1,185 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<p>Access token</p>
+<div style="inline-size: 1350px;overflow-wrap: break-word;" id="access-token-container">&nbsp;</div>
+<table style="margin-top:15px">
+  <tr>
+    <th>ACTION</th>
+    <th>RESPONSE</th>
+  </tr>
+  {{!-- CREATE ORDER --}}
+  <tr>
+    <td>
+      <button disabled id="create-order-button" onclick="createOrder()">Create Order</button>
+    </td>
+    <td class="seperator">
+      <div id="create-order-response"></div>
+      <div><span id="create-order-approve-container"></span> </div>
+    </td>
+  </tr>
+  {{!-- GET ORDER DETAILS --}}
+  <tr>
+    <td>
+      <button disabled id="get-order-details-button" onclick="getOrderDetails()">Get Order Details</button>
+    </td>
+    <td class="seperator">
+      <div id="ba-response"></div>
+    </td>
+  </tr>
+  {{!-- CAPTURE ORDER --}}
+  <tr>
+    <td>
+      <button disabled id="ba-pay" onclick="captureOrder()">Capture Order</button>
+    </td>
+    <td class="seperator">
+      <div id="ba-pay-response"></div>
+    </td>
+  </tr>
+</table>
+
+
+<div id="payment-view">
+  <!-- Buttons container -->
+  <div style="padding:10px">
+    <table border="0" align="left" valign="top" bgcolor="#FFFFFF" style="width: 39%">
+      <tr>
+        <td colspan="2">
+          <div id="paypal-button-container"></div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">&nbsp;</td>
+      </tr>
+
+    </table>
+  </div>
+
+</div>
+<div>
+  <span id="payment-result">&nbsp; </span>
+  <span colspan="2" id="payment-result-cc">&nbsp;</span>
+
+</div>
+
+
+<!-- Implementation -->
+<script>
+  var globalAccessToken = "";
+  var globalClientToken = "";
+  var orderId = "";
+  var baId = "";
+  var orderData = { "intent": "CAPTURE", 
+                    "purchase_units": [
+                      { "reference_id": "d9f80740-38f0-11e8-b467-0ed5f89f718b", 
+                         "amount": {"currency_code": "USD", "value": "100.00" }
+                      } 
+                      ], 
+                    "payment_source": {
+                                      "paypal": { "experience_context": 
+                                                    { "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED", 
+                                                      "payment_method_selected": "PAYPAL", 
+                                                      "brand_name": "EXAMPLE INC", 
+                                                      "locale": "en-US", 
+                                                      "landing_page": "LOGIN", 
+                                                      "shipping_preference": "SET_PROVIDED_ADDRESS", 
+                                                      "user_action": "PAY_NOW", 
+                                                      "return_url": "https://example.com/returnUrl", 
+                                                      "cancel_url": "https://example.com/cancelUrl" 
+                                                    } 
+                                                } 
+                                        } 
+                  };
+
+  $.ajax('ppapi/auth/accesstoken/generate', {
+    type: 'POST',  
+    data: {}, 
+    success: function (data, status, xhr) {
+      console.log(data);
+      const accesstoken = data.access_token;
+      globalAccessToken = accesstoken;
+      $("#access-token-container").html(globalAccessToken);
+      $("#create-order-button").removeAttr('disabled');
+    },
+    error: function (jqXhr, textStatus, errorMessage) {
+      console.log(errorMessage);
+    }
+  });
+
+  function createOrder() {
+    $.ajax('/ppapi/order', {
+      type: 'POST',
+      headers: {
+        'Authorization': `Bearer ${globalAccessToken}`
+      },
+      data: orderData,
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#create-order-response").html(JSON.stringify(data));
+        $("#get-order-details-button").removeAttr("disabled");
+        
+        const links = data.links;
+        const approveUrl = links.find((l) => l.rel == "approve").href;
+        const captureUrl = links.find((l) => l.rel == "capture").href;
+        $("#create-order-approve-container").html(`<p><b>Follow this url to: <br> APPROVE Order: <a target='_blank' href="${approveUrl}">Approve Order</a><br> CAPTURE Order: <a target='_blank' href="${captureUrl}">Capture Order</a></b></p>`);
+        orderId = data.id;
+
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
+    });
+
+  }
+
+  function getOrderDetails() {
+    
+    $.ajax(`/ppapi/order/${orderId}`, {
+      type: 'POST',
+      headers: {
+        'Authorization': `Bearer ${globalAccessToken}`
+      },
+      data: { token_id: orderId },
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#ba-response").html(JSON.stringify(data));
+        $("#get-ba-details").removeAttr("disabled");
+        $("#ba-pay").removeAttr("disabled");
+        baId = data.id;
+
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
+    });
+
+  }
+
+  function uuidv4() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+
+  function captureOrder() {
+    var guid = uuidv4();
+    debugger;
+    $.ajax(`/ppapi/order/${orderId}/capture`, {
+      type: 'POST',
+      headers: {
+        'Authorization': `Bearer ${globalAccessToken}`
+      },     
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#ba-pay-response").html(JSON.stringify(data)).css('color','green'); ;
+
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+        $("#ba-pay-response").html(JSON.stringify(jqXhr.responseJSON)).css('color','red'); 
+      }
+    });
+
+  }
+
+
+</script>

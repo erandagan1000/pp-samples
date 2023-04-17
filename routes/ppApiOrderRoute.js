@@ -48,6 +48,20 @@ router.patch('/', (req, res, next) => {
 
   });
 });
+ // order details
+router.post('/:id', (req, res, next) => {
+
+  orderId = req.params.id;
+  ppApiHelperV2.getOrderDetails(orderId, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
 
 router.post('/lpm/sofort', (req, res, next) => {
 
@@ -95,7 +109,7 @@ router.post('/:id/capture', (req, res, next) => {
   orderId = req.params.id;
   ppApiHelperV2.captureOrder(orderId, (data, error) => {
     if (error) {
-      res.status(500).send(error);
+      res.status(500).send(error.response.data);
       return;
     }
     res.status(200).send(data);

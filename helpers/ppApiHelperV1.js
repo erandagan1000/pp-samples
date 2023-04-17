@@ -25,7 +25,7 @@ const generateAccessToken = (callback) => {
     .then(function (response) {
       // handle success
       const data = response.data;
-      console.log(response.data);
+      
       callback(data, undefined);
     })
     .catch(function (error) {

@@ -9,6 +9,21 @@ var globalRepo = {
 }
 const axios = require('axios').default;
 
+const ppAppIL = {
+  identifier: "ppapp_il",
+  user: "sb-nbbv29187947_api1.business.example.com",
+  password: "KWJRWRSEX3M9DL6W",
+  signature: "A0sMXJquGaU-ojwm1INM52vCoHK4AIg5NtbvVE-JirehO8lSB9e.kuQg"
+}
+
+const ppAppUS = {
+  identifier: "ppapp_us",
+  user: "sb-fdhqv12110699_api1.business.example.com",
+  password: "LVLCW8JQRMTKAWVV",
+  signature: "AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB"
+}
+
+var nvpConfig = ppAppIL;
 
 const test = () => {
   return "hello test"
@@ -16,7 +31,7 @@ const test = () => {
 
 // #region Checkout Functions
 const setExpressCheckout = (data, callback) => {
-  const amount = "444.00";
+  const amount = "212.00";
   globalRepo.amount = amount;
 
   const config = {
@@ -25,10 +40,11 @@ const setExpressCheckout = (data, callback) => {
   if (!data) {
     data = "METHOD=SetExpressCheckout" +
       "&VERSION=50.0" +
-      "&USER=sb-fdhqv12110699_api1.business.example.com" +
-      "&PWD=LVLCW8JQRMTKAWVV" +
-      "&SIGNATURE=AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB" +
+      "&USER=" + nvpConfig.user +
+      "&PWD=" +nvpConfig.password +
+      "&SIGNATURE=" + nvpConfig.signature +
       "&AMT=" + amount +
+      "&PAYMENTREQUEST_0_INVNUM="+nvpConfig.identifier+"_1234"  +
       "&cancelUrl=http://localhost:3000/ppnvpicc/cancel" +
       "&returnUrl=http://localhost:3000/ppnvpicc/success";
 
@@ -52,7 +68,7 @@ const setExpressCheckout = (data, callback) => {
 
 const setupBillingAgreementWithPayment = (data, callback) => {
 
-  const amount = "555.00";
+  const amount = "765.00";
   globalRepo.amount = amount;
   const config = {
     headers: {}
@@ -60,13 +76,14 @@ const setupBillingAgreementWithPayment = (data, callback) => {
   if (!data) {
     data = "METHOD=SetExpressCheckout" +
       "&VERSION=86" +
-      "&USER=sb-fdhqv12110699_api1.business.example.com" +
-      "&PWD=LVLCW8JQRMTKAWVV" +
-      "&SIGNATURE=AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB" +
+      "&USER=" + nvpConfig.user +
+      "&PWD=" +nvpConfig.password +
+      "&SIGNATURE=" + nvpConfig.signature +
       "&PAYMENTREQUEST_0_PAYMENTACTION=AUTHORIZATION" +  // #Payment authorization
       "&PAYMENTREQUEST_0_AMT=" + amount + // #The amount authorized
       "&PAYMENTREQUEST_0_CURRENCYCODE=USD" + //#The currency, e.g. US dollars
       "&L_BILLINGTYPE0=MerchantInitiatedBilling" + // #The type of billing agreement
+      "&L_BILLINGAGREEMENTCUSTOM0=" + nvpConfig.identifier + "_5678" +
       "&L_BILLINGAGREEMENTDESCRIPTION0=This is the description of the Billing Agreement " + // #The description of the billing agreement
       "&cancelUrl=http://localhost:3000/ppnvpicc/cancel" + // #For use if the consumer decides not to proceed with payment
       "&returnUrl=http://localhost:3000/ppnvpicc/success?rt=1"; // #For use if the consumer proceeds with payment
@@ -102,11 +119,11 @@ const setupBillingAgreementBeforePayment = (data, callback) => {
   if (!data) {
     data = "METHOD=SetExpressCheckout" +
       "&VERSION=86" +
-      "&USER=sb-fdhqv12110699_api1.business.example.com" +
-      "&PWD=LVLCW8JQRMTKAWVV" +
-      "&SIGNATURE=AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB" +
+      "&USER=" + nvpConfig.user +
+      "&PWD=" +nvpConfig.password +
+      "&SIGNATURE=" + nvpConfig.signature +
       "&PAYMENTREQUEST_0_PAYMENTACTION=AUTHORIZATION" +  // #Payment authorization
-      "&PAYMENTREQUEST_0_AMT=00.00" + // #The amount authorized
+      "&PAYMENTREQUEST_0_AMT=00.00" + // #The amount authorized // 00.00 doesnt work anymore apr-2023
       "&PAYMENTREQUEST_0_CURRENCYCODE=USD" + //#The currency, e.g. US dollars
       "&L_BILLINGTYPE0=MerchantInitiatedBilling" + // #The type of billing agreement
       "&L_BILLINGAGREEMENTDESCRIPTION0=This is the description of the Billing Agreement" + // #The description of the billing agreement
@@ -141,9 +158,9 @@ const createBillingAgreement = (token, payerId, callback) => {
 
   data = "METHOD=CreateBillingAgreement" +
     "&VERSION=86" +
-    "&USER=sb-fdhqv12110699_api1.business.example.com" +
-    "&PWD=LVLCW8JQRMTKAWVV" +
-    "&SIGNATURE=AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB" +
+    "&USER=" + nvpConfig.user +
+    "&PWD=" +nvpConfig.password +
+    "&SIGNATURE=" + nvpConfig.signature +
     "&AMT=" + amount +
     "&TOKEN=" + token;
 
@@ -184,9 +201,9 @@ const capturePurchase = (token, payerId, amount, callback) => {
 
   data = "METHOD=DoExpressCheckoutPayment" +
     "&VERSION=86" +
-    "&USER=sb-fdhqv12110699_api1.business.example.com" +
-    "&PWD=LVLCW8JQRMTKAWVV" +
-    "&SIGNATURE=AZtvKKDvwCy2IviJ1ypzYiZgRHF6AImT1rcDNCvAixiDa-iA2chJsAVB" +
+    "&USER=" + nvpConfig.user +
+    "&PWD=" +nvpConfig.password +
+    "&SIGNATURE=" + nvpConfig.signature +
     "&TOKEN=" + token +
     "&PAYMENTREQUEST_0_PAYMENTACTION=SALE" +
     "&PAYERID=" + payerId +
