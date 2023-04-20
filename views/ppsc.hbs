@@ -63,6 +63,7 @@
     }
   }).render('#paypal-button-container').then(function () {
     $("#loading-button").hide();
+
   });
 
   // Messages BNPL
@@ -74,21 +75,22 @@
       ratio: '8x1'          // 1x1 8x1 20x1 1x4
     },
     countryCode: 'US',      // DE GB US
-    onRender: myOnRenderFunction
+    // onRender: myOnRenderFunction
   }).render("#my-paypal-installment-banner-container");
 
   paypal.Messages({
-  amount: 3000,
-  style: {
-    layout: 'text',       // flex text
-    logo: {
-      type: 'primary',    // primary alternative inline none
-    },
-    text: {
-      color: 'blue'       // blue black white white-no-border
+    amount: 3000,
+    style: {
+      layout: 'text',       // flex text
+      logo: {
+        type: 'primary',    // primary alternative inline none
+      },
+      text: {
+        color: 'blue'       // blue black white white-no-border
+      }
     }
-  }
-}).render("#my-paypal-installment-banner-container");
+  }).render("#my-paypal-installment-banner-container");
+
 
 
 </script>

@@ -64,6 +64,7 @@ const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) 
   const config = {
     headers: {
       Authorization: accessToken,
+      "Prefer": "return=representation"
     }
   };
   const data = { "billing_agreement_id": baId };

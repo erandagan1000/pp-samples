@@ -258,7 +258,8 @@ router.post('/billing-agreement/cancel', (req, res, next) => {
 
 });
 
-// full rt flow: generate AccesToken => create BA token  
+
+// ***************** full RT flow: generate AccesToken => create BA token  
 router.post('/flow/start', (req, res, next) => {
 
   ppApiHelperV1.generateAccessToken((data, error) => {
@@ -288,7 +289,9 @@ router.post('/flow/start', (req, res, next) => {
 
     ppApiHelperV1.generateBillingAgreementToken(accessToken, paymentData, (data, error) => {
       if (error) {
+        console.log(error.response.data.details[0]);
         res.status(error.response.status || 500).send(error);
+        
         return;
       }
       console.log(`Billing Agreement Token is: ${data.token_id}`);

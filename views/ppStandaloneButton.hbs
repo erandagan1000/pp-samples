@@ -68,35 +68,21 @@
   var globalClientToken = "";
   var orderId = "";
   var baId = "";
-  var orderData = { "intent": "CAPTURE", 
-                    "purchase_units": [
-                      { "reference_id": "d9f80740-38f0-11e8-b467-0ed5f89f718b", 
-                         "amount": {"currency_code": "USD", "value": "100.00" }
-                      } 
-                      ], 
-                    "payment_source": {
-                                      "paypal": { "experience_context": 
-                                                    { "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED", 
-                                                      "payment_method_selected": "PAYPAL", 
-                                                      "brand_name": "EXAMPLE INC", 
-                                                      "locale": "en-US", 
-                                                      "landing_page": "LOGIN", 
-                                                      "shipping_preference": "SET_PROVIDED_ADDRESS", 
-                                                      "user_action": "PAY_NOW", 
-                                                      "return_url": "https://example.com/returnUrl", 
-                                                      "cancel_url": "https://example.com/cancelUrl" 
-                                                    } 
-                                                } 
-                                        } 
-                  };
-
+ 
+  var orderData = {intent: "CAPTURE", purchase_units: [
+      {
+        reference_id: uuidv4(),
+        amount: { currency_code: "USD", value: "115.00" }
+      }]
+  };
   $.ajax('ppapi/auth/accesstoken/generate', {
-    type: 'POST',  
-    data: {}, 
+    type: 'POST',
+    data: {},
     success: function (data, status, xhr) {
       console.log(data);
       const accesstoken = data.access_token;
       globalAccessToken = accesstoken;
+      
       $("#access-token-container").html(globalAccessToken);
       $("#create-order-button").removeAttr('disabled');
     },
@@ -109,14 +95,16 @@
     $.ajax('/ppapi/order', {
       type: 'POST',
       headers: {
-        'Authorization': `Bearer ${globalAccessToken}`
+        'Authorization': `Bearer ${globalAccessToken}`,
+        "Content-Type": "application/json"
+       
       },
-      data: orderData,
+      data: JSON.stringify(orderData),
       success: function (data, status, xhr) {
         console.log(data);
         $("#create-order-response").html(JSON.stringify(data));
         $("#get-order-details-button").removeAttr("disabled");
-        
+
         const links = data.links;
         const approveUrl = links.find((l) => l.rel == "approve").href;
         const captureUrl = links.find((l) => l.rel == "capture").href;
@@ -132,7 +120,7 @@
   }
 
   function getOrderDetails() {
-    
+
     $.ajax(`/ppapi/order/${orderId}`, {
       type: 'POST',
       headers: {
@@ -162,20 +150,20 @@
 
   function captureOrder() {
     var guid = uuidv4();
-    debugger;
+    
     $.ajax(`/ppapi/order/${orderId}/capture`, {
       type: 'POST',
       headers: {
         'Authorization': `Bearer ${globalAccessToken}`
-      },     
+      },
       success: function (data, status, xhr) {
         console.log(data);
-        $("#ba-pay-response").html(JSON.stringify(data)).css('color','green'); ;
+        $("#ba-pay-response").html(JSON.stringify(data)).css('color', 'green');;
 
       },
       error: function (jqXhr, textStatus, errorMessage) {
         console.log(errorMessage);
-        $("#ba-pay-response").html(JSON.stringify(jqXhr.responseJSON)).css('color','red'); 
+        $("#ba-pay-response").html(JSON.stringify(jqXhr.responseJSON)).css('color', 'red');
       }
     });
 

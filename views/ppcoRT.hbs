@@ -33,7 +33,7 @@
 {{!---------------------------------SCRIPTS------------------------------------------}}
 {{!-- PayPal --}}
 <script
-  src="https://www.paypal.com/sdk/js?client-id=AY9EO8j_-K_-b7KlPOjKygOfrne63x_TXmbTnP7AfniWwXZvOtkALnEwSBjb69NqYvQBmFGrgLwbnDtK&currency=USD&components=buttons&vault=true">
+  src="https://www.paypal.com/sdk/js?client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk&currency=USD&components=buttons&vault=true&intent=tokenize">
   </script>
 
 <script src="https://www.paypalobjects.com/api/checkout.js" async></script>
@@ -41,11 +41,20 @@
 
 {{!-- PAGE LOGIC --}}
 <script>
+  
+  function uuidv4() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+
   var globalAccessToken = "";
   var globalClientToken = "";
   var baTokenId = "";
   var baId = "";
-  let guid = "a9b8501c-a70a-4968-84d3-1711e33bef3f";
+  let guid = uuidv4();
+  
+  
 
   $("#loading-button").show();
   paypal.Buttons({

@@ -1,0 +1,148 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<div>Amount: <input type="text" id="input-amount" style="width:100px" value="77"></div>
+<div class="loading" id="loading-button">Loading paypal button...</div>
+
+<ol>
+
+  <li>Click first to confirm the order (Also create PP Order)
+    <div>
+      <button name="confirm-order" id="confirm-order">Confirm Order </button>
+    </div>
+    <div id="create-order-response"></div>
+
+  </li>
+  <li>Click to start PP InContext Flow
+    <div id="paypal-button-container"></div>
+  </li>
+  
+  <div id="paypal-result-container"></div>
+
+</ol>
+
+
+
+
+{{!-- PP Rest API simple --}}
+{{!-- client-id=Abf.. #App: MerchantAppUS | Account: eran.m.us@merchant.com (BusinessPro) --}}
+<script
+  src="https://www.paypal.com/sdk/js?client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk&debug=true&components=buttons&disable-funding=giropay,sepa,sofort,card">
+  </script>
+
+
+
+<script>
+  var amountElement = $("#input-amount");
+  var amount = amountElement.val();
+  amountElement.change(function () {
+    amount = amountElement.val();
+    console.log(amount);
+  });
+
+  $("#loading-button").show();
+  paypal.Buttons({
+
+    // Sets up the transaction when a payment button is clicked
+    createOrder: function (data, actions) {
+      console.log("ORDERID: ", orderId);
+      return orderId;
+    },
+
+    // Finalize the transaction after payer approval
+    onApprove: function (data, actions) {
+      return actions.order.capture().then(function (orderData) {
+        // Successful capture! For dev/demo purposes:
+        let resultJson = JSON.stringify(orderData, null, 2);
+        console.log('Capture result', orderData, resultJson);
+        var transaction = orderData.purchase_units[0].payments.captures[0];
+        alert('Transaction ' + transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
+        $('#paypal-result-container').text(resultJson);
+        // When ready to go live, remove the alert and show a success message within this page. For example:
+        // var element = document.getElementById('paypal-button-container');
+        // element.innerHTML = '';
+        // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+        // Or go to another URL:  actions.redirect('thank_you.html');
+      }).catch(function (err) {
+        console.log(err);
+        $('#paypal-result-container').text(err);
+      });
+    }
+  }).render('#paypal-button-container').then(function () {
+    $("#loading-button").hide();
+  });
+
+
+  /*****************For the manual crate order***********/
+  var orderData;
+
+  var confirmButton = document.querySelector('#confirm-order');
+  confirmButton.addEventListener('click', function () {
+
+    console.log("CONFIRM ORDER");
+
+    orderData = {
+      intent: "CAPTURE", purchase_units: [
+        {
+          reference_id: uuidv4(),
+          amount: { currency_code: "USD", value: amount }
+        }]
+    };
+
+    $.ajax('ppapi/auth/accesstoken/generate', {
+      type: 'POST',
+      data: {},
+      success: function (data, status, xhr) {
+        console.log(data);
+        const accesstoken = data.access_token;
+        globalAccessToken = accesstoken;
+        $("#access-token-container").html(globalAccessToken);
+        $("#create-order-button").removeAttr('disabled');
+        createOrder();
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
+    });
+
+
+
+  });
+
+
+  function createOrder() {
+    
+    $.ajax('/ppapi/order', {
+      type: 'POST',
+      headers: {
+        'Authorization': `Bearer ${globalAccessToken}`,
+        "Content-Type": "application/json",
+
+      },
+      data: JSON.stringify(orderData),
+      success: function (data, status, xhr) {
+        console.log(data);
+        $("#create-order-response").html(JSON.stringify(data));
+        $("#get-order-details-button").removeAttr("disabled");
+
+        const links = data.links;
+        const approveUrl = links.find((l) => l.rel == "approve").href;
+        const captureUrl = links.find((l) => l.rel == "capture").href;
+        $("#create-order-approve-container").html(`<p><b>Follow this url to: <br> APPROVE Order: <a target='_blank' href="${approveUrl}">Approve Order</a><br> CAPTURE Order: <a target='_blank' href="${captureUrl}">Capture Order</a></b></p>`);
+        orderId = data.id;
+
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+      }
+    });
+
+  }
+
+  function uuidv4() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+
+
+</script>

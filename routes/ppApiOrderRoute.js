@@ -9,17 +9,7 @@ const ppApiHelperV2 = require('../helpers/ppApiHelperV2')
 // create order
 router.post('/', (req, res, next) => {
 
-  const payload = {
-    intent: "CAPTURE",
-    purchase_units: [
-      {
-        amount: {
-          currency_code: "USD",
-          value: "115.00"
-        }
-      }
-    ]
-  };
+  var payload = req.body || {intent: "CAPTURE", purchase_units: [{ amount: { currency_code: "USD", value: "115.00"}}]};
   const guid = ppApiHelperV2.uuidv4();
 
   ppApiHelperV2.createOrder(guid, payload, (data, error) => {
@@ -37,7 +27,7 @@ router.post('/', (req, res, next) => {
 router.patch('/', (req, res, next) => {
 
   const payload = req.body;
-  
+
   ppApiHelperV2.onShippingChange(payload, (data, error) => {
     if (error) {
       res.status(500).send(error);
@@ -48,7 +38,7 @@ router.patch('/', (req, res, next) => {
 
   });
 });
- // order details
+// order details
 router.post('/:id', (req, res, next) => {
 
   orderId = req.params.id;

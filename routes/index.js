@@ -56,8 +56,12 @@ router.get('/btgp', function(req, res, next) {
 
 // ********************  PayPal ************************
 router.get('/ppsc', function(req, res, next) {
-  res.render('ppsc', { title: 'PP Rest API - Standard Checkout' });
+  res.render('ppsc', { title: 'PP Smart Payment Button - Standard Checkout' });
 });
+router.get('/ppspbapi', function(req, res, next) {
+  res.render('ppSpbAndOrdersApi', { title: 'PP Rest API + SPB - Standard Checkout' });
+});
+
 router.get('/ppccs', function(req, res, next) {
   res.render('ppccShip', { title: 'PP Rest API - Custom Checkout With Shipping Options' });
 });
