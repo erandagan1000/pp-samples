@@ -48,7 +48,7 @@
     paypalBuyNowPayLater: { color: 'gold', fundingSource: 'paylater', vault: false }
 
   }
-  const selectedIntegrationSettings = integrationSettings.paypalBuyNowPayLater;
+  const selectedIntegrationSettings = integrationSettings.paypalCredit;
   // load PP JS SDK
   var script = document.createElement('script');
   script.src = `https://www.paypal.com/sdk/js?client-id=sb&buyer-country=US&vault=${selectedIntegrationSettings.vault}`;
