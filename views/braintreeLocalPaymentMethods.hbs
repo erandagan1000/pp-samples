@@ -9,6 +9,9 @@
   <button id="sofort-button">
     <img  width="45px" height="30px" src="https://www.paypalobjects.com/images/checkout/alternative_payments/paypal_sofort_black.svg" class="payment-button" />
   </button>
+  <button id="giropay-button">
+    <img  width="45px" height="30px" src="https://www.paypalobjects.com/images/checkout/alternative_payments/paypal_giropay_black.svg" class="payment-button" />
+  </button>
 </div>
 
 
@@ -44,10 +47,10 @@
 
 <!-- includes the Braintree JS client SDK -->
 <!-- Load the client component. -->
-<script src="https://js.braintreegateway.com/web/3.85.3/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.92.1/js/client.min.js"></script>
 
 <!-- Load the local payment component. -->
-<script src="https://js.braintreegateway.com/web/3.85.3/js/local-payment.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.92.1/js/local-payment.min.js"></script>
 <script>
 
   var tokenSpan = document.querySelector('#token')
@@ -70,6 +73,7 @@
   // -----------------------------------------------------------------
   var idealButton = document.getElementById('ideal-button');  //NL EURO
   var sofortButton = document.getElementById('sofort-button'); // AT, BE, DE, IT, NL, ES, GB EURO, GBP
+  var giropayButton = document.getElementById('giropay-button');  //EURO (Germany)
   var globalLocalPaymentInstance;
   var globalPaymentId;
   function merchantAccountId() {
@@ -179,5 +183,6 @@
 
 idealButton.addEventListener('click', createLocalPaymentClickListener('ideal'));
 sofortButton.addEventListener('click', createLocalPaymentClickListener('sofort'));
+giropayButton.addEventListener('click', createLocalPaymentClickListener('giropay'));
 
 </script>

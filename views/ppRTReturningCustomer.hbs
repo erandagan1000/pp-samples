@@ -66,7 +66,7 @@
 
       const myDataClientPromise = new Promise(generateDataClientToken);
       myDataClientPromise.then((data) => {
-        console.log("reolved client token:", data);
+        console.log("resolved client token:", data);
         window.paypalLoadScript({
           "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk",
           "data-user-id-token": globalUserIdToken,

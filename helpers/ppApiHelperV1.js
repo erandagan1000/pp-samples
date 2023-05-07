@@ -25,7 +25,7 @@ const generateAccessToken = (callback) => {
     .then(function (response) {
       // handle success
       const data = response.data;
-      
+
       callback(data, undefined);
     })
     .catch(function (error) {
@@ -43,7 +43,7 @@ const generateClientToken = (accessToken, payload, callback) => {
       Authorization: accessToken,
     }
   };
-  const data = payload ? payload: {};
+  const data = payload ? payload : {};
   // generate access token, givven merchant credenials
   axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, config)
     .then(function (response) {
@@ -64,12 +64,19 @@ const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) 
   const config = {
     headers: {
       Authorization: accessToken,
-      "Prefer": "return=representation"
+      "Prefer": "return=representation",
+      "Accept": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded"
+
     }
   };
-  const data = { "billing_agreement_id": baId };
+  const data = {
+    claims: ["billing_agreement_id", baId],
+    grant_type: 'client_credentials',
+    response_type: "id_token"
+  };
   // generate access token, givven merchant credenials
-  axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, config)
+  axios.post('https://api-m.sandbox.paypal.com/v1/oauth2/token', data, config)
     .then(function (response) {
       // handle success
       const data = response.data;
@@ -96,7 +103,7 @@ const generateBillingAgreementToken = (accessToken, data, callback) => {
   };
   if (!data.payer) {
     data = {
-      "description": "Billing Agreement",
+      "description": "Billing Agreement Custom Description",
       "shipping_address":
       {
         "line1": "1350 North First Street",
