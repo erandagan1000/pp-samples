@@ -1,4 +1,5 @@
 const braintree = require("braintree");
+const { config } = require("dotenv");
 
 // In server side
 // if using the ECBT integration, merchant will typically use:  btConfigEcbtUS or btConfigEcbtUK (no BT console access)
@@ -89,6 +90,10 @@ const find = function (transactionId) {
   return gateway.transaction.find(transactionId);
 }
 
+const get64BitApiKey = function(){
+  return btoa(`${btConfig.publicKey}:${btConfig.privateKey}`);
+}
+
 const gateway = new braintree.BraintreeGateway(btConfig);
 const isECBT = true;
 
@@ -103,7 +108,8 @@ module.exports = {
   addressCreate,
   submitForSettlement,
   find,
-  paymentMetohdCreateFromPaymentMethodToken
+  paymentMetohdCreateFromPaymentMethodToken,
+  get64BitApiKey
 
 
 };

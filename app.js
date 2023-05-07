@@ -19,6 +19,7 @@ var btCommonRouter = require('./routes/btCommonRoute');
 var btDropInCheckoutRouter = require('./routes/btDropInCheckoutRoute');
 var btHostedFieldsPaymentRouter = require('./routes/btHostedFieldsPaymentRoute');
 var btVaultPaymentRouter = require('./routes/btVaultPaymentRoute');
+var btGraphQlRouter = require('./routes/btGraphQLRoute');
 
 //NVP
 var ppNvpApiRouter = require('./routes/ppNvpApiRoute');
@@ -65,6 +66,7 @@ app.use('/bt', btCommonRouter);
 app.use('/bt/di/checkout', btDropInCheckoutRouter);
 app.use('/bt/hf/payment', btHostedFieldsPaymentRouter);
 app.use('/bt/vault/payment', btVaultPaymentRouter);
+app.use('/bt/gql',btGraphQlRouter );
 
 // pp rest api
 app.use('/ppapi/auth', authRouter);
