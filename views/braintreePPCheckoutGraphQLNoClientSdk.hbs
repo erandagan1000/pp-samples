@@ -52,13 +52,31 @@
 
 <!-- Implementation -->
 <script>
+  var amountElement = $("#input-amount");
+  var amount = amountElement.val();
 
-  var amount = $("#input-amount")[0].value;
-  
+  var currencyElement = $("#input-currency");
+  var currency = currencyElement.val();
+
   var orderData = {
     reference_id: uuidv4(),
-    amount: { currency_code: "USD", value: amount }
+    amount: { currency_code: currency, value: amount }
   };
+
+  amountElement.change(function () {
+    amount = amountElement.val();
+    orderData.amount.value = amount;
+    console.log(amount);
+  });
+
+  currencyElement.change(function () {
+    currency = currencyElement.val();
+    orderData.amount.currency_code = currency;
+    console.log(currency);
+  });
+
+ 
+  
 
   var paymentId = "";
   var payerId = "" ;
@@ -96,9 +114,9 @@
 
   function createNonce() {
     debugger;
-     {{!-- paymentId = $("#input-payment-id")[0].value();
-     paymentToken = $("#input-ec-token")[0].value(); --}}
-     payerId =$("#input-payer-id")[0].value;
+     {{!-- paymentId = $("#input-payment-id").val());
+     paymentToken = $("#input-ec-token").val(); --}}
+     payerId =$("#input-payer-id").val();
 
     var payload = {
       selectedCurrency: orderData.amount.currency_code,
