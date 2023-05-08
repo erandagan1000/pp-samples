@@ -91,7 +91,10 @@ const find = function (transactionId) {
 }
 
 const get64BitApiKey = function(){
-  return btoa(`${btConfig.publicKey}:${btConfig.privateKey}`);
+  var apiKey64Bit = Buffer.from(`${btConfig.publicKey}:${btConfig.privateKey}`).toString('base64');
+  //console.log(apiKey64Bit);
+  //console.log(btoa(`${btConfig.publicKey}:${btConfig.privateKey}`));
+  return apiKey64Bit
 }
 
 const gateway = new braintree.BraintreeGateway(btConfig);
