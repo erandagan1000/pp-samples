@@ -228,6 +228,7 @@ const createPayment = (accessToken, data, clientMetaDataId, callback) => {
 
 }
 
+
 const getBillingAgreementDetails = (accessToken, baId, callback) => {
 
   const config = {

@@ -168,6 +168,37 @@ const onShippingChange = (data) => {
 
 }
 
+// create payment with BA using orders v2 call
+const createPaymentWithBa = (accessToken, data, clientMetaDataId, callback) => {
+
+  
+
+  let config = {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": accessToken,
+      "PAYPAL-CLIENT-METADATA-ID": clientMetaDataId,
+      "paypal-request-id" : clientMetaDataId
+    }
+  };
+  if (!data) {
+    callback(undefined, "Error: Payment data not provided");
+  }
+
+
+  axios.post('https://api-m.sandbox.paypal.com/v2/checkout/orders', data, config)
+    .then(function (response) {
+      // handle success
+      const data = response.data;
+      callback(data, undefined);
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error.response.data);
+      callback(undefined, error)
+    });
+
+}
 
 module.exports = {
   test,
@@ -175,5 +206,6 @@ module.exports = {
   getOrderDetails,
   captureOrder,
   uuidv4,
-  onShippingChange
+  onShippingChange,
+  createPaymentWithBa
 };

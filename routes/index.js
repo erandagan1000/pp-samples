@@ -5,6 +5,9 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'PayPal Demo' });
 });
+router.get('/lr', function(req, res, next) {
+  res.render('limitedRelease', { title: 'Limited Release URLs' });
+});
 
 // ********************  Braintree ************************
 

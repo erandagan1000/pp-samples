@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ppApiHelperV1 = require('../helpers/ppApiHelperV1')
+const ppApiHelperV2 = require('../helpers/ppApiHelperV2')
 var randomstring = require("randomstring");
 
 // test
@@ -39,7 +40,7 @@ router.post('/billing-agreement', (req, res, next) => {
 
   ppApiHelperV1.createBillingAgreement(accessToken, data, (data, error) => {
     if (error) {
-      const errorMessage = `API Message: ${error.response.data.details[0].message }`;
+      const errorMessage = `API Message: ${error.response.data.details[0].message}`;
       res.status(200).send();
       return;
     }
@@ -53,12 +54,14 @@ router.post('/billing-agreement', (req, res, next) => {
 router.post('/pay', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
-  const data = req.body; 
-  
-  
+  const data = req.body;
+
+
   const clientMetaDataId = data.fnGuid;
   let baId = data.baId;
-  let paymentPayload = {
+  
+  // v1 payload
+  let paymentPayloadV1 = {
     intent: "sale",
     payer:
     {
@@ -81,7 +84,7 @@ router.post('/pay', (req, res, next) => {
         description: "Payment with Billing Agreement.",
         custom: "Payment custom field.",
         note_to_payee: "RT example.",
-        invoice_number:randomstring.generate(10),
+        invoice_number: randomstring.generate(10),
         item_list:
         {
           items: [
@@ -102,8 +105,8 @@ router.post('/pay', (req, res, next) => {
       return_url: "http://localhost:3000/success",
       cancel_url: "http://localhost:3000/cancel"
     }
-  }; 
-  /*
+  };
+  /* PAYLOAD SAMPLE
   expected payload
   {
   "intent": "sale",
@@ -150,9 +153,37 @@ router.post('/pay', (req, res, next) => {
     "cancel_url": "https://example.com/cancel"
   }
 }
-  */ 
+  */
 
-  ppApiHelperV1.createPayment(accessToken, paymentPayload,clientMetaDataId, (data, error) => {
+  // use Orders v1 to process payment
+  // ppApiHelperV1.createPayment(accessToken, paymentPayloadV1, clientMetaDataId, (data, error) => {
+  //   if (error) {
+  //     res.status(error.response.status || 500).send(error);
+  //     return;
+  //   }
+  //   res.status(200).send(data);
+  //   return;
+
+  // });
+
+  // v2 payload
+  let paymentPayloadV2 = {
+    "intent": "CAPTURE", 
+    "purchase_units": [{
+      "amount": {
+        "currency_code": "EUR",
+        "value": "101.01"
+      }
+    }], "payment_source": {
+      "token": {
+        "id": baId,
+        "type": "BILLING_AGREEMENT"
+      }
+    }
+    };
+
+  // Use Orders V2 to process payment
+  ppApiHelperV2.createPaymentWithBa(accessToken, paymentPayloadV2, clientMetaDataId, (data, error) => {
     if (error) {
       res.status(error.response.status || 500).send(error);
       return;
@@ -202,8 +233,8 @@ router.patch('/billing-agreement', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
   const billingAgreementId = req.body.baId;
-  const modifications = req.body.modifications;  
-  
+  const modifications = req.body.modifications;
+
   /*
   expected payload:
   { "baId": xxx,
@@ -227,7 +258,7 @@ router.patch('/billing-agreement', (req, res, next) => {
   }
  }]
 }
-  */ 
+  */
 
   ppApiHelperV1.updateBillingAgreementDetails(accessToken, billingAgreementId, modifications, (data, error) => {
     if (error) {
@@ -291,30 +322,30 @@ router.post('/flow/start', (req, res, next) => {
       if (error) {
         console.log(error.response.data.details[0]);
         res.status(error.response.status || 500).send(error);
-        
+
         return;
       }
       console.log(`Billing Agreement Token is: ${data.token_id}`);
       data.accessToken = accessToken;
       res.status(200).send(data);
       return;
-  
+
     });
 
-  }); 
+  });
 
-  
+
 
 });
 
 router.post('/flow/create-billing-agreement', (req, res, next) => {
-  
+
   const reqData = req.body;  // expecting: {"token_id": "BA-8A802366G0648845Y"}
 
   ppApiHelperV1.generateAccessToken((data, error) => {
 
     const accessToken = `Bearer ${data.access_token}`;
-    
+
 
     ppApiHelperV1.createBillingAgreement(accessToken, reqData, (data, error) => {
       if (error) {
@@ -324,12 +355,12 @@ router.post('/flow/create-billing-agreement', (req, res, next) => {
       console.log(data);
       res.status(200).send(data);
       return;
-  
+
     });
 
-  }); 
+  });
 
-  
+
 
 });
 
