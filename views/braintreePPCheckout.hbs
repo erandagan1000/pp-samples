@@ -3,7 +3,7 @@
 <hr>
 
 <!---------------- Paypal Button ------------------>
-<div>Amount: <input type="text" id="input-amount" style="width:100px" value="400"></div>
+<div>Amount: <input type="text" id="input-amount" style="width:100px" value="40"></div>
 <div>Currency: <input type="text" id="input-currency" style="width:100px" value="USD"></div>
 <div>authorize or capture: <input type="text" id="auth-or-capture" style="width:100px" value="capture"></div>
 <div>
@@ -147,7 +147,7 @@
               //offerCredit: true, //optional - offer Credit option
               enableShippingAddress: true,
               shippingAddressEditable: false,
-              shippingAddressOverride: {
+              {{!-- shippingAddressOverride: {
                 recipientName: 'Scruff McGruff',
                 line1: '1234 Main St.',
                 line2: 'Unit 1',
@@ -156,11 +156,14 @@
                 postalCode: '60652',
                 state: 'IL',
                 phone: '123.456.7890'
-              }
+              } --}}
             });
           },
 
           onApprove: function (data, actions) {
+
+            console.log("buyer approved, you can calculate taxes and update amount and send nonce to server with updated amount");
+            console.log("data: ", data, "actions: ", actions);
 
             return paypalCheckoutInstance.tokenizePayment(data).then(function (payload) {
               // Submit `payload.nonce` to your server
@@ -169,7 +172,7 @@
                 url: '/bt/vault/payment/checkout',
                 data: {
                   'paymentMethodNonce': payload.nonce,
-                  'amount': amount,
+                  'amount': amount*2,
                   'currency': selectedCurrency,
                   'isAuthorizeRequest': authOrCapture == 'authorize'
 

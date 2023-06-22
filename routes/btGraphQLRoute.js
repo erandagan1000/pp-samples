@@ -152,7 +152,7 @@ router.post('/capture-nonce', (req, res, next) => {
   var amount = req.body.amount;
  
 
-  var query = graphQl.gql`mutation ExampleCharge($input: ChargePaymentMethodInput!) {
+  var query = graphQl.gql`mutation ChargePaymentMethod($input: ChargePaymentMethodInput!) {
     chargePaymentMethod(input: $input) {
       transaction {
         id

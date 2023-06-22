@@ -9,12 +9,47 @@ const ppApiHelperV2 = require('../helpers/ppApiHelperV2')
 // create order
 router.post('/', (req, res, next) => {
 
-  var payload = req.body || {intent: "CAPTURE", purchase_units: [{ amount: { currency_code: "USD", value: "115.00"}}]};
+  let defaultPayload = {
+    intent: "CAPTURE",
+    payment_source: {
+      paypal: {
+        experience_context: {
+          brand_name: "ERAN BRAND FROM EXPERIENCE CONTEXT",
+          // shipping_preference: "GET_FROM_FILE", //NO_SHIPPING or SET_PROVIDED_ADDRESS
+          // landing_page: "LOGIN", //GUEST_CHECKOUT or NO_PREFERENCE
+          user_action: "PAY_NOW",//PAY_NOW or CONTINUE
+          return_url: "htttp://localhost:3000",
+          cancel_url: "htttp://localhost:3000"
+        },
+        // email_address: "eran.buyer.us@email.com",
+        // //name: "Eran Buyer US",
+        // address: {
+        //   address_line_1: "Address Line 1", address_line_2: "Address Line 2", postal_code: "1234567",admin_area_2:"admin_area_2", country_code: "US"
+        // },
+      }
+    },
+    purchase_units: [
+      {
+        amount:
+          { currency_code: "USD", value: "115.00" },
+        // shipping: {
+        //   address: {
+        //     address_line_1: "Purchase Unit Address Line 1", address_line_2: "Address Line 2", postal_code: "1234567", admin_area_2:"admin_area_2" , country_code: "US"
+        //   }
+        // }
+      },
+    ],
+
+  };
+
+  var payload = req.body && req.body.intent ? req.body : defaultPayload;
+
   const guid = ppApiHelperV2.uuidv4();
 
   ppApiHelperV2.createOrder(guid, payload, (data, error) => {
     if (error) {
       res.status(500).send(error);
+      console.log(error.response.data.details)
       return;
     }
     res.status(200).send(data);

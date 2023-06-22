@@ -5,9 +5,10 @@ const test = () => {
 }
 
 // #region Auth Functions 
+
 const generateAccessToken = (callback) => {
 
-  console.log(process.env.PP_API_CLIENT_ID);
+  // console.log(process.env.PP_API_CLIENT_ID);
   const options = {
     auth: {
       username: process.env.PP_API_CLIENT_ID,
@@ -61,20 +62,59 @@ const generateClientToken = (accessToken, payload, callback) => {
 
 const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) => {
 
+  /* OPTION  1 */
+  /*
   const config = {
     headers: {
       Authorization: accessToken,
+      "Prefer": "return=representation",
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Accept-Language": "en_US"
+ 
+    }
+  };
+  const data = {
+    //claims: ["billing_agreement_id", baId],
+    grant_type: 'client_credentials',
+    response_type: "id_token",
+    billing_agreement_id: baId
+  };
+
+  // generate access token, givven merchant credenials
+axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, config)
+.then(function (response) {
+  // handle success
+  const data = response.data;
+  callback(data, undefined);
+})
+.catch(function (error) {
+  // handle error
+  console.log(error);
+  callback(undefined, error)
+})
+*/
+  /* OPTION  2 */
+
+  const config = {
+    auth: {
+      username: process.env.PP_API_CLIENT_ID,
+      password: process.env.PP_API_CLIENT_SECRET
+    },
+    headers: {
       "Prefer": "return=representation",
       "Accept": "application/json",
       "Content-Type": "application/x-www-form-urlencoded"
 
     }
   };
-  const data = {
-    claims: ["billing_agreement_id", baId],
-    grant_type: 'client_credentials',
-    response_type: "id_token"
-  };
+  const data = new URLSearchParams();
+  data.append('grant_type', 'client_credentials');
+  // added according to Vault V3 doc
+  data.append('response_type', 'id_token');
+  // console.log(options);
+  data.append('claims', ["billing_agreement_id", baId]);
+
   // generate access token, givven merchant credenials
   axios.post('https://api-m.sandbox.paypal.com/v1/oauth2/token', data, config)
     .then(function (response) {
@@ -87,6 +127,8 @@ const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) 
       console.log(error);
       callback(undefined, error)
     })
+
+
 
 }
 

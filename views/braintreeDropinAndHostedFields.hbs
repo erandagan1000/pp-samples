@@ -4,8 +4,8 @@
     target="_blank">Valid Test Cards</a>
 </h2>
 <br />
-<!----------------- drop-in fields example ---------------------->
-<div>
+<!----------------- dropin1 fields example ---------------------->
+<div style="background-color:aliceblue">
   <h2>DropIn Quick - <font color="blue">using tokenization key</font>
   </h2>
 
@@ -18,31 +18,31 @@
 </div>
 
 
-<!----------------- client server example with token ------------------>
-<div>
+<!----------------- dropin2 example with token ------------------>
+<div style="background-color:bisque">
 
   <h2>DropIn With Server - <font color="blue">using token</font>
   </h2>
 
 
   <button id="generate-token" style="display:none">generate token</button>
-  <span id="token"></span>
+  <div style="width:1200px"><span id="token" style="font-size:7pt;word-wrap: break-word"></span></div>
   <div><input type="checkbox" id="use-stored-card" name="use-stored-card">Use Stored Card (Create clinet token with
     customerId)<input type="text" style="width: 180px" name="customer-id" id="customer-id" value="894738055"></div>
   <div><input type="checkbox" id="force-issuer-decline" name="force-issuer-decline">Force Issuer decline (will setup the
     decline amount in server)</div>
-  <form id="payment-form" action="bt/hf/payment/checkout" method="post">
+  <form id="dropin-payment-form" action="bt/hf/payment/checkout" method="post">
     <!-- Putting the empty container you plan to pass to
       `braintree.dropin.create` inside a form will make layout and flow
       easier to manage -->
     <div id="dropin-container1"></div>
-    <input type="submit" id="hosted-fields-submit-button" />
+    <input type="submit" id="dropin-submit-button" value="Dropin Submit" />
     <input type="hidden" id="nonce" name="payment_method_nonce" />
   </form>
 
 </div>
 <!----------------- Hosted fields example  ------------------>
-<div>
+<div style="background-color:aliceblue">
   <hr>
   <h2>Hosted Fields example</h2>
   <hr>
@@ -77,7 +77,7 @@
 
 
       <div style="padding:10px">
-        <input type="submit" value="Pay" id="pay" disabled />
+        <input type="submit" value="Make Payment" id="pay" disabled />
       </div>
 
     </form>
@@ -111,7 +111,7 @@
 
 <script>
   // ----------------------- 
-  // drop in example
+  // dropin1 example - tokenization key (not recommended) 
   // ----------------------
   var button = document.querySelector('#submit-button');
 
@@ -154,7 +154,7 @@
 
 
   // -----------------------------------------------------------------
-  // client server example
+  // Dropin2 example
   // -----------------------------------------------------------------
   var customerInput = $("#customer-id")   // customerId with saved credit card as payment method in vault
   var customerId = customerInput.val();
@@ -169,7 +169,7 @@
   var payButton = document.querySelector('#pay');
   var generateClientTokenUrl = '/bt/hf/payment/client_token';
   $("#pay").hide();
-  $("#hosted-fields-submit-button").hide();
+  $("#dropin-submit-button").hide();
 
   button1.addEventListener('click', function () {
     $.ajax({
@@ -180,17 +180,15 @@
       token = result;
       tokenSpan.innerHTML = `<p>${token}</p>`;
 
-      const form = document.getElementById('payment-form');
-
-      createHostedFieldBraintreeInstance(token);
-      // createInitializeComponentPaypalCheckout(token);
+      const form = document.getElementById('dropin-payment-form');
 
       braintree.dropin.create({
         authorization: token,
         container: '#dropin-container1'
       }, (error, dropinInstance) => {
         if (error) { console.error(error); }
-
+        
+        $("#dropin-submit-button").show();
         form.addEventListener('submit', event => {
           event.preventDefault();
 
@@ -204,14 +202,19 @@
             //   it a the hidden field before submitting the complete form to
             //   a server-side integration
             document.getElementById('nonce').value = payload.nonce;
+            alert(payload.nonce);
             form.submit();
           });
         });
       });
 
+      // use the access token for the hosted fields demo
+      createHostedFieldBraintreeInstance(token);
+
     });
 
   });
+  // to generate access token
   button1.click();
 
   var checkBoxUseStoredCard = $("#use-stored-card");
@@ -228,8 +231,9 @@
   });
 
   // -----------------------------------------------------------------
-
   // Hosted fields example
+  // -----------------------------------------------------------------
+
   function createHostedFieldBraintreeInstance(token) {
 
     var form = document.querySelector('#my-sample-form');
@@ -282,14 +286,14 @@
         }
 
         // Include this to verify BIN while user typing it
+
         hostedFieldsInstance.on('binAvailable', function (event) {
-          console.log("Event Fired: binAvailable ",event.bin) // send bin to 3rd party bin service
+          console.log("Event Fired: binAvailable ", event.bin) // send bin to 3rd party bin service
         });
 
         submit.removeAttribute('disabled');
         $("#pay").show();
-        $("#hosted-fields-submit-button").show();
-
+        
         form.addEventListener('submit', function (event) {
           event.preventDefault();
 
@@ -302,6 +306,8 @@
             // If this was a real integration, this is where you would
             // send the nonce to your server.
             alert('Got a nonce: ' + payload.nonce);
+            debugger;
+            console.log(payload);
             document.getElementById('hf-nonce').value = payload.nonce;
             document.getElementById('hf_save_for_next_purchase').value = $("#save-for-next-purchase")[0].checked;
             document.getElementById('isDesiredToBeDeclined').value = $("#force-issuer-decline")[0].checked;
