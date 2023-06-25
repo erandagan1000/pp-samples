@@ -51,7 +51,8 @@
 
 
   <!-- Implementation -->
-  <script src="https://unpkg.com/@paypal/paypal-js@5.0.3/dist/iife/paypal-js.min.js"></script>
+  {{!--
+  <script src="https://unpkg.com/@paypal/paypal-js@5.0.3/dist/iife/paypal-js.min.js"></script> --}}
 
 
   {{!-- Page Logic --}}
@@ -60,33 +61,34 @@
     $("#loading-button").show();
     let orderId;
     var globalUserIdToken = "";
-    let paypal;
+    // let paypal;
 
     try {
 
       const myDataClientPromise = new Promise(generateDataClientToken);
       myDataClientPromise.then((data) => {
+
         console.log("resolved client token:", data);
-        window.paypalLoadScript({
-          "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk",
-          "data-user-id-token": globalUserIdToken,
-          "components": "buttons,hosted-fields"
-        }).then((pp) => {
-          paypal = pp;
-          if (paypal) {
-            try {
 
-              loadUiControls();
-
-            } catch (error) {
-              console.error("failed to render the PayPal Buttons", error);
-            }
-          }
+        var script = document.createElement('script');
+        var scriptSrc = "https://www.paypal.com/sdk/js?components=buttons&client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk&currency=USD&intent=capture&commit=false"
+        
+        script.src = scriptSrc;
+        script.setAttribute("data-user-id-token",globalUserIdToken);
+        document.body.appendChild(script);
+        console.log("script loaded");
 
 
-        }).catch((error) => {
-          console.error("failed to load the PayPal JS SDK script", error);
-        });
+        try {
+          window.setTimeout(() =>  {loadUiControls()},1500);
+
+
+
+        }
+        catch (error) {
+          console.error("failed to render the PayPal Buttons", error);
+        }
+
 
       });
     }
@@ -103,7 +105,7 @@
         success: function (data, status, xhr) {
           console.log(data);
           const accesstoken = data.access_token;
-          
+
 
           $.ajax('ppapi/auth/clienttoken/generate/baid', {
             type: 'POST',
@@ -112,7 +114,7 @@
             },
             data: { baId: "B-6M698525DU7956918" },
             success: function (data, status, xhr) {
-              
+
               console.log(data.client_token);
               globalUserIdToken = data.id_token;
               resolve(data.id_token);
@@ -132,8 +134,8 @@
       });
     }
 
-    function loadUiControls() {
-
+    var loadUiControls = function() {
+      console.log("loadUiControls called");
       // Displays PayPal buttons
       paypal.Buttons({
         style: {
