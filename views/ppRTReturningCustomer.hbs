@@ -14,7 +14,7 @@
   <div><a href="/">Home</a></div>
   <h1>{{title}}</h1>
   <h2>Note</h2>
-  <p>This example uses a hard coded Billing Agreement: B-77V61078G4351940W, in order to demo the returning user UX</p>
+  <p>This example uses a hard coded Billing Agreement: B-6M698525DU7956918, in order to demo the returning user UX</p>
   <p>A real merchant will generally get the BA as a property of the user profile</p>
   <br><a href="https://developer.paypal.com/limited-release/pay-later-billing-agreements-sdk/returning-buyer/">
     Link to docs</a>
@@ -110,7 +110,7 @@
             headers: {
               'Authorization': `Bearer ${accesstoken}`
             },
-            data: { baId: "B-77V61078G4351940W" },
+            data: { baId: "B-6M698525DU7956918" },
             success: function (data, status, xhr) {
               
               console.log(data.client_token);
