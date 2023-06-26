@@ -113,7 +113,10 @@ axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, 
   // added according to Vault V3 doc
   data.append('response_type', 'id_token');
   // console.log(options);
-  data.append('claims', ["billing_agreement_id", baId]);
+  //RT style (old)
+  // data.append('claims', ["billing_agreement_id", baId]);
+  // Vault style (new)
+  data.append('target_customer_id', baId);
 
   // generate access token, givven merchant credenials
   axios.post('https://api-m.sandbox.paypal.com/v1/oauth2/token', data, config)

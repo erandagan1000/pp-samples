@@ -2,9 +2,9 @@
 
 <head>
 
-  <meta charset="utf-8" />
-  <!-- Optimal rendering on mobile devices. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ensures optimal rendering on mobile devices. -->
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" /> <!-- Optimal Internet Explorer compatibility -->
 </head>
 
 <body>
@@ -14,7 +14,7 @@
   <div><a href="/">Home</a></div>
   <h1>{{title}}</h1>
   <h2>Note</h2>
-  <p>This example uses a hard coded Billing Agreement: B-6M698525DU7956918, in order to demo the returning user UX</p>
+  <p>This example uses a hard coded Billing Agreement: 8BT84277MU161505B, in order to demo the returning user UX</p>
   <p>A real merchant will generally get the BA as a property of the user profile</p>
   <br><a href="https://developer.paypal.com/limited-release/pay-later-billing-agreements-sdk/returning-buyer/">
     Link to docs</a>
@@ -22,7 +22,7 @@
   <div id="payment-view">
     <!-- Buttons container -->
     <div style="padding:10px">
-      <table border="0" align="left" valign="top" bgcolor="#FFFFFF" style="width: 39%">
+      <table border="0" align="left" valign="top" bgcolor="#FFFFFF" style="width: 60%">
         <tr>
           <td>
             <div id="paypal-button-container"></div>
@@ -30,8 +30,6 @@
         </tr>
       </table>
     </div>
-
-
 
   </div>
   <div>
@@ -71,19 +69,20 @@
         console.log("resolved client token:", data);
 
         var script = document.createElement('script');
-        var scriptSrc = "https://www.paypal.com/sdk/js?components=buttons&client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk&currency=USD&intent=capture&commit=false"
-        
+        var scriptSrc = "https://www.paypal.com/sdk/js?client-id=AZjPmiH8MFbpWiO_y_WNWjyemnCVCAnpRPGE9_DB4mp8iBbjPfPLViZUhvoRifOjROWxVVWx8nJg_szi&currency=USD&disable-funding=credit,card,sepa,giropay,sofort";
+        // script.async = false;  
         script.src = scriptSrc;
         script.setAttribute("data-user-id-token",globalUserIdToken);
         document.body.appendChild(script);
+        
         console.log("script loaded");
 
 
         try {
-          window.setTimeout(() =>  {loadUiControls()},1500);
-
-
-
+         // window.setTimeout(() =>  {loadUiControls()},1500);
+          script.onload = () => {
+            loadUiControls();
+          }
         }
         catch (error) {
           console.error("failed to render the PayPal Buttons", error);
@@ -112,7 +111,7 @@
             headers: {
               'Authorization': `Bearer ${accesstoken}`
             },
-            data: { baId: "B-6M698525DU7956918" },
+            data: { baId: "8BT84277MU161505B" },
             success: function (data, status, xhr) {
 
               console.log(data.client_token);
@@ -139,27 +138,27 @@
       // Displays PayPal buttons
       paypal.Buttons({
         style: {
-          layout: 'horizontal'
+          layout: 'vertical'
         },
         createOrder: function (data, actions) {
           return actions.order.create({
             purchase_units: [{
               amount: {
-                value: "13.00"
+                value: "333.00"
               }
             }]
           });
         },
         onApprove: function (data, actions) {
           return actions.order.capture().then(function (details) {
-            // window.location.href = '/success.html';
-            // $("#payment-result").text(`Payment success: \n ${JSON.stringify(details)}`);
+           
             $("#payment-result").jsonViewer(details);
             document.querySelector("#payment-view").style = 'display: none';
 
           });
         }
-      }).render("#paypal-button-container").then(() => {
+      }).render("#paypal-button-container")
+      .then(() => {
         console.log("render executed");
         $("#loading-button").hide();
       });
