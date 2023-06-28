@@ -14,7 +14,7 @@
   <div><a href="/">Home</a></div>
   <h1>{{title}}</h1>
   <h2>Note</h2>
-  <p>This example uses a hard coded Billing Agreement: B-29S75814H84296230, in order to demo the returning user UX</p>
+  <p>This example uses a hard coded Billing Agreement: B-2GY56936SM587904M, in order to demo the returning user UX</p>
   <p>A real merchant will generally get the BA as a property of the user profile</p>
   <br><a href="https://developer.paypal.com/limited-release/pay-later-billing-agreements-sdk/returning-buyer/">
     Link to docs with BA (not working as of Jun-2023</a>
@@ -56,10 +56,7 @@
 
 
   <!-- Implementation -->
-  {{!--
-  <script src="https://unpkg.com/@paypal/paypal-js@5.0.3/dist/iife/paypal-js.min.js"></script> --}}
-
-
+  
   {{!-- Page Logic --}}
   <script>
 
@@ -73,17 +70,16 @@
       const myDataClientPromise = new Promise(generateDataClientToken);
       myDataClientPromise.then((data) => {
 
-        console.log("resolved client token:", data);
+        console.log("resolved- id_token is:", data);
 
         var script = document.createElement('script');
-        var scriptSrc = "https://www.paypal.com/sdk/js?client-id=AZjPmiH8MFbpWiO_y_WNWjyemnCVCAnpRPGE9_DB4mp8iBbjPfPLViZUhvoRifOjROWxVVWx8nJg_szi";
+        var scriptSrc = "https://www.paypal.com/sdk/js?client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk";
         // script.async = false;  
         script.src = scriptSrc;
         script.setAttribute("data-user-id-token",globalUserIdToken);
-        document.body.appendChild(script);
         
+        document.body.appendChild(script);
         console.log("script loaded");
-
 
         try {
          // window.setTimeout(() =>  {loadUiControls()},1500);
@@ -113,7 +109,7 @@
         type: 'POST',  // http method
         data: {},  // data to submit
         success: function (data, status, xhr) {
-          console.log(data);
+          console.log("accesstoken response: ", data);
           const accesstoken = data.access_token;
 
 
@@ -122,7 +118,8 @@
             headers: {
               'Authorization': `Bearer ${accesstoken}`
             },
-            data: { baId: "B-29S75814H84296230" },
+            data: { baId: "B-2GY56936SM587904M",  //for RT - client token with saved BA - not working as of jun-30-2023
+                    customerId: "customer_9999"}, // for Vault V3 , cusomter created in this page: http://localhost:3000/ppvaultv3
             success: function (data, status, xhr) {
 
               console.log(data.client_token);

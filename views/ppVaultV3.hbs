@@ -16,6 +16,10 @@
  <h2>Note</h2>
   <p>Integration steps are taken from the Wrod Doc: SOW_Vault_v3</p>
 <br>
+<div>
+  <button onclick="">Run returning User experience</button>
+  <div id="div-vaulted-customer-id"></div>
+</div>
 
   <div id="payment-view">
     <!-- Buttons container -->
@@ -52,9 +56,8 @@
       myDataClientPromise.then((data) => {
         console.log("reolved client token:", data);
         window.paypalLoadScript({
-          "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk",
-          "data-user-id-token": globalUserIdToken,
-          "components": "buttons,hosted-fields"
+          "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk"
+         
         }).then((pp) => {
           paypal = pp;
           if (paypal) {
@@ -93,7 +96,7 @@
             headers: {
               'Authorization': `Bearer ${accesstoken}`
             },
-            data: {customer_id: "customer_1234"},
+            data: {customer_id: "customer_9999"},
             success: function (data, status, xhr) {
               console.log(data.client_token);
               globalUserIdToken = data.id_token;
@@ -136,6 +139,7 @@
             // $("#payment-result").text(`Payment success: \n ${JSON.stringify(details)}`);
             $("#payment-result").jsonViewer(details);
             document.querySelector("#payment-view").style = 'display: none';
+            $("#div-vaulted-customer-id").text = "aa";
 
           });
         }

@@ -81,8 +81,9 @@ router.post('/clienttoken/generate/customerid', (req, res, next) => {
 router.post('/clienttoken/generate/baid', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
-  const baId = req.body.baId;
-  ppApiHelperV1.generateClientTokenWithBillingAgreementId(accessToken,baId, (data, error) => {
+  const baId = req.body.baId; // RT
+  const customerId =req.body.customerId
+  ppApiHelperV1.generateClientTokenWithBillingAgreementId(accessToken,baId,customerId, (data, error) => {
     if (error) {
       res.status(500).send(error);
       return;

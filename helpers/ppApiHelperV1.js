@@ -60,7 +60,7 @@ const generateClientToken = (accessToken, payload, callback) => {
 
 }
 
-const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) => {
+const generateClientTokenWithBillingAgreementId = (accessToken, baId, customerId, callback) => {
 
   /* OPTION  1 */
   /*
@@ -116,7 +116,7 @@ axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, 
   //RT style (old)
   // data.append('claims', ["billing_agreement_id", baId]);
   // Vault style (new)
-  data.append('target_customer_id', baId);
+  data.append('target_customer_id', customerId);
 
   // generate access token, givven merchant credenials
   axios.post('https://api-m.sandbox.paypal.com/v1/oauth2/token', data, config)
@@ -164,7 +164,7 @@ const generateBillingAgreementToken = (accessToken, data, callback) => {
       },
       "plan":
       {
-        "type": "MERCHANT_INITIATED_BILLING",
+        "type":  "MERCHANT_INITIATED_BILLING",
         "merchant_preferences":
         {
           "return_url": "http://localhost:3000/pprt",
