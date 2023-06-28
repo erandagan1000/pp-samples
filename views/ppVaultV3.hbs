@@ -17,7 +17,7 @@
   <p>Integration steps are taken from the Wrod Doc: SOW_Vault_v3</p>
 <br>
 <div>
-  <button onclick="">Run returning User experience</button>
+  <button onclick="generateDataClientTokenForReturningUser()" style="width:fit-content">Run returning User experience</button>
   <div id="div-vaulted-customer-id"></div>
 </div>
 
@@ -49,6 +49,7 @@
     let orderId;
     var globalUserIdToken = "";
     let paypal;
+    let vaultedCustomerId = $("#div-vaulted-customer-id").val();
 
     try {
 
@@ -56,7 +57,9 @@
       myDataClientPromise.then((data) => {
         console.log("reolved client token:", data);
         window.paypalLoadScript({
-          "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk"
+          "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk",
+          "data-user-id-token": globalUserIdToken,
+          "components": "buttons,hosted-fields"
          
         }).then((pp) => {
           paypal = pp;
@@ -91,12 +94,47 @@
           console.log(data);
           const accesstoken = data.access_token;
 
+          $.ajax('/ppapi/auth/clienttoken/generate', {
+            type: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accesstoken}`
+            },
+            success: function (data, status, xhr) {
+              console.log(data.client_token);
+              globalUserIdToken = data.id_token;
+              resolve(data.id_token);
+            },
+            error: function (jqXhr, textStatus, errorMessage) {
+              console.log(errorMessage);
+              reject(errorMessage);
+            }
+
+          });
+
+        },
+        error: function (jqXhr, textStatus, errorMessage) {
+          console.log(errorMessage);
+          reject(errorMessage);
+        }
+      });
+    }
+
+    function generateDataClientTokenForReturningUser(resolve, reject) {
+
+      $.ajax('ppapi/auth/accesstoken/generate', {
+        type: 'POST',  // http method
+        data: {},  // data to submit
+        success: function (data, status, xhr) {
+          console.log(data);
+          const accesstoken = data.access_token;
+          debugger;
+
           $.ajax('/ppapi/auth/clienttoken/generate/customerid', {
             type: 'POST',
             headers: {
               'Authorization': `Bearer ${accesstoken}`
             },
-            data: {customer_id: "customer_9999"},
+            data: {customer_id: vaultedCustomerId},
             success: function (data, status, xhr) {
               console.log(data.client_token);
               globalUserIdToken = data.id_token;
@@ -122,16 +160,21 @@
       // Displays PayPal buttons
       paypal.Buttons({
         style: {
-          layout: 'horizontal'
+          layout: 'vertical'
         },
         createOrder: function (data, actions) {
-          return actions.order.create({
-            purchase_units: [{
-              amount: {
-                value: "121.00"
-              }
-            }]
-          });
+          return fetch('/ppapi/order/and-vault-payment-method', {
+          method: 'post'
+        }).then(function (res) {
+          debugger;
+          console.log(res);
+          return res.json();
+        }).then(function (orderData) {
+          orderId = orderData.id;
+          return orderId;
+          console.log(orderData);
+
+        });
         },
         onApprove: function (data, actions) {
           return actions.order.capture().then(function (details) {
@@ -139,7 +182,8 @@
             // $("#payment-result").text(`Payment success: \n ${JSON.stringify(details)}`);
             $("#payment-result").jsonViewer(details);
             document.querySelector("#payment-view").style = 'display: none';
-            $("#div-vaulted-customer-id").text = "aa";
+            debugger;
+            $("#div-vaulted-customer-id").innerHtml = "aa";
 
           });
         }
