@@ -196,7 +196,7 @@ router.post('/s2s', (req, res, next) => {
 });
 
 // create order
-router.post('/and-vault-payment-method', (req, res, next) => {
+router.post('/vault-payment-method', (req, res, next) => {
 
   let defaultPayload = {
     intent: "CAPTURE",

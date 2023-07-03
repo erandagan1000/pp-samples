@@ -92,6 +92,7 @@ const captureOrder = (orderId, callback) => {
       }
     };
 
+    
     const data = {};
 
     axios.post(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`, data, config)

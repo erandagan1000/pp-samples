@@ -65,7 +65,8 @@ router.post('/clienttoken/generate/customerid', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
   const payload= req.body;
-  ppApiHelperV1.generateClientToken(accessToken, payload, (data, error) => {
+  const customerId = payload.customer_id;
+  ppApiHelperV1.generateClientTokenWithCustomerId(accessToken, customerId, (data, error) => {
     if (error) {
       res.status(500).send(error);
       return;
