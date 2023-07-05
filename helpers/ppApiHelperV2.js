@@ -32,7 +32,7 @@ const createOrder = (guid, data, callback) => {
         // handle success
         const data = response.data;
         console.log("ppApiHelperV2.createOrder");
-        console.log("ORDER-CREATE:", data);
+        console.log("ORDER-CREATED:", data);
         callback(data, undefined);
       })
       .catch(function (error) {
@@ -92,6 +92,7 @@ const captureOrder = (orderId, callback) => {
       }
     };
 
+    
     const data = {};
 
     axios.post(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`, data, config)

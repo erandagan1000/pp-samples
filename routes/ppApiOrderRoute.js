@@ -73,20 +73,7 @@ router.patch('/', (req, res, next) => {
 
   });
 });
-// order details
-router.post('/:id', (req, res, next) => {
 
-  orderId = req.params.id;
-  ppApiHelperV2.getOrderDetails(orderId, (data, error) => {
-    if (error) {
-      res.status(500).send(error);
-      return;
-    }
-    res.status(200).send(data);
-    return;
-
-  });
-});
 
 router.post('/lpm/sofort', (req, res, next) => {
 
@@ -208,4 +195,82 @@ router.post('/s2s', (req, res, next) => {
 
 });
 
+// create order
+router.post('/vault-payment-method', (req, res, next) => {
+
+  let defaultPayload = {
+    intent: "CAPTURE",
+    application_context:{ 
+      brand_name:"Jon Doe's Clothing Shop", 
+      locale:"en-US", 
+      landing_page:"LOGIN", 
+      return_url:"https://example.com/returnUrl", 
+      cancel_url:"https://www.paypal.com/checkoutnow/error" 
+   }, 
+
+    payment_source: {
+      paypal: {
+        experience_context: {
+          brand_name: "ERAN BRAND FROM EXPERIENCE CONTEXT",
+          locale: "en-US",
+          landing_page: "LOGIN",
+          return_url: "htttp://localhost:3000",
+          cancel_url: "htttp://localhost:3000"
+        },
+
+      }
+    },
+    purchase_units: [
+      {
+        amount:
+          { currency_code: "USD", value: "115.00" },
+
+      },
+    ],
+    payment_source:{ 
+      paypal:{ 
+         attributes:{ 
+            vault:{ 
+               permit_multiple_payment_tokens:false, 
+               store_in_vault:"ON_SUCCESS", 
+               usage_type:"MERCHANT", 
+               customer_type:"CONSUMER" 
+            } 
+         } 
+      } 
+   } 
+
+
+  };
+
+  var payload = req.body && req.body.intent ? req.body : defaultPayload;
+
+  const guid = ppApiHelperV2.uuidv4();
+
+  ppApiHelperV2.createOrder(guid, payload, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      console.log(error.response.data.details)
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
+
+// order details
+router.post('/:id', (req, res, next) => {
+
+  orderId = req.params.id;
+  ppApiHelperV2.getOrderDetails(orderId, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
 module.exports = router;
