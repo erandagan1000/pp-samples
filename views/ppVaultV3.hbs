@@ -8,7 +8,6 @@
 </head>
 
 <body>
-
   <div class="loading" id="loading-button">Loading paypal button...</div>
 
   <div><a href="/">Home</a></div>
@@ -19,7 +18,8 @@
   <div>
     <button onclick="createButton(true)" style="width:fit-content">Run returning User
       experience</button>
-    <div id="div-vaulted-customer-id"></div>
+     <br/> 
+    <div id="div-vaulted-customer-id" style="margin:10px;background-color:yellow;width:100px">&nbsp;</div>
   </div>
 
   <div id="payment-view">
@@ -50,42 +50,8 @@
     let orderId;
     var globalUserIdToken = "";
     let paypal;
-    let vaultedCustomerId = $("#div-vaulted-customer-id").val();
-    /*
-    try {
-
-      const myDataClientPromise = new Promise(generateDataClientToken);
-      myDataClientPromise.then((data) => {
-        console.log("reolved client token:", data);
-        window.paypalLoadScript({
-          "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk",
-          "data-user-id-token": globalUserIdToken,
-          "components": "buttons,hosted-fields"
-
-        }).then((pp) => {
-          paypal = pp;
-          if (paypal) {
-            try {
-
-              loadUiControls();
-
-            } catch (error) {
-              console.error("failed to render the PayPal Buttons", error);
-            }
-          }
-
-
-        }).catch((error) => {
-          console.error("failed to load the PayPal JS SDK script", error);
-        });
-
-      });
-    }
-
-    catch (error) {
-      console.error("failed to load the PayPal JS SDK script", error);
-    }
-    */
+    let vaultedCustomerId = "";
+    
 
     function createButton(isRetruning) {
       try {
@@ -101,7 +67,7 @@
         myDataClientPromise.then((data) => {
           console.log("reolved client token:", data);
           window.paypalLoadScript({
-            "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk",
+            "client-id": "AZjPmiH8MFbpWiO_y_WNWjyemnCVCAnpRPGE9_DB4mp8iBbjPfPLViZUhvoRifOjROWxVVWx8nJg_szi",
             "data-user-id-token": globalUserIdToken,
             "components": "buttons,hosted-fields"
 
@@ -172,7 +138,7 @@
         data: {},  // data to submit
         success: function (data, status, xhr) {
           console.log(data);
-          debugger;
+          
           const accesstoken = data.access_token;
           $.ajax('/ppapi/auth/clienttoken/generate/customerid', {
             type: 'POST',
@@ -181,7 +147,7 @@
             },
             data: { customer_id: vaultedCustomerId},   //vaultedCustomerId
             success: function (data, status, xhr) {
-              debugger;
+              
               console.log(data.client_token);
               globalUserIdToken = data.id_token;
               resolve(data.id_token);
@@ -229,9 +195,9 @@
           }).then(function (resJson) {
            
             console.log("resJson: ", resJson);
-            // let customerId = resJson.payment_source.paypal.attributes.vault.customer.id;  
-            let customerId = resJson.payment_source.paypal.attributes.vault.id; 
-            $("#div-vaulted-customer-id").innerHTML = `<p>${customerId}</p>`;
+            vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.customer.id;  
+            // vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.id; 
+            document.querySelector("#div-vaulted-customer-id").innerHTML = `<p>${vaultedCustomerId}</p>`;
             $("#payment-result").jsonViewer(resJson);
             document.querySelector("#payment-view").style = 'display: none';
 
@@ -241,12 +207,14 @@
       }).render("#paypal-button-container").then(() => {
         console.log("render executed");
         $("#loading-button").hide();
+        document.querySelector("#payment-view").style = 'display: block';
       });
 
     }
 
     createButton(false);
   </script>
+  
 
 </body>
 

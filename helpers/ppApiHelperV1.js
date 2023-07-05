@@ -98,10 +98,7 @@ const generateClientTokenWithCustomerId = (accessToken, customerId, callback) =>
 
   
   const config = {
-    // auth: {
-    //   username: process.env.PP_API_CLIENT_ID,
-    //   password: process.env.PP_API_CLIENT_SECRET
-    // },
+    
     headers: {
       "Authorization": accessToken,
       "Prefer": "return=representation",
