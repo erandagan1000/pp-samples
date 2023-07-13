@@ -13,7 +13,7 @@ const btConfigEcbtUS = {
 
 //ECBT - eran.m.uk@merchant.com
 const btConfigEcbtUK = {
-  accessToken: "access_token$sandbox$dc95jmkxp82n6wxj$eec6c23d7ae7a481677df772631d4aa4"
+  accessToken: "access_token$sandbox$hq7c8r82tfvt3yqw$f2468ab77bd83587c48979083f4ac57e"
 }
 
 // BT full Integration

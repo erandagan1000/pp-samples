@@ -63,6 +63,10 @@ router.post("/checkout", (req, res) => {
       
       options: {
         submitForSettlement
+      },
+      //just to test if it is passed with ECBT
+      customFields: {
+        age: "30"
       }
     }
   }
@@ -108,7 +112,7 @@ router.post("/checkout", (req, res) => {
         storeShippingAddressInVault: storeInVault    
       },
       customFields: {
-        age: 30
+        age: "30"
       }
     }
 

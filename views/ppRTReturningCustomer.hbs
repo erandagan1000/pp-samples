@@ -14,7 +14,7 @@
   <div><a href="/">Home</a></div>
   <h1>{{title}}</h1>
   <h2>Note</h2>
-  <p>This example uses a hard coded Billing Agreement: B-6M698525DU7956918, in order to demo the returning user UX</p>
+  <p>This example uses a hard coded Billing Agreement: B-2BG585865D559962H, in order to demo the returning user UX</p>
   <p>A real merchant will generally get the BA as a property of the user profile</p>
   <br><a href="https://developer.paypal.com/limited-release/pay-later-billing-agreements-sdk/returning-buyer/">
     Link to docs</a>
@@ -59,7 +59,7 @@
 
     $("#loading-button").show();
     let orderId;
-    var globalUserIdToken = "";
+    var globalUserIdToken = "", globalClientId="";
     let paypal;
 
     try {
@@ -67,8 +67,9 @@
       const myDataClientPromise = new Promise(generateDataClientToken);
       myDataClientPromise.then((data) => {
         console.log("resolved client token:", data);
+        console.log("clientId: ", globalClientId);
         window.paypalLoadScript({
-          "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk",
+          "client-id": globalClientId,
           "data-user-id-token": globalUserIdToken,
           "components": "buttons,hosted-fields"
         }).then((pp) => {
@@ -103,14 +104,14 @@
         success: function (data, status, xhr) {
           console.log(data);
           const accesstoken = data.access_token;
-          
+          globalClientId = data.clientId;          
 
           $.ajax('ppapi/auth/clienttoken/generate/baid', {
             type: 'POST',
             headers: {
               'Authorization': `Bearer ${accesstoken}`
             },
-            data: { baId: "B-6M698525DU7956918" },
+            data: { baId: "B-2BG585865D559962H" },
             success: function (data, status, xhr) {
               
               console.log(data.client_token);

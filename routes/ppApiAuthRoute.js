@@ -28,6 +28,7 @@ router.post('/accesstoken/generate', (req, res, next) => {
         return;
       }
       data.merchantName = process.env.PP_MERCHANT_NAME
+      data.clientId = process.env.PP_API_CLIENT_ID
       res.status(200).send(data);
       return;
 
