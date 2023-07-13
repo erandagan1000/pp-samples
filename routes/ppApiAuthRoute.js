@@ -62,11 +62,12 @@ router.post('/clienttoken/generate', (req, res, next) => {
 });
 
 // generate client_token
-router.post('/clienttoken/generate/customerid', (req, res, next) => {
+router.post('/clienttoken/generate/baid', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
-  const payload= req.body;
-  ppApiHelperV1.generateClientToken(accessToken, payload, (data, error) => {
+  const baId = req.body.baId; // RT
+  
+  ppApiHelperV1.generateClientTokenWithBillingAgreementId(accessToken, baId, (data, error) => {
     if (error) {
       res.status(500).send(error);
       return;
@@ -79,11 +80,12 @@ router.post('/clienttoken/generate/customerid', (req, res, next) => {
 });
 
 // generate client_token with billing-agreement
-router.post('/clienttoken/generate/baid', (req, res, next) => {
+router.post('/clienttoken/generate/customerid', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
-  const baId = req.body.baId;
-  ppApiHelperV1.generateClientTokenWithBillingAgreementId(accessToken,baId, (data, error) => {
+ 
+  const customerId =  req.body.customer_id && req.body.customer_id.length > 0 ? req.body.customer_id : "uwmkKoRoWs";  // uwmkKoRoWs  is existing customerId in merchant app: ACDC (eran.m.us@merchant.com
+  ppApiHelperV1.generateClientTokenWithCustomerId(accessToken,customerId, (data, error) => {
     if (error) {
       res.status(500).send(error);
       return;

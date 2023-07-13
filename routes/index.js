@@ -64,6 +64,10 @@ router.get('/ppscgnosdk', function(req, res, next) {
 router.get('/ppsc', function(req, res, next) {
   res.render('ppsc', { title: 'PP Smart Payment Button - Standard Checkout' });
 });
+router.get('/ppscmsg', function(req, res, next) {
+  res.render('ppscMessaging', { title: 'PP Messaging' });
+});
+
 router.get('/ppspbapi', function(req, res, next) {
   res.render('ppSpbAndOrdersApi', { title: 'PP Rest API + SPB - Standard Checkout' });
 });

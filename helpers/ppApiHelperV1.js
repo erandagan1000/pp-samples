@@ -62,8 +62,6 @@ const generateClientToken = (accessToken, payload, callback) => {
 
 const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) => {
 
-  /* OPTION  1 */
-  /*
   const config = {
     headers: {
       Authorization: accessToken,
@@ -71,7 +69,7 @@ const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) 
       "Accept": "application/json",
       "Content-Type": "application/json",
       "Accept-Language": "en_US"
- 
+
     }
   };
   const data = {
@@ -82,26 +80,27 @@ const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) 
   };
 
   // generate access token, givven merchant credenials
-axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, config)
-.then(function (response) {
-  // handle success
-  const data = response.data;
-  callback(data, undefined);
-})
-.catch(function (error) {
-  // handle error
-  console.log(error);
-  callback(undefined, error)
-})
-*/
-  /* OPTION  2 */
+  axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, config)
+    .then(function (response) {
+      // handle success
+      const data = response.data;
+      callback(data, undefined);
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+      callback(undefined, error)
+    })
 
+}
+
+const generateClientTokenWithCustomerId = (accessToken, customerId, callback) => {
+
+  
   const config = {
-    auth: {
-      username: process.env.PP_API_CLIENT_ID,
-      password: process.env.PP_API_CLIENT_SECRET
-    },
+    
     headers: {
+      "Authorization": accessToken,
       "Prefer": "return=representation",
       "Accept": "application/json",
       "Content-Type": "application/x-www-form-urlencoded"
@@ -112,8 +111,8 @@ axios.post('https://api-m.sandbox.paypal.com/v1/identity/generate-token', data, 
   data.append('grant_type', 'client_credentials');
   // added according to Vault V3 doc
   data.append('response_type', 'id_token');
-  // console.log(options);
-  data.append('claims', ["billing_agreement_id", baId]);
+  // Vault style (new)
+  data.append('target_customer_id', customerId);
 
   // generate access token, givven merchant credenials
   axios.post('https://api-m.sandbox.paypal.com/v1/oauth2/token', data, config)
@@ -456,6 +455,7 @@ module.exports = {
   generateClientToken,
   generateBillingAgreementToken,
   generateClientTokenWithBillingAgreementId,
+  generateClientTokenWithCustomerId,
   createBillingAgreement,
   createPayment,
   getBillingAgreementDetails,
