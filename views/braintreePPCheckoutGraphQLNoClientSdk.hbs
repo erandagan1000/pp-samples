@@ -26,6 +26,7 @@
       <button id="create-order-button" onclick="createOrder()">[1] Create Order</button>
     </td>
     <td class="seperator">
+      <div id="in-progress-1">In Progress...</div>
       <div id="create-order-response"></div>
       <div><span id="create-order-approve-container"></span> </div>
     </td>
@@ -36,6 +37,7 @@
       <button  id="get-order-details-button" onclick="createNonce()">[2] Create Nonce</button>
     </td>
     <td class="seperator">
+      <div id="in-progress-2">In Progress...</div>
       <div id="create-nonce-response"></div>
     </td>
   </tr>
@@ -45,6 +47,7 @@
       <button id="ba-pay" onclick="captureNonce()">[3] Capture Nonce</button>
     </td>
     <td class="seperator">
+      <div id="in-progress-3">In Progress...</div>
       <div id="capture-nonce-response"></div>
     </td>
   </tr>
@@ -54,6 +57,9 @@
 
 <!-- Implementation -->
 <script>
+  $("#in-progress-1").hide();
+  $("#in-progress-2").hide();
+  $("#in-progress-3").hide();
   var amountElement = $("#input-amount");
   var amount = amountElement.val();
 
@@ -89,6 +95,7 @@
   
 
   function createOrder() {
+    $("#in-progress-1").show();
     $.ajax('/bt/gql/create-payment', {
       type: 'POST',
       headers: {"Content-Type": "application/json"},
@@ -97,8 +104,8 @@
         console.log(data);
         $("#create-order-response").html(JSON.stringify(data));
         $("#get-order-details-button").removeAttr("disabled");
-       
-        debugger;
+        $("#in-progress-1").hide();      
+        
         const approveUrl = data.createPayPalOneTimePayment.approvalUrl;
         paymentToken = approveUrl.split("=")[2];
         paymentId = data.createPayPalOneTimePayment.paymentId;
@@ -115,10 +122,10 @@
   }
 
   function createNonce() {
-    debugger;
-     {{!-- paymentId = $("#input-payment-id").val());
-     paymentToken = $("#input-ec-token").val(); --}}
-     payerId =$("#input-payer-id").val();
+    
+    $("#in-progress-2").show();
+    
+    payerId =$("#input-payer-id").val();
 
     var payload = {
       selectedCurrency: orderData.amount.currency_code,
@@ -126,7 +133,7 @@
       paymentId,
       payerId
 
-    };
+    };    
 
     $.ajax('/bt/gql/create-nonce', {
       type: 'POST',
@@ -136,8 +143,8 @@
         console.log(data);
         $("#create-nonce-response").html(JSON.stringify(data));
         $("#create-nonce-button").removeAttr("disabled");
-
-        debugger;
+        $("#in-progress-2").hide();
+        
         paymentMethodId = data.tokenizePayPalOneTimePayment.paymentMethod.id;
         console.log("paymentMethodId: ", paymentMethodId);
         
@@ -151,6 +158,7 @@
   
 
   function captureNonce() {
+    $("#in-progress-3").show();
     var guid = uuidv4();
 
     var payload = {
@@ -165,7 +173,8 @@
       data: JSON.stringify(payload),
       success: function (data, status, xhr) {
         console.log(data);
-        $("#capture-nonce-response").html(JSON.stringify(data)).css('color', 'green');;
+        $("#capture-nonce-response").html(JSON.stringify(data)).css('color', 'green');
+        $("#in-progress-3").hide();
 
       },
       error: function (jqXhr, textStatus, errorMessage) {

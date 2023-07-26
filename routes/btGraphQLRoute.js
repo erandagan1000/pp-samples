@@ -61,12 +61,14 @@ router.post('/create-payment', (req, res, next) => {
       "merchantAccountId": merchantAccountId,
       "cancelUrl": "https://braintreegateway.com/canceltest",
       "intent": "SALE",
+     // "offerPayLater": false,
       "returnUrl": returnUrl,
       "paypalExperienceProfile": {
         "brandName": "Eran",
         "collectShippingAddress": false,
-        "landingPageType": "LOGIN",
-        "locale": "en-US"
+        "landingPageType": "DEFAULT",
+        "locale": "en-US",
+        "userAction": "COMMIT"
       }
     }
   };
