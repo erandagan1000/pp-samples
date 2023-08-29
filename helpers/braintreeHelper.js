@@ -90,6 +90,13 @@ const find = function (transactionId) {
   return gateway.transaction.find(transactionId);
 }
 
+const searchByCurrency = function (currency, callback) {
+   
+  return gateway.transaction.search((search) => {
+    search.currency(currency);
+  }, callback);
+}
+
 const get64BitApiKey = function(){
   var apiKey64Bit = Buffer.from(`${btConfig.publicKey}:${btConfig.privateKey}`).toString('base64');
   //console.log(apiKey64Bit);
@@ -111,6 +118,7 @@ module.exports = {
   addressCreate,
   submitForSettlement,
   find,
+  searchByCurrency,
   paymentMetohdCreateFromPaymentMethodToken,
   get64BitApiKey
 

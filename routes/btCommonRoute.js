@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const btHelper = require("../helpers/braintreeHelper");
+const CircularJSON = require('circular-json');
 
 // base route: /bt
 
@@ -125,7 +126,7 @@ router.get('/capture/:transactionid', (req, res, next) => {
 
 });
 
-router.get('/find/:transactionid', (req, res, next) => {
+router.get('/transaction/find/:transactionid', (req, res, next) => {
 
   const transactionId = req.params.transactionid;
 
@@ -144,11 +145,51 @@ router.get('/find/:transactionid', (req, res, next) => {
 
 });
 
+router.get('/transaction/search/:key/:value', (req, res, next) => {
+
+  const key = req.params.key;
+  const value = req.params.value;
+  let txns = [];
+
+  btHelper.gateway.transaction.search((search) => {
+    search.currency().is("USD");
+  }, (err, response) => {
+    response.each((err, transaction) => {
+
+      txns.push(transaction);
+    });
+
+    setTimeout(() => {
+      res.status(200).send(CircularJSON.stringify(txns));
+    }, 10000);
+
+  });
+
+
+});
+
+router.get('/transaction/search/currency', (req, res, next) => {
+
+  let txns =[];
+
+  btHelper.searchByCurrency("USD", (err, response) => {
+    response.each((err, transaction) => {
+      txns.push(transaction);
+    });
+
+    setTimeout(() => {
+      res.status(200).send(CircularJSON.stringify(txns));
+    }, 10000);
+
+  });
+
+});
+
 router.post('/webhook', (req, res, next) => {
-  
-    console.log(req.body);
-    res.status(200).send("success");
-  
+
+  console.log(req.body);
+  res.status(200).send("success");
+
 });
 
 

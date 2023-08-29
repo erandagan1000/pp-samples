@@ -193,6 +193,60 @@ router.post('/capture-nonce', (req, res, next) => {
 
 });
 
+router.post('/tokenizecc', (req, res, next) => {
+
+  const accessToken64Bit = btHelper.get64BitApiKey();
+  console.log(req.body);
+   
+  var query = graphQl.gql`mutation TokenizeCreditCard($input: TokenizeCreditCardInput!){
+    tokenizeCreditCard(input: $input){
+      paymentMethod{
+        id
+        legacyId
+        usage
+        details{
+          ... on CreditCardDetails{
+            brandCode
+            last4
+            expirationMonth
+            expirationYear
+          }
+        }
+      }
+    }
+  }`
+  var variables = {
+    "input": {
+      "creditCard": {
+        "number": "4111111111111111",
+        "expirationMonth": "12",
+        "expirationYear": "2024",
+        "cvv":"123"
+      }
+    }
+  };
+  
+  var headers = {
+    'Authorization': `Basic ${accessToken64Bit}`,
+    'Braintree-Version': '2021-01-18'
+  };
+  graphQl.request({
+    url: endpoint,
+    document: query,
+    variables: variables,
+    requestHeaders: headers,
+  }).then(function (data) {
+    console.log(data);
+    res.status(200).send(data);
+
+  }).catch(function (error) {
+    // handle error
+    console.log(error);
+    res.status(500).send(error);
+  })
+
+});
+
 
 
 module.exports = router;

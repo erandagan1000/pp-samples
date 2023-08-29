@@ -105,9 +105,9 @@
         $("#create-order-response").html(JSON.stringify(data));
         $("#get-order-details-button").removeAttr("disabled");
         $("#in-progress-1").hide();      
-        
+        debugger;
         const approveUrl = data.createPayPalOneTimePayment.approvalUrl;
-        paymentToken = approveUrl.split("=")[2];
+        paymentToken = approveUrl.split("=")[1];
         paymentId = data.createPayPalOneTimePayment.paymentId;
         
         $("#create-order-approve-container").html(`<p><b>Follow this url to: <br> APPROVE Order: <a target='_blank' href="${approveUrl}">Approve Order</a></b></p>`);

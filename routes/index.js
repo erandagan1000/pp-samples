@@ -57,7 +57,11 @@ router.get('/btgp', function(req, res, next) {
   res.render('braintreeGooglePay', { title: 'BrainTree Google Pay' });
 });
 router.get('/ppscgnosdk', function(req, res, next) {
-  res.render('braintreePPCheckoutGraphQLNoClientSdk', { title: 'Standard Checkout - GraphQL - NO Client SDK' });
+  res.render('braintreeCheckoutGraphQLNoClientSdkPP', { title: 'GraphQL PP Standard Checkout - NO Client SDK' });
+});
+
+router.get('/ccgnosdk', function(req, res, next) {
+  res.render('braintreeCheckoutGraphQLNoClientSdkCC', { title: 'GraphQL Credit Card Checkout - NO Client SDK' });
 });
 
 // ********************  PayPal ************************
