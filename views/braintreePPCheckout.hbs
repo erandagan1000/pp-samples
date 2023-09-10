@@ -3,7 +3,7 @@
 <hr>
 
 <!---------------- Paypal Button ------------------>
-<div>Amount: <input type="text" id="input-amount" style="width:100px" value="40"></div>
+<div>Amount: <input type="text" id="input-amount" style="width:100px" value="44"></div>
 <div>Currency: <input type="text" id="input-currency" style="width:100px" value="USD"></div>
 <div>authorize or capture: <input type="text" id="auth-or-capture" style="width:100px" value="capture"></div>
 <div>
@@ -41,10 +41,10 @@
 
 <!-- includes the Braintree JS client SDK -->
 <!-- Load the client component. -->
-<script src="https://js.braintreegateway.com/web/3.91.0/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.97.1/js/client.min.js"></script>
 
 <!-- Load the PayPal Checkout component. -->
-<script src="https://js.braintreegateway.com/web/3.91.0/js/paypal-checkout.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.97.1/js/paypal-checkout.min.js"></script>
 
 <script>
 
@@ -54,6 +54,7 @@
 
   var amountElement = $("#input-amount");
   var amount = amountElement.val();
+  var qty = 4;
 
   amountElement.change(function () {
     amount = amountElement.val();
@@ -140,7 +141,7 @@
           createOrder: function () {
             return paypalCheckoutInstance.createPayment({
               flow: 'checkout', // Required
-              amount: amount, // Required
+              amount: amount*qty, // Required
               currency: selectedCurrency, // Required, must match the currency passed in with loadPayPalSDK
               intent: authOrCapture, // Must match the intent passed in with loadPayPalSDK
 
@@ -172,7 +173,7 @@
                 url: '/bt/vault/payment/checkout',
                 data: {
                   'paymentMethodNonce': payload.nonce,
-                  'amount': amount*2,
+                  'amount': amount,
                   'currency': selectedCurrency,
                   'isAuthorizeRequest': authOrCapture == 'authorize'
 
@@ -198,7 +199,7 @@
 
                 } else {
                   console.log(result);
-                  $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+                  $('#checkout-message').html(`<h1>Error</h1><p>Check your console.</p><p>${result?.transaction?.additionalProcessorResponse || result.message}</p>`);
                   $("#checkout-result").jsonViewer(result);
                 }
               });

@@ -7,12 +7,12 @@ var randomstring = require("randomstring");
 
 // #region Token Functions
 router.get("/client_token", (req, res) => {
-  
+
   //Expect payload {merchant_account_id: xxx}  if merchant uses multiple PP account linked to the same BT gateway (MID)
   // he will need to specify the MAID to use, it should be the one connnected in BT Console where he linked the PP asccount
   let selectedCurrency = req.query.currency;
-  if(selectedCurrency && !btHelper.isECBT) {
-    payload = {merchant_account_id: btHelper.getMerchantAccountIdByCurrency(selectedCurrency)};
+  if (selectedCurrency && !btHelper.isECBT) {
+    payload = { merchant_account_id: btHelper.getMerchantAccountIdByCurrency(selectedCurrency) };
   }
   else {
     payload = {};
@@ -40,27 +40,26 @@ router.post("/checkout", (req, res) => {
   var nonceFromTheClient = req.body.paymentMethodNonce;
   var amount = req.body.amount;
   const selectedCurrency = req.body.currency;
-  var storeInVault =  (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || false; 
+  var storeInVault = (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || false;
   console.log("store in vault: ", storeInVault);
 
   // set merchantAccountId by selected presntment currency
-  
+
   const merchantAccountId = btHelper.isECBT ? undefined : btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
 
   let submitForSettlement = true;
-  if (req.body.isAuthorizeRequest && req.body.isAuthorizeRequest == 'true')
-  {
+  if (req.body.isAuthorizeRequest && req.body.isAuthorizeRequest == 'true') {
     submitForSettlement = false;
   }
   console.log("submitForSettlement: ", submitForSettlement);
 
   let requestParams = {}
-
-  if(btHelper.isECBT) {
+  console.log("btHelper.isECBT: ", btHelper.isECBT);
+  if (btHelper.isECBT) {
     requestParams = {
       amount,
       paymentMethodNonce: nonceFromTheClient,
-      
+
       options: {
         submitForSettlement
       },
@@ -71,10 +70,21 @@ router.post("/checkout", (req, res) => {
     }
   }
   else {
+    let qty1 = 1, qty2 = 3;
+    let taxPerUnit = 1.00;
+    let totalTax = (qty1+qty2) * taxPerUnit;
     requestParams = {
-      amount,
+      amount: amount*(qty1+qty2) + totalTax,
+      purchaseOrderNumber: "12345",
+      taxAmount: totalTax,
       paymentMethodNonce: nonceFromTheClient,
       merchantAccountId: merchantAccountId,  //if ommitted the default MID (configured on BT console) will be used
+      descriptor: {
+        name: 'ERUS   *DYN DESCRIPTOR',  //[section]*[prodcut desc] - section must be same value as in Admin "CC Statement name"
+                                        //section must be either 3, 7 or 12 characters and the product descriptor can be up to 18, 14, or 9 characters respectively 
+       // phone: '8044822122',          //(with an * in between for a total descriptor name of 22
+        //url: 'erandagan.com',
+      },
       // customer: {
       //   firstName: "Jen",
       //   lastName: "Smith",
@@ -106,10 +116,40 @@ router.post("/checkout", (req, res) => {
         postalCode: "60103",
         countryCodeAlpha2: "US"
       },
+      
+      lineItems: [
+        {
+          name: "Item 1 desc",
+          kind: "debit",
+          quantity: qty1,
+          unitAmount: amount,
+          unitOfMeasure: "unit",
+          totalAmount: qty1 * amount,
+          taxAmount: taxPerUnit,
+          discountAmount: "0.00",
+          productCode: "54321",
+          commodityCode: "98765"
+        },
+        {
+          name: "Item 2 desc",
+          kind: "debit",
+          quantity: qty2,
+          unitAmount: amount,
+          unitOfMeasure: "unit",
+          totalAmount: qty2 * amount,
+          taxAmount: taxPerUnit,
+          discountAmount: "0.00",
+          productCode: "54321",
+          commodityCode: "98765"
+        }
+      ],
       options: {
         submitForSettlement,
-        storeInVaultOnSuccess: storeInVault,   
-        storeShippingAddressInVault: storeInVault    
+        storeInVaultOnSuccess: storeInVault,
+        storeShippingAddressInVault: storeInVault,
+        paypal: {
+          "description": "Product xx description from options"
+        }
       },
       customFields: {
         age: "30"
@@ -136,7 +176,7 @@ router.post('/vault', (req, res, next) => {
   // set merchantAccountId by selected presntment currency
   const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
   const deviceData = req.body.deviceData || '';
-  console.log("deviceData", deviceData); 
+  console.log("deviceData", deviceData);
 
   const saleRequest = {
     amount: req.body.amount,

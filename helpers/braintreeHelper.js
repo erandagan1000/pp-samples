@@ -105,7 +105,7 @@ const get64BitApiKey = function(){
 }
 
 const gateway = new braintree.BraintreeGateway(btConfig);
-const isECBT = true;
+const isECBT = false;
 
 module.exports = {
   isECBT,

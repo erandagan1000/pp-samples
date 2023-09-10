@@ -34,6 +34,12 @@
       createOrder: function (data, actions) {
         return actions.order.create({
           purchase_units: [{
+           // description: "puchase unit description",
+           // soft_descriptor: "my soft descriptor",
+            /*items: [
+            {name: "item 1", quantity:1},
+            {name: "item 2", quantity:5}
+            ],*/
             amount: {
               value: amount // Can reference variables or functions. Example: `value: document.getElementById('...').value`
             }
@@ -49,7 +55,7 @@
           console.log('Capture result', orderData, resultJson);
           var transaction = orderData.purchase_units[0].payments.captures[0];
           // alert('Transaction ' + transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
-          $('#paypal-result-container').text(resultJson);
+          $('#paypal-result-container').text(`Capture Result: ${resultJson} | Transaction: ${JSON.stringify(transaction)} `);
           // When ready to go live, remove the alert and show a success message within this page. For example:
           // var element = document.getElementById('paypal-button-container');
           // element.innerHTML = '';
