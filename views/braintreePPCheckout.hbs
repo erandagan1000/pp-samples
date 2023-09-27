@@ -182,12 +182,15 @@
 
                 if (result.success) {
                   var approveDiv = document.querySelector('#approve-payload');
-                  var captureURl = '', captureHtml = '';
+                  var captureUrl = '', captureHtml = '', voidUrl= '', voidHtml = '';
                   if (authOrCapture == 'authorize') {
-                    captureURl = `http://localhost:3000/bt/capture/${result.transaction.id}`
-                    captureHtml = `<div style="margin-top:5px"><h2>Transaction Authorized Successfully.<p><a href='${captureURl}' target=_blank>Click to CAPTURE: ${result.transaction.id}</a></p></h2></div>`;
+                    captureUrl = `http://localhost:3000/bt/capture/${result.transaction.id}`
+                    captureHtml = `<div style="margin-top:5px"><h2>Transaction Authorized Successfully.<p><a href='${captureUrl}' target=_blank>Click to CAPTURE: ${result.transaction.id}</a></p></h2></div>`;
+
+                    voidUrl = `http://localhost:3000/bt/void/${result.transaction.id}`
+                    voidHtml = `<div style="margin-top:5px"><h2>Transaction Authorized Successfully.<p><a href='${voidUrl}' target=_blank>Click to VOID: ${result.transaction.id}</a></p></h2></div>`;
                   }
-                  approveDiv.innerHTML = JSON.stringify(payload) + '  ' + captureHtml;
+                  approveDiv.innerHTML = JSON.stringify(payload) + '  ' + captureHtml + ' | ' + voidHtml;
 
                   $('#checkout-message').html('<h1>Success</h1><p>BT Checkout is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p><p><a href="/">Home</a></p>');
 

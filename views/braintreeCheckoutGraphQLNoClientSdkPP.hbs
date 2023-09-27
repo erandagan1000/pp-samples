@@ -110,7 +110,7 @@
         paymentToken = approveUrl.split("=")[1];
         paymentId = data.createPayPalOneTimePayment.paymentId;
         
-        $("#create-order-approve-container").html(`<p><b>Follow this url to: <br> APPROVE Order: <a target='_blank' href="${approveUrl}">Approve Order</a></b></p>`);
+        $("#create-order-approve-container").html(`<p><b>Follow this url to: <br> APPROVE Order: <a target='_blank' href="${approveUrl}">Approve Order </a></b>(Note the PAYERID concatedneted to the retrun_url </p>`);
         orderId = data.id;
 
       },

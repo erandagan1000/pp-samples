@@ -85,6 +85,11 @@ const submitForSettlement = function (transactionId) {
   return gateway.transaction.submitForSettlement(transactionId);
 }
 
+const voidTransaction = function (transactionId) {
+   
+  return gateway.transaction.void(transactionId);
+}
+
 const find = function (transactionId) {
    
   return gateway.transaction.find(transactionId);
@@ -120,7 +125,8 @@ module.exports = {
   find,
   searchByCurrency,
   paymentMetohdCreateFromPaymentMethodToken,
-  get64BitApiKey
+  get64BitApiKey,
+  voidTransaction 
 
 
 };
