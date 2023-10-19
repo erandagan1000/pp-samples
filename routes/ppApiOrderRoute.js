@@ -44,9 +44,12 @@ router.post('/', (req, res, next) => {
 
   var payload = req.body && req.body.intent ? req.body : defaultPayload;
 
+  var additions =  {paypal: {experience_context: {brand_name: "ERAN BRAND FROM EXPERIENCE CONTEXT"}}};
+  var payload1 = {...payload , payment_source: additions };
+  
   const guid = ppApiHelperV2.uuidv4();
 
-  ppApiHelperV2.createOrder(guid, payload, (data, error) => {
+  ppApiHelperV2.createOrder(guid, payload1, (data, error) => {
     if (error) {
       res.status(500).send(error);
       console.log(error.response.data.details)

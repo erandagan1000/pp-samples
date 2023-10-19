@@ -3,6 +3,63 @@
 <h2><a href="https://developer.paypal.com/braintree/docs/reference/general/testing#valid-card-numbers"
     target="_blank">Valid Test Cards</a>
 </h2>
+
+<!----------------- Hosted fields example  ------------------>
+<div style="background-color:aliceblue">
+  <hr>
+  <h2>Hosted Fields example</h2>
+  <hr>
+
+  <div style="width:600px">
+    <form action="/bt/hf/payment/checkout" id="my-sample-form" method="post">
+      <div style="padding:10px">
+        <label for="card-number" style="padding:5px;margin-top:5px">Card Number</label>
+        <div id="card-number" style="height:30px;border-style:solid;border-color:lightgray"></div>
+
+      </div>
+      <div style="padding:10px">
+        <label for="cvv" style="margin-top:5px">CVV</label>
+        <div id="cvv" style="height:30px;border-style:solid;border-color:lightgray"></div>
+
+      </div>
+
+      <div style="padding:10px">
+        <label for="expiration-date" style="margin-top:5px">Expiration Date</label>
+        <div id="expiration-date" style="height:30px;border-style:solid;border-color:lightgray"></div>
+
+      </div>
+      <div style="padding:10px">
+        <input id="save-for-next-purchase" type="checkbox">
+        <label for="save-for-next-purchase" style="margin-top:5px">Save details for next purchase</label>
+      </div>
+
+      <div style="padding:10px">
+        <input id="verify-cc" type="checkbox">
+        <label for="verify-cc" style="margin-top:5px">Verify Credit Card</label>
+      </div>
+
+
+      <input type="hidden" id="hf-nonce" name="payment_method_nonce" />
+      <input type="hidden" id="hf_save_for_next_purchase" name="hf_save_for_next_purchase" />
+      <input type="hidden" id="verify_cc" name="verify_cc" />
+      <input type="hidden" id="isDesiredToBeDeclined" name="isDesiredToBeDeclined" />
+
+
+      <div style="padding:10px">
+        <input type="submit" value="Make Payment" id="pay" disabled />
+      </div>
+
+    </form>
+  </div>
+
+
+</div>
+
+<!-- test card -->
+<div style="color:gray">
+  <p><a href="https://developer.paypal.com/braintree/docs/guides/credit-cards/testing-go-live/node" target="_blank">Test Cards</a></p>
+
+</div>
 <br />
 <!----------------- dropin1 fields example ---------------------->
 <div style="background-color:aliceblue">
@@ -41,59 +98,7 @@
   </form>
 
 </div>
-<!----------------- Hosted fields example  ------------------>
-<div style="background-color:aliceblue">
-  <hr>
-  <h2>Hosted Fields example</h2>
-  <hr>
 
-  <div style="width:600px">
-    <form action="/bt/hf/payment/checkout" id="my-sample-form" method="post">
-      <div style="padding:10px">
-        <label for="card-number" style="padding:5px;margin-top:5px">Card Number</label>
-        <div id="card-number" style="height:30px;border-style:solid;border-color:lightgray"></div>
-
-      </div>
-      <div style="padding:10px">
-        <label for="cvv" style="margin-top:5px">CVV</label>
-        <div id="cvv" style="height:30px;border-style:solid;border-color:lightgray"></div>
-
-      </div>
-
-      <div style="padding:10px">
-        <label for="expiration-date" style="margin-top:5px">Expiration Date</label>
-        <div id="expiration-date" style="height:30px;border-style:solid;border-color:lightgray"></div>
-
-      </div>
-      <div style="padding:10px">
-        <input id="save-for-next-purchase" type="checkbox">
-        <label for="save-for-next-purchase" style="margin-top:5px">Save details for next purchase</label>
-
-
-      </div>
-      <input type="hidden" id="hf-nonce" name="payment_method_nonce" />
-      <input type="hidden" id="hf_save_for_next_purchase" name="hf_save_for_next_purchase" />
-      <input type="hidden" id="isDesiredToBeDeclined" name="isDesiredToBeDeclined" />
-
-
-      <div style="padding:10px">
-        <input type="submit" value="Make Payment" id="pay" disabled />
-      </div>
-
-    </form>
-  </div>
-
-
-</div>
-
-<!-- test card -->
-<div style="color:gray">
-  <p>test card</p>
-  <div>
-    Card number: 4111 1111 1111 1111 | Expiry: 09/23 | CVV: 400 | Postal Code: 40000
-  </div>
-
-</div>
 <!-- includes the Braintree JS client SDK -->
 
 <!-- Load the PayPal JS SDK with your PayPal Client ID-->
@@ -188,7 +193,7 @@
         container: '#dropin-container1'
       }, (error, dropinInstance) => {
         if (error) { console.error(error); }
-        
+
         $("#dropin-submit-button").show();
         form.addEventListener('submit', event => {
           event.preventDefault();
@@ -270,6 +275,7 @@
           number: {
             container: '#card-number',
             placeholder: '4111 1111 1111 1111'
+            
           },
           cvv: {
             container: '#cvv',
@@ -294,7 +300,7 @@
 
         submit.removeAttribute('disabled');
         $("#pay").show();
-        
+
         form.addEventListener('submit', function (event) {
           event.preventDefault();
 
@@ -312,6 +318,7 @@
             document.getElementById('hf-nonce').value = payload.nonce;
             document.getElementById('hf_save_for_next_purchase').value = $("#save-for-next-purchase")[0].checked;
             document.getElementById('isDesiredToBeDeclined').value = $("#force-issuer-decline")[0].checked;
+            document.getElementById('verify_cc').value = $("#verify-cc")[0].checked;
             form.submit();
 
           });

@@ -61,7 +61,7 @@ router.post('/create-payment', (req, res, next) => {
       "merchantAccountId": merchantAccountId,
       "cancelUrl": "https://braintreegateway.com/canceltest",
       "intent": "SALE",
-     // "offerPayLater": false,
+      // "offerPayLater": false,
       "returnUrl": returnUrl,
       "paypalExperienceProfile": {
         "brandName": "Eran",
@@ -115,15 +115,15 @@ router.post('/create-nonce', (req, res, next) => {
 }`
   var variables = {
     "tokenizePayPalOneTimePaymentInput": {
-        "merchantAccountId": merchantAccountId,
-        "paypalOneTimePayment": {
-            "paymentToken": paymentToken,
-            "payerId": payerId,
-            "paymentId": paymentId
-        },
-        "clientMutationId": "tokenizePayment_0EK45232HK957833W"
+      "merchantAccountId": merchantAccountId,
+      "paypalOneTimePayment": {
+        "paymentToken": paymentToken,
+        "payerId": payerId,
+        "paymentId": paymentId
+      },
+      "clientMutationId": "tokenizePayment_0EK45232HK957833W"
     }
-};
+  };
   var headers = {
     'Authorization': `Basic ${accessToken64Bit}`,
     'Braintree-Version': '2021-01-18'
@@ -152,7 +152,7 @@ router.post('/capture-nonce', (req, res, next) => {
   var merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
   var paymentMethodId = req.body.paymentMethodId;
   var amount = req.body.amount;
- 
+
 
   var query = graphQl.gql`mutation ChargePaymentMethod($input: ChargePaymentMethodInput!) {
     chargePaymentMethod(input: $input) {
@@ -197,7 +197,7 @@ router.post('/tokenizecc', (req, res, next) => {
 
   const accessToken64Bit = btHelper.get64BitApiKey();
   console.log(req.body);
-   
+
   var query = graphQl.gql`mutation TokenizeCreditCard($input: TokenizeCreditCardInput!){
     tokenizeCreditCard(input: $input){
       paymentMethod{
@@ -221,11 +221,11 @@ router.post('/tokenizecc', (req, res, next) => {
         "number": "4111111111111111",
         "expirationMonth": "12",
         "expirationYear": "2024",
-        "cvv":"123"
+        "cvv": "123"
       }
     }
   };
-  
+
   var headers = {
     'Authorization': `Basic ${accessToken64Bit}`,
     'Braintree-Version': '2021-01-18'
@@ -247,6 +247,51 @@ router.post('/tokenizecc', (req, res, next) => {
 
 });
 
+router.get('/verifycc', (req, res, next) => {
+
+  const accessToken64Bit = btHelper.get64BitApiKey();
+  var merchantAccountId = btHelper.getMerchantAccountIdByCurrency('USD');
+
+
+  var query = graphQl.gql`mutation VerifyCreditCard($input: VerifyCreditCardInput!){
+    verifyCreditCard(input: $input){
+      clientMutationId
+      verification{
+        id
+        legacyId
+
+      }
+    }
+  }`
+  var variables = {
+    "input": {
+      "clientMutationId": "tokenizePayment_0EK45232HK957833W",
+      "paymentMethodId": "tokencc_bc_wr2xmp_wrz4gz_fy3yrv_zrwptq_x4z",
+      "merchantAccountId": merchantAccountId
+      
+    }
+  };
+
+  var headers = {
+    'Authorization': `Basic ${accessToken64Bit}`,
+    'Braintree-Version': '2021-01-18'
+  };
+  graphQl.request({
+    url: endpoint,
+    document: query,
+    variables: variables,
+    requestHeaders: headers,
+  }).then(function (data) {
+    console.log(data);
+    res.status(200).send(data);
+
+  }).catch(function (error) {
+    // handle error
+    console.log(error);
+    res.status(500).send(error);
+  })
+
+});
 
 
 module.exports = router;

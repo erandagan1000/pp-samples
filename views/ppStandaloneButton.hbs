@@ -106,8 +106,8 @@
         $("#get-order-details-button").removeAttr("disabled");
 
         const links = data.links;
-        const approveUrl = links.find((l) => l.rel == "approve").href;
-        const captureUrl = links.find((l) => l.rel == "capture").href;
+        const approveUrl = links.find((l) => l.rel == "approve" || l.rel == "payer-action").href;
+        const captureUrl = links.find((l) => l.rel == "capture")?.href;
         $("#create-order-approve-container").html(`<p><b>Follow this url to: <br> APPROVE Order: <a target='_blank' href="${approveUrl}">Approve Order</a><br> CAPTURE Order: <a target='_blank' href="${captureUrl}">Capture Order</a></b></p>`);
         orderId = data.id;
 

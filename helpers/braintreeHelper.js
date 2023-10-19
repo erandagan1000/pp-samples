@@ -109,6 +109,8 @@ const get64BitApiKey = function(){
   return apiKey64Bit
 }
 
+
+
 const gateway = new braintree.BraintreeGateway(btConfig);
 const isECBT = false;
 

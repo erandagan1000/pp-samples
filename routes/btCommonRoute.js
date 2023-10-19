@@ -75,6 +75,7 @@ router.get('/creditcard/:id', (req, res, next) => {
 router.post('/vault/customer', (req, res, next) => {
 
   const nonce = req.body.paymentMethodNonce;
+  let verifyCard = req.body.verifyCard == 'true';
   var customer = {
     firstName: "Jen",
     lastName: "Smith",
@@ -89,7 +90,8 @@ router.post('/vault/customer', (req, res, next) => {
     console.log(savedCustomer);
     btHelper.paymentMetohdCreate({
       customerId: savedCustomer.customer.id,
-      paymentMethodNonce: nonce
+      paymentMethodNonce: nonce,
+      options: { verifyCard }
     }).then(function (savedPaymentMethod) {
       res.status(200).send(savedPaymentMethod);
 
@@ -190,7 +192,7 @@ router.get('/transaction/search/:key/:value', (req, res, next) => {
 
 router.get('/transaction/search/currency', (req, res, next) => {
 
-  let txns =[];
+  let txns = [];
 
   btHelper.searchByCurrency("USD", (err, response) => {
     response.each((err, transaction) => {
@@ -204,6 +206,23 @@ router.get('/transaction/search/currency', (req, res, next) => {
   });
 
 });
+
+router.post('/verifycard', (req, res, next) => {
+
+
+  btHelper.searchByCurrency("USD", (err, response) => {
+    response.each((err, transaction) => {
+      txns.push(transaction);
+    });
+
+    setTimeout(() => {
+      res.status(200).send(CircularJSON.stringify(txns));
+    }, 10000);
+
+  });
+
+});
+
 
 router.post('/webhook', (req, res, next) => {
 

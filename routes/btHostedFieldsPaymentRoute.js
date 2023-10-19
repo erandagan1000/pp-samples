@@ -30,9 +30,11 @@ router.post("/checkout", (req, res) => {
   var useNonce = req.query.dontUseNonce != '1';
   var nonceFromTheClient = req.body.payment_method_nonce;
   var storeInVaultOnsuccess = (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || false;
+  var verifyCard = (req.body.verify_cc && req.body.verify_cc == 'true') || false;
   var maid = req.body.maid;
   console.log("nonce: " + nonceFromTheClient);
-  console.log("storeInVaultOnsuccess", storeInVaultOnsuccess);
+  console.log("storeInVaultOnsuccess: ", storeInVaultOnsuccess);
+  console.log("verifyCard: ", verifyCard);
   // set merchantAccountId by selected presntment currency
   const selectedCurrency = req.body.currency;
   const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
@@ -44,23 +46,52 @@ router.post("/checkout", (req, res) => {
 
   const amount = req.body.isDesiredToBeDeclined == 'true' ? "2001.00" : "122.00"
 
-  if (useNonce) {
+  var customer = {
+    firstName: "Jen",
+    lastName: "Smith",
+    company: "Braintree",
+    email: "jen@example.com",
+    phone: "312.555.1234",
+    fax: "614.555.5678",
+    website: "www.example.com"
+  };
+
+  // just veify CC
+  if (verifyCard) {
+    
+
+    btHelper.customerCreate(customer).then(function (savedCustomer) {
+
+      console.log(savedCustomer);
+      btHelper.paymentMetohdCreate({
+        customerId: savedCustomer.customer.id,
+        paymentMethodNonce: nonceFromTheClient,
+        options: { verifyCard }
+      }).then(function (savedPaymentMethod) {
+        res.status(200).send(savedPaymentMethod);
+
+      }).catch(function (error) {
+        // handle error
+        console.log(error);
+        res.status(500).send(error);
+      });
+    })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        res.status(500).send(error);
+      });
+  }
+
+  else if (useNonce) {
+
     btHelper.gateway.transaction.sale(
       {
         amount,
         paymentMethodNonce: nonceFromTheClient,
         merchantAccountId: merchantAccountId,  //if ommitted the default MID (configured on BT console) will be used
         // deviceData: deviceDataFromTheClient,
-        customer: {
-          firstName: "JenWithCustomField",
-          lastName: "Smith",
-          company: "Braintree",
-          email: "jen@example.com",
-          phone: "312.555.1234",
-          fax: "614.555.5678",
-          website: "www.example.com"
-          
-        },
+        customer,
         // billing: {
         //   firstName: "Paul",
         //   lastName: "Smith",
@@ -94,10 +125,9 @@ router.post("/checkout", (req, res) => {
 
       },
       (err, result) => {
-
-        const fullResult = `<div><a href="/">Home</a></div><br/><h2>CUSTOMER ID: ${storeInVaultOnsuccess ? result.transaction.customer.id : "None"}</h2><div>${JSON.stringify(result)}</div>`;
+        var custId = result.transaction.customer.id;
+        const fullResult = `<div><a href="/">Home</a></div><br/><h2>CUSTOMER ID: ${storeInVaultOnsuccess ? custId : "None"}</h2><div>${JSON.stringify(result)}</div>`;
         res.send(fullResult);
-
       }
     );
 

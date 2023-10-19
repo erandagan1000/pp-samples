@@ -1,118 +1,217 @@
-
-
 <a href="/lr">Limited Release Links</a>
 <h1>Examples</h1>
 
 <hr>
 
-<ul>
-  <li>Braintree <a onclick="toggleList('bt')" style="font-size:80%">Show/Hide</a>
-    <ul name="bt-list" id="bt-list">
-      <li>
-        <a href="/btco">Paypal Checkout + Auth/Capture (v3)</a>&nbsp;&nbsp;
-        <a href="/btco2">Paypal Checkout + Auth/Capture (v3) With Config</a>&nbsp;&nbsp;
-        <a href="/btco1">v2(OLD)</a>
+
+
+<div class="accordion" id="accordionExample">
+  {{!-- BT SDK --}}
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+        aria-expanded="true" aria-controls="collapseOne">
+        Braintree
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <ul class="list-group">
+          <li class="list-group-item">PayPal
+            <ul class="list-group">
+              <li class="list-group-item">
+                <a href="/btco">Paypal Checkout + Auth/Capture (v3)</a>&nbsp;&nbsp;
+                <a href="/btco2">Paypal Checkout + Auth/Capture (v3) With Config</a>&nbsp;&nbsp;
+                <a href="/btco1">v2(OLD)</a>
+              </li>
+              <li class="list-group-item"><a href="/btcov">Paypal Checkout + Vault</a></li>
+              <li class="list-group-item"><a href="/btv">Paypal Vault</a></li>
+              <li class="list-group-item"><a href="/btvdc">Paypal Vault + Data Collector</a></li>
+              <li class="list-group-item"><a href="/btvrc">Paypal Vault Returning Customer</a></li>
+
+            </ul>
+          </li>
+          <li class="list-group-item">Credit Cards
+            <ul class="list-group">
+              <li class="list-group-item"><a href="/btdihf">Dropin + Hosted Fields</a></li>
+              <li class="list-group-item"><a href="/bthfcvvon">Hosted Fields CVV-Only nonce</a></li>
+              <li class="list-group-item"><a href="/bt3ds">Dropin + Hosted Fields (3D Secure)</a></li>
+
+            </ul>
+          </li>
+
+          <li class="list-group-item">LPMs
+            <ul class="list-group">
+              <li class="list-group-item"><a href="/btlpm">LPMs - Local Payment Method</a></li>
+              <li class="list-group-item"><a href="/btvenmo">Venmo</a></li>
+              <li class="list-group-item"><a href="/btach">ACH Direct Debit (US, UK only)</a></li>
+              <li class="list-group-item"><a href="/btap">Apple Pay</a> - <span style="font-size:0.7em">Can be tested
+                  only from iOS Mobile device
+                  using
+                  Safari browser</span></li>
+              <li class="list-group-item"><a href="/btgp">Google Pay</a></li>
+
+            </ul>
+          </li>
+          <li class="list-group-item">GraphQL
+            <ul class="list-group">
+              <li class="list-group-item"><a href="/ppscgnosdk">GraphQL PP Standard Checkout - NO Client SDK</a></li>
+              <li class="list-group-item"><a href="/ccgnosdk">GraphQL CC Checkout - NO Client SDK (TBD)</a></li>
+
+
+            </ul>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </div>
+  {{!-- PP SDK--}}
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
+        aria-expanded="false" aria-controls="collapseTwo">
+        Rest API - Payments V1 & Orders V2
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <li class="list-group-item">PayPal
+          <ul class="list-group">
+            <li class="list-group-item"><a href="/ppsc">Standard Checkout</a></li>
+
+            <li class="list-group-item"><a href="/ppspbapi">Smart Payment Button (SPB) + Orders API</a></li>
+            <li class="list-group-item"><a href="/ppscmsg">Messaging</a></li>
+
+            <li class="list-group-item"><a href="/ppccs">Custom Checkout With Shipping</a></li>
+            <li class="list-group-item"><a href="/ppsab">Standalone Button - Orders API v2</a></li>
+            <li class="list-group-item"><a href="/ppsub">Subscription</a></li>
+          </ul>
         </li>
-      <li><a href="/btcov">Paypal Checkout + Vault</a></li>
-      <li><a href="/btv">Paypal Vault</a></li>
-      <li><a href="/btvdc">Paypal Vault + Data Collector</a></li>
-      <li><a href="/btvrc">Paypal Vault Returning Customer</a></li>
-      <li><a href="/btdihf">Dropin + Hosted Fields</a></li>
-      <li><a href="/bthfcvvon">Hosted Fields CVV-Only nonce</a></li>
-      <li><a href="/bt3ds">Dropin + Hosted Fields (3D Secure)</a></li>
-      <li><a href="/btlpm">LPMs - Local Payment Method</a></li>
-      <li><a href="/btvenmo">Venmo</a></li>
-      <li><a href="/btach">ACH Direct Debit (US, UK only)</a></li>
-      <li><a href="/btap">Apple Pay</a> - <span style="font-size:0.7em">Can be tested only from iOS Mobile device using Safari browser</span></li>
-      <li><a href="/btgp">Google Pay</a></li>
-      <li><a href="/ppscgnosdk">GraphQL PP Standard Checkout - NO Client SDK</a></li>
-      <li><a href="/ccgnosdk">GraphQL CC Checkout - NO Client SDK (TBD)</a></li>
+        <li class="list-group-item">Reference Transacion
+          <ul class="list-group">
+            <li class="list-group-item"><a href="/ppcort">RT - Smart Button Checkout (+ FN)</a></li>
+            <li class="list-group-item"><a href="/pprt">RT - Server Side Integration (Server2Server)</a></li>
+            <li class="list-group-item"><a href="/pprtrc">RT - Returning Customer</a></li>
+
+          </ul>
+        </li>
+        <li class="list-group-item">Credit Cards (ACDC)
+          <ul class="list-group">
+            <li class="list-group-item"><a href="/ppac">Advanced Checkout (Button + ACDC) </a></li>
+            <li class="list-group-item"><a href="/ppacdls">Advanced Checkout (Button + ACDC) - Load SDK on runtime </a>
+            </li>
+            <li class="list-group-item"><a href="/ppac3ds">Advanced Checkout (ACDC) - 3D Secure (SDK)</a></li>
+          </ul>
+        </li>
+        <li class="list-group-item">APMs
+          <ul class="list-group">
+            <li class="list-group-item"><a href="/ppvenmo">Venmo</a></li>
+            <li class="list-group-item"><a href="/ppapmjssdk">APMs - JSSDK</a></li>
+            <li class="list-group-item"><a href="/ppapmov2">APMs - Orders V2</a></li>
+            {{!-- <li class="list-group-item"><a href="/ppccm">Custom Checkout Other Payment Methods (Marks) </a><span
+                style="color: red">**WIP**</span></li> --}}
+
+          </ul>
+        </li>
+        <li class="list-group-item">Vault v3
+          <ul class="list-group">
+            <li class="list-group-item"><a href="/ppvault">PP Vault - Limited Release</a></li>
+            <li class="list-group-item"><a href="/ppvaultv3">PP Vault V3 - Limited Release</a></li>
+          </ul>
+        </li>
 
 
-    </ul>
-  </li>
-  <li>Rest API - Payments V1 & Orders V2 <a onclick="toggleList('pp')" style="font-size:80%">Show/Hide</a>
-    <ul name="pp-list" id="pp-list">
-      <li><a href="/ppsc">Standard Checkout</a></li>
-        
-      <li><a href="/ppspbapi">Smart Payment Button (SPB) + Orders API</a></li>
-      <li><a href="/ppscmsg">Messaging</a></li>
-      
-      <li><a href="/ppccs">Custom Checkout With Shipping</a></li>
-      <li><a href="/ppsab">Standalone Button - Orders API v2</a></li>
-      <li><a href="/ppac">Advanced Checkout (Button + ACDC) </a></li>
-      <li><a href="/ppacdls">Advanced Checkout (Button + ACDC) - Load SDK on runtime </a></li>
-      <li><a href="/ppac3ds">Advanced Checkout (ACDC) - 3D Secure (SDK)</a></li>
-      <li><a href="/ppcort">RT - Smart Button Checkout (+ FN)</a></li>
-      <li><a href="/pprt">RT - Server Side Integration (Server2Server)</a></li>
-      <li><a href="/pprtrc">RT - Returning Customer</a></li>
-      <li><a href="/ppvenmo">Venmo</a></li>
-      <li><a href="/ppapmjssdk">APMs - JSSDK</a></li>
-      <li><a href="/ppapmov2">APMs - Orders V2</a></li>
-      {{!-- <li><a href="/ppccm">Custom Checkout Other Payment Methods (Marks) </a><span
-          style="color: red">**WIP**</span></li> --}}
-      <li><a href="/ppsub">Subscription</a></li>
-      <li><a href="/ppvault">PP Vault - Limited Release</a></li>
-      <li><a href="/ppvaultv3">PP Vault V3 - Limited Release</a></li>
+      </div>
+    </div>
+  </div>
+  {{!-- NVP --}}
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree"
+        aria-expanded="false" aria-controls="collapseThree">
+        SOAP/NVP
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <li class="list-group-item"><a href="/ppnvpicc">In Context Checkout</a></li>
+        <li class="list-group-item"><a href="/ppnvprt">RT Checkout Before Purchase</a></li>
+        <li class="list-group-item"><a href="/ppnvprtco">RT Checkout During Purchase</a></li>
 
-    </ul>
-  </li>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <li>MVP/SOAP <a onclick="toggleList('nvp')" style="font-size:80%">Show/Hide</a>
-    <ul name="nvp-list" id="nvp-list">
-      <li><a href="/ppnvpicc">In Context Checkout</a></li>
-      <li><a href="/ppnvprt">RT Checkout Before Purchase</a></li>
-      <li><a href="/ppnvprtco">RT Checkout During Purchase</a></li>
-    </ul>
-  </li>
+<hr>
+{{!-- BT Console redirect --}}
+<div class="card">
+  <div class="card-header">
+    Braintree
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">BT Console Redirect</h5>
+    <p class="card-text">
+      <select id="bt-merchant-select" class="form-select" aria-label="Default select example" onchange="setSelectedMerchant()">
+  <option selected>Select merchant</option>
+  <option value="WAVES">Waves</option>
+  <option value="NEXT">Next</option>
+</select>
 
-</ul>
+
+<div class="form-check form-switch">
+
+  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked
+    onclick="setEnvironment()">
+  <label class="form-check-label" for="flexSwitchCheckChecked">Live</label>
+</div>
+<h4>Selected Merchant <span class="badge text-bg-primary" id="selected-merchant-lbl" name="selected-merchant-lbl"></span></h2>
+    </p>
+    <a href="#" class="btn btn-primary" onclick="goToConsole()">Go to BT Console</a>
+  </div>
+</div>
+
 
 <script>
 
-  var btListHidden = false;
-  var ppListHidden = false;
-  var nvpListHidden = false;
-  var btListElem = $("#bt-list");
-  var ppListElem = $("#pp-list");
-  var nvpListElem = $("#nvp-list");
+  var btConsoleUrl;
+  var merchantsIds = [
+      { name: "WAVES", sandbox: "qkg7v8649whgm765", live: "2894xn6j8hyf3wqf" },
+      { name: "NEXT", sandbox: "sqh9nn8w252yrynr", live: "cwcspwg65zsthydk" },
+    ];
 
-  function toggleList(listName) {
 
-    switch (listName) {
-      case 'bt':
-        if (btListHidden) {
-          btListElem.show();
-          btListHidden = false;
-        }
-        else {
-          btListElem.hide()
-          btListHidden = true;
-        }
-        break;
-      case 'pp':
-        if (ppListHidden) {
-          ppListElem.show();
-          ppListHidden = false;
-        }
-        else {
-          ppListElem.hide()
-          ppListHidden = true;
-        }
-        break;
-      case 'nvp':
-        if (nvpListHidden) {
-          nvpListElem.show();
-          nvpListHidden = false;
-        }
-        else {
-          nvpListElem.hide()
-          nvpListHidden = true;
-        }
-        break;
+  function setSelectedMerchant() {
+   
+    var merchantselectedValue = $("#bt-merchant-select").val();
+    var selectedMerchant = merchantsIds.find(m => m.name == merchantselectedValue);
+    
+    if (isLiveEnvironment) {
+      $("#selected-merchant-lbl").text(selectedMerchant.live);
+      btConsoleUrl = `https://www.braintreegateway.com/merchants/${selectedMerchant.live}`;
+
+    }
+    else {
+      $("#selected-merchant-lbl").text(selectedMerchant.sandbox);
+      btConsoleUrl= `https://sandbox.braintreegateway.com/merchants/${selectedMerchant.sandbox}`;
 
     }
 
+
+  }
+
+  function goToConsole() {
+    window.open(btConsoleUrl);
+    
+  }
+
+  var isLiveEnvironment = $("#flexSwitchCheckChecked").prop('checked');
+
+  function setEnvironment() {
+    $("#flexSwitchCheckChecked").prop('checked', !isLiveEnvironment);
+    isLiveEnvironment = $("#flexSwitchCheckChecked").prop('checked');
+    console.log(isLiveEnvironment);
 
   }
 
