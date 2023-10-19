@@ -153,22 +153,24 @@
   <div class="card-body">
     <h5 class="card-title">BT Console Redirect</h5>
     <p class="card-text">
-      <select id="bt-merchant-select" class="form-select" aria-label="Default select example" onchange="setSelectedMerchant()">
-  <option selected>Select merchant</option>
-  <option value="WAVES">Waves</option>
-  <option value="NEXT">Next</option>
-</select>
+      <select id="bt-merchant-select" class="form-select" aria-label="Default select example"
+        onchange="setSelectedMerchant()">
+        <option selected>Select merchant</option>
+        <option value="WAVES">Waves</option>
+        <option value="NEXT">Next</option>
+      </select>
 
 
-<div class="form-check form-switch">
+    <div class="form-check form-switch">
 
-  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked
-    onclick="setEnvironment()">
-  <label class="form-check-label" for="flexSwitchCheckChecked">Live</label>
-</div>
-<h4>Selected Merchant <span class="badge text-bg-primary" id="selected-merchant-lbl" name="selected-merchant-lbl"></span></h2>
-    </p>
-    <a href="#" class="btn btn-primary" onclick="goToConsole()">Go to BT Console</a>
+      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked
+        onclick="setEnvironment()">
+      <label class="form-check-label" for="flexSwitchCheckChecked">Live</label>
+    </div>
+    <h4>Selected Merchant <span class="badge text-bg-primary" id="selected-merchant-lbl"
+        name="selected-merchant-lbl"></span></h2>
+      </p>
+      <a href="#" class="btn btn-primary" onclick="goToConsole()">Go to BT Console</a>
   </div>
 </div>
 
@@ -177,16 +179,16 @@
 
   var btConsoleUrl;
   var merchantsIds = [
-      { name: "WAVES", sandbox: "qkg7v8649whgm765", live: "2894xn6j8hyf3wqf" },
-      { name: "NEXT", sandbox: "sqh9nn8w252yrynr", live: "cwcspwg65zsthydk" },
-    ];
-
+    { name: "WAVES", sandbox: "qkg7v8649whgm765", live: "2894xn6j8hyf3wqf" },
+    { name: "NEXT", sandbox: "sqh9nn8w252yrynr", live: "cwcspwg65zsthydk" },
+  ];
+  var isLiveEnvironment = $("#flexSwitchCheckChecked").prop('checked');
 
   function setSelectedMerchant() {
-   
+
     var merchantselectedValue = $("#bt-merchant-select").val();
     var selectedMerchant = merchantsIds.find(m => m.name == merchantselectedValue);
-    
+
     if (isLiveEnvironment) {
       $("#selected-merchant-lbl").text(selectedMerchant.live);
       btConsoleUrl = `https://www.braintreegateway.com/merchants/${selectedMerchant.live}`;
@@ -194,7 +196,7 @@
     }
     else {
       $("#selected-merchant-lbl").text(selectedMerchant.sandbox);
-      btConsoleUrl= `https://sandbox.braintreegateway.com/merchants/${selectedMerchant.sandbox}`;
+      btConsoleUrl = `https://sandbox.braintreegateway.com/merchants/${selectedMerchant.sandbox}`;
 
     }
 
@@ -203,15 +205,14 @@
 
   function goToConsole() {
     window.open(btConsoleUrl);
-    
-  }
 
-  var isLiveEnvironment = $("#flexSwitchCheckChecked").prop('checked');
+  }
 
   function setEnvironment() {
     $("#flexSwitchCheckChecked").prop('checked', !isLiveEnvironment);
     isLiveEnvironment = $("#flexSwitchCheckChecked").prop('checked');
     console.log(isLiveEnvironment);
+    setSelectedMerchant();
 
   }
 
