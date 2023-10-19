@@ -10,8 +10,18 @@
   </script>
 
 <script>
+  var fundingSource;
   $("#loading-button").show();
-  paypal.Buttons().render('#paypal-button-container').then(function() {
+  paypal.Buttons({
+    onClick: (data) => {
+      // fundingSource = "venmo"
+      console.log(data);
+      fundingSource = data.fundingSource
+
+      // Use this value to determine what funding source was used to pay
+      // Update your confirmation pages and notifications from "PayPal" to "Venmo"
+    }
+  }).render('#paypal-button-container').then(function () {
     $("#loading-button").hide();
   });
 </script>
