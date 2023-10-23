@@ -1,0 +1,227 @@
+<html>
+
+<head>
+
+  <meta charset="utf-8" />
+  <!-- Optimal rendering on mobile devices. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+  <div class="loading" id="loading-button">Loading paypal button...</div>
+
+  <div><a href="/">Home</a></div>
+  <h1>{{title}}</h1>
+
+  <br>
+  <div>
+    <button onclick="createButton(true)" style="width:fit-content">Run returning User
+      experience</button>
+    <br />
+    <div id="div-vaulted-customer-id" style="margin:10px;background-color:yellow;width:100px">&nbsp;</div>
+  </div>
+
+  <div id="payment-view">
+    <!-- Buttons container -->
+    <div style="padding:10px">
+      <table border="0" align="left" valign="top" bgcolor="#FFFFFF" style="width:100%">
+        <tr>
+          <td>
+            <div id="paypal-button-container"></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+  <div id="payment-result">&nbsp;</div>
+
+
+  <!-- Implementation -->
+  <script src="https://unpkg.com/@paypal/paypal-js@5.0.3/dist/iife/paypal-js.min.js"></script>
+  <script>
+
+
+    $("#loading-button").show();
+    let orderId;
+    var globalUserIdToken = "";
+    let paypal;
+    let vaultedCustomerId = "";
+
+
+    function createButton(isRetruning) {
+      try {
+
+        let myDataClientPromise;
+        if (isRetruning) {
+          myDataClientPromise = new Promise(generateDataClientTokenForReturningUser);
+        }
+        else {
+          myDataClientPromise = new Promise(generateDataClientToken);
+        }
+
+        myDataClientPromise.then((data) => {
+          console.log("reolved client token:", data);
+          window.paypalLoadScript({
+            "client-id": "AZjPmiH8MFbpWiO_y_WNWjyemnCVCAnpRPGE9_DB4mp8iBbjPfPLViZUhvoRifOjROWxVVWx8nJg_szi",
+            "data-user-id-token": globalUserIdToken,
+            "components": "buttons,hosted-fields"
+
+          }).then((pp) => {
+            paypal = pp;
+            if (paypal) {
+              try {
+
+                loadUiControls();
+
+              } catch (error) {
+                console.error("failed to render the PayPal Buttons", error);
+              }
+            }
+
+
+          }).catch((error) => {
+            console.error("failed to load the PayPal JS SDK script", error);
+          });
+
+        });
+      }
+
+      catch (error) {
+        console.error("failed to load the PayPal JS SDK script", error);
+      }
+
+    }
+
+    function generateDataClientToken(resolve, reject) {
+      document.querySelector("#payment-result").style = 'display: none';
+
+      $.ajax('ppapi/auth/accesstoken/generate', {
+        type: 'POST',  // http method
+        data: {},  // data to submit
+        success: function (data, status, xhr) {
+          console.log(data);
+          const accesstoken = data.access_token;
+          globalUserIdToken = data.id_token;
+
+          $.ajax('/ppapi/auth/clienttoken/generate', {
+            type: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accesstoken}`
+            },
+            success: function (data, status, xhr) {
+              console.log(data.client_token);
+              resolve(data);
+            },
+            error: function (jqXhr, textStatus, errorMessage) {
+              console.log(errorMessage);
+              reject(errorMessage);
+            }
+
+          });
+
+        },
+        error: function (jqXhr, textStatus, errorMessage) {
+          console.log(errorMessage);
+          reject(errorMessage);
+        }
+      });
+    }
+
+    function generateDataClientTokenForReturningUser(resolve, reject) {
+      document.querySelector("#payment-result").style = 'display: none';
+
+      $.ajax('ppapi/auth/accesstoken/generate', {
+        type: 'POST',  // http method
+        data: {},  // data to submit
+        success: function (data, status, xhr) {
+          console.log(data);
+
+          const accesstoken = data.access_token;
+
+          $.ajax('/ppapi/auth/clienttoken/generate/customerid', {
+            type: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accesstoken}`
+            },
+            data: { customer_id: vaultedCustomerId },   //vaultedCustomerId
+            success: function (data, status, xhr) {
+              console.log(data.client_token);
+              //Should be set here, since sending the customerID
+              globalUserIdToken = data.id_token;
+              resolve(data);
+            },
+            error: function (jqXhr, textStatus, errorMessage) {
+              console.log(errorMessage);
+              reject(errorMessage);
+            }
+
+          });
+
+        },
+        error: function (jqXhr, textStatus, errorMessage) {
+          console.log(errorMessage);
+          reject(errorMessage);
+        }
+      });
+    }
+
+    function loadUiControls() {
+
+      // Displays PayPal buttons
+      paypal.Buttons({
+        style: {
+          layout: 'vertical'
+        },
+        createOrder: function (data, actions) {
+          return fetch('/ppapi/order/vault-payment-method', {
+            method: 'post',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ source: data.paymentSource }),
+          }).then(function (res) {
+            console.log("RESOLVED1: createOrder: ", res);
+            return res.json();
+          }).then(function (orderData) {
+            orderId = orderData.id;
+            console.log("RESOLVED: createOrder: ", orderData);
+            return orderId;
+          });
+        },
+        onApprove: function (data, actions) {
+          return fetch('/ppapi/order/' + data.orderID + '/capture', {
+            method: 'post'
+          }).then(function (result) {
+            return result.json();
+
+          }).then(function (resJson) {
+
+            console.log("resJson: ", resJson);
+            vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.customer.id;
+            // vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.id; 
+            document.querySelector("#div-vaulted-customer-id").innerHTML = `<p>${vaultedCustomerId}</p>`;
+            $("#payment-result").jsonViewer(resJson);
+            document.querySelector("#payment-view").style = 'display: none';
+            document.querySelector("#payment-result").style = 'display: block';
+
+          });
+
+        }
+      }).render("#paypal-button-container").then(() => {
+        console.log("render executed");
+        $("#loading-button").hide();
+        document.querySelector("#payment-view").style = 'display: block';
+      });
+
+    }
+
+    createButton(false);
+  </script>
+
+
+</body>
+
+</html>

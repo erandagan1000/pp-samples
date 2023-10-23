@@ -10,7 +10,7 @@ router.get('/lr', function(req, res, next) {
 });
 
 // ********************  Braintree ************************
-
+// #region BRAINTREE
 router.get('/btco', function(req, res, next) {
   res.render('braintreePPCheckout', { title: 'BrainTree Paypal Checkout + Auth/Capture' });
 });
@@ -64,7 +64,10 @@ router.get('/ccgnosdk', function(req, res, next) {
   res.render('braintreeCheckoutGraphQLNoClientSdkCC', { title: 'GraphQL Credit Card Checkout - NO Client SDK' });
 });
 
+// #endregion
+
 // ********************  PayPal ************************
+// #region PAYPAL
 router.get('/ppsc', function(req, res, next) {
   res.render('ppsc', { title: 'PP Smart Payment Button - Standard Checkout' });
 });
@@ -124,11 +127,31 @@ router.get('/ppvault', function(req, res, next) {
   res.render('ppVault', { title: 'PP Vault - Limited release' });
 }); 
 
-router.get('/ppvaultv3', function(req, res, next) {
-  res.render('ppVaultV3', { title: 'PP Vault V3 - Limited release' });
-}); 
+// router.get('/ppvaultv3', function(req, res, next) {
+//   res.render('ppVaultV3', { title: 'PP Vault V3 - Limited release' });
+// });
+
+router.get('/ppvaultv3pp', function(req, res, next) {
+  res.render('ppvaultv3pp', { title: 'PP Vault V3 - PayPal' });
+});
+
+router.get('/ppvaultv3card', function(req, res, next) {
+  res.render('ppvaultv3card', { title: 'PP Vault V3 - Credit Card' });
+});
+
+router.get('/ppvaultv3venmo', function(req, res, next) {
+  res.render('ppvaultv3venmo', { title: 'PP Vault V3 - Venmo' });
+});
+
+router.get('/ppvaultv3apay', function(req, res, next) {
+  res.render('ppvaultv3apay', { title: 'PP Vault V3 - Apple Pay' });
+});
+
+// #endregion
 
 // ********************  PayPal NVP ************************
+// #region PayPal NVP 
+
 
 router.get('/ppnvpicc', function(req, res, next) {
   res.render('ppNvpInContextCheckout', { title: 'PP NVP In Context Checkout' });
@@ -139,8 +162,10 @@ router.get('/ppnvprt', function(req, res, next) {
 router.get('/ppnvprtco', function(req, res, next) {
   res.render('ppNvpCheckoutRT', { title: 'PP NVP Reference Transaction Checkout During Purchase' });
 });
+// #endregion
 
-// result pages
+// ********************  RESULT PAGES ************************
+// #region RESULT PAGES
 router.get('/ppnvpicc/success', function(req, res, next) {
   res.render('success', { title: 'NVP Transaction success', token: req.query.token, payer: req.query.PayerID  });
 });
@@ -160,5 +185,7 @@ router.get('/cancel', function(req, res, next) {
 router.get('/lpm/success', function(req, res, next) {
   res.render('success', { title: 'LPM Transaction success', token: req.query.token  });
 });
+
+// #endregion
 
 module.exports = router;

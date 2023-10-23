@@ -19,6 +19,7 @@ const generateAccessToken = (callback) => {
   params.append('grant_type', 'client_credentials');
   // added according to Vault V3 doc
   params.append('response_type', 'id_token');
+  // params.append('Content-Type', 'application/x-www-form-urlencoded');
   // console.log(options);
 
   // generate access token, givven merchant credenials

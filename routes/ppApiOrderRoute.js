@@ -44,9 +44,9 @@ router.post('/', (req, res, next) => {
 
   var payload = req.body && req.body.intent ? req.body : defaultPayload;
 
-  var additions =  {paypal: {experience_context: {brand_name: "ERAN BRAND FROM EXPERIENCE CONTEXT"}}};
-  var payload1 = {...payload , payment_source: additions };
-  
+  var additions = { paypal: { experience_context: { brand_name: "ERAN BRAND FROM EXPERIENCE CONTEXT" } } };
+  var payload1 = { ...payload, payment_source: additions };
+
   const guid = ppApiHelperV2.uuidv4();
 
   ppApiHelperV2.createOrder(guid, payload1, (data, error) => {
@@ -201,27 +201,40 @@ router.post('/s2s', (req, res, next) => {
 // create order
 router.post('/vault-payment-method', (req, res, next) => {
 
+  let paymentSource = req.body.source;
+  let payment_source = undefined;
+  if (paymentSource == "paypal") {
+    payment_source = {
+      paypal: {
+        // experience_context generate error when is sent with attributes.vault
+        // experience_context: {
+        //   brand_name: "ERAN BRAND FROM EXPERIENCE CONTEXT",
+        //   locale: "en-US",
+        //   landing_page: "LOGIN",
+        //   return_url: "htttp://localhost:3000",
+        //   cancel_url: "htttp://localhost:3000"
+        // },
+        attributes: {
+          vault: {
+            permit_multiple_payment_tokens: false,
+            store_in_vault: "ON_SUCCESS",
+            usage_type: "MERCHANT",
+            customer_type: "CONSUMER"
+          }
+        }
+      }
+    }
+
+  }
+
   let defaultPayload = {
     intent: "CAPTURE",
-    application_context:{ 
-      brand_name:"Jon Doe's Clothing Shop", 
-      locale:"en-US", 
-      landing_page:"LOGIN", 
-      return_url:"https://example.com/returnUrl", 
-      cancel_url:"https://www.paypal.com/checkoutnow/error" 
-   }, 
-
-    payment_source: {
-      paypal: {
-        experience_context: {
-          brand_name: "ERAN BRAND FROM EXPERIENCE CONTEXT",
-          locale: "en-US",
-          landing_page: "LOGIN",
-          return_url: "htttp://localhost:3000",
-          cancel_url: "htttp://localhost:3000"
-        },
-
-      }
+    application_context: {
+      brand_name: "Jon Doe's Clothing Shop",
+      locale: "en-US",
+      landing_page: "LOGIN",
+      return_url: "https://example.com/returnUrl",
+      cancel_url: "https://www.paypal.com/checkoutnow/error"
     },
     purchase_units: [
       {
@@ -230,19 +243,7 @@ router.post('/vault-payment-method', (req, res, next) => {
 
       },
     ],
-    payment_source:{ 
-      paypal:{ 
-         attributes:{ 
-            vault:{ 
-               permit_multiple_payment_tokens:false, 
-               store_in_vault:"ON_SUCCESS", 
-               usage_type:"MERCHANT", 
-               customer_type:"CONSUMER" 
-            } 
-         } 
-      } 
-   } 
-
+    payment_source
 
   };
 
