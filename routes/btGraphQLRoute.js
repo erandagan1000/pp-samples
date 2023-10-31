@@ -168,7 +168,11 @@ router.post('/capture-nonce', (req, res, next) => {
       "paymentMethodId": paymentMethodId,
       "transaction": {
         "amount": amount,
-        "merchantAccountId": merchantAccountId
+        "merchantAccountId": merchantAccountId,
+        "descriptor": {
+          "name": "BT *dynamic descriptor", 
+          "phone": "0543339126"
+        }
       }
     }
   };

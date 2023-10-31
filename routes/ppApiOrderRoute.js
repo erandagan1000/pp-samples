@@ -203,6 +203,15 @@ router.post('/vault-payment-method', (req, res, next) => {
 
   let paymentSource = req.body.source;
   let payment_source = undefined;
+  let vaultAttributes = {
+    vault: {
+      permit_multiple_payment_tokens: paymentSource == "card",  // false for paypal, true for card
+      store_in_vault: "ON_SUCCESS",
+      usage_type: "MERCHANT",
+      customer_type: "CONSUMER"
+    }
+  };
+
   if (paymentSource == "paypal") {
     payment_source = {
       paypal: {
@@ -214,18 +223,24 @@ router.post('/vault-payment-method', (req, res, next) => {
         //   return_url: "htttp://localhost:3000",
         //   cancel_url: "htttp://localhost:3000"
         // },
-        attributes: {
-          vault: {
-            permit_multiple_payment_tokens: false,
-            store_in_vault: "ON_SUCCESS",
-            usage_type: "MERCHANT",
-            customer_type: "CONSUMER"
-          }
-        }
+        attributes: vaultAttributes
       }
     }
-
   }
+  else if (paymentSource == "card") {
+    payment_source = {
+      card: {
+        attributes: vaultAttributes
+      },
+      experience_context: {
+        shipping_preference: "NO_SHIPPING",
+        return_url: "https://example.com/returnUrl",
+        cancel_url: "https://example.com/cancelUrl",
+      },
+    };
+  }
+
+
 
   let defaultPayload = {
     intent: "CAPTURE",
@@ -277,4 +292,20 @@ router.post('/:id', (req, res, next) => {
 
   });
 });
+
+router.get('/vault-payment-tokens/:customerid', (req, res, next) => {
+
+  var customerId = req.params.customerid;
+  ppApiHelperV2.getSavedPaymentMethodsForCustomer(customerId, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
+
+
 module.exports = router;

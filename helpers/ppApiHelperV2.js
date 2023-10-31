@@ -201,6 +201,45 @@ const createPaymentWithBa = (accessToken, data, clientMetaDataId, callback) => {
 
 }
 
+//vault v3
+const getSavedPaymentMethodsForCustomer = (customerId, callback) => {
+  ppApiHelperV1.generateAccessToken((result, error) => {
+
+    if (error) {
+      callback(undefined, error);
+    }
+    const accessToken = result.access_token;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+      }
+    };
+
+    
+    const data = {};
+
+    axios.get(`https://api-m.sandbox.paypal.com/v3/vault/payment-tokens?customer_id=${customerId}`, config)
+      .then(function (response) {
+        // handle success
+        const data = response.data;
+        console.log("getPaymentTokens");
+        console.log("data:", data);
+       
+        
+        callback(data, undefined);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        callback(undefined, error)
+      })
+  });
+
+
+}
+
 module.exports = {
   test,
   createOrder,
@@ -208,5 +247,6 @@ module.exports = {
   captureOrder,
   uuidv4,
   onShippingChange,
-  createPaymentWithBa
+  createPaymentWithBa,
+  getSavedPaymentMethodsForCustomer
 };
