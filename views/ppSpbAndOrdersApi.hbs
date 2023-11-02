@@ -26,7 +26,7 @@
 {{!-- PP Rest API simple --}}
 {{!-- client-id=Abf.. #App: MerchantAppUS | Account: eran.m.us@merchant.com (BusinessPro) --}}
 <script
-  src="https://www.paypal.com/sdk/js?client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk&debug=true&components=buttons&disable-funding=giropay,sepa,sofort,card">
+  src="https://www.paypal.com/sdk/js?client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk&components=buttons&disable-funding=giropay,sepa,sofort,card">
   </script>
 
 
@@ -37,14 +37,34 @@
   var orderId ='';
   amountElement.change(function () {
     amount = amountElement.val();
-    console.log(amount);
+    console.log("amount: ", amount);
   });
 
   $("#loading-button").show();
-  paypal.Buttons({
+  
 
-    // Sets up the transaction when a payment button is clicked
+  /*****************For the manual crate order***********/
+  var orderData = {
+      intent: "CAPTURE", purchase_units: [
+        {
+          reference_id: uuidv4(),
+          amount: { currency_code: "USD", value: amount }
+        }]
+    };
+
+  
+  var confirmButton = document.querySelector('#confirm-order');
+  confirmButton.addEventListener('click', function () {
+    console.log("CONFIRM ORDER");
+    createOrder();
+      
+  });
+
+
+  paypal.Buttons({
+    
     createOrder: function (data, actions) {
+      // dont create order. just create orderId
       console.log("ORDERID: ", orderId);
       return orderId;
     },
@@ -71,65 +91,22 @@
   }).render('#paypal-button-container').then(function () {
     $("#loading-button").hide();
   });
-
-
-  /*****************For the manual crate order***********/
-  var orderData;
-
-  var confirmButton = document.querySelector('#confirm-order');
-  confirmButton.addEventListener('click', function () {
-
-    console.log("CONFIRM ORDER");
-
-    orderData = {
-      intent: "CAPTURE", purchase_units: [
-        {
-          reference_id: uuidv4(),
-          amount: { currency_code: "USD", value: amount }
-        }]
-    };
-
-    $.ajax('ppapi/auth/accesstoken/generate', {
-      type: 'POST',
-      data: {},
-      success: function (data, status, xhr) {
-        console.log(data);
-        const accesstoken = data.access_token;
-        globalAccessToken = accesstoken;
-        $("#access-token-container").html(globalAccessToken);
-        $("#create-order-button").removeAttr('disabled');
-        createOrder();
-      },
-      error: function (jqXhr, textStatus, errorMessage) {
-        console.log(errorMessage);
-      }
-    });
-
-
-
-  });
-
-
+  
   function createOrder() {
     
     $.ajax('/ppapi/order', {
       type: 'POST',
       headers: {
-        'Authorization': `Bearer ${globalAccessToken}`,
         "Content-Type": "application/json",
 
       },
       data: JSON.stringify(orderData),
-      success: function (data, status, xhr) {
-        console.log(data);
-        $("#create-order-response").html(JSON.stringify(data));
-        $("#get-order-details-button").removeAttr("disabled");
-
-        const links = data.links;
-        const userActionUrl = links.find((l) => l.rel == "payer-action").href;
-     
-        // $("#create-order-approve-container").html(`<p><b>Follow this url to: <br> APPROVE Order: <a target='_blank' href="${userActionUrl}">Approve Order</a><br> CAPTURE Order: <a target='_blank' href="${captureUrl}">Capture Order</a></b></p>`);
-        orderId = data.id;
+      success: function (createOrderResData, status, xhr) {
+        console.log(createOrderResData);
+        $("#create-order-response").html(JSON.stringify(createOrderResData));
+       
+        orderId = createOrderResData.id;
+        console.log("orderId: ", orderId);
 
       },
       error: function (jqXhr, textStatus, errorMessage) {
