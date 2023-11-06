@@ -8,7 +8,7 @@
 </head>
 
 <body>
-   <div><a href="/">Home</a></div>
+  <div><a href="/">Home</a></div>
   <h1>{{title}}</h1>
 
   <br>
@@ -21,7 +21,7 @@
   </div>
   <script src="https://unpkg.com/@paypal/paypal-js/dist/iife/paypal-js.min.js"></script>
   <script
-    src="https://www.paypal.com/sdk/js?components=card-fields&client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk&currency=USD&intent=capture&merchant-id=BVKWTJDWMSX48"></script>
+    src="https://www.paypal.com/sdk/js?components=card-fields&client-id={{clientId}}&currency=USD&intent=capture&merchant-id=BVKWTJDWMSX48"></script>
   <div id="payment-view">
     <!-- Buttons container -->
     <div style="padding:10px">
@@ -68,13 +68,17 @@
     var globalUserIdToken = "";
     let paypal;
     let vaultedCustomerId = "";
+    
 
 
-    function createButton(isRetruning) {
+    function createButton(isRetruning, clientId) {
       try {
         $("#loading-button").show();
         $("#payment-result").hide();
+        $("#payment-view").hide();
+
         let myDataClientPromise;
+
         if (isRetruning) {
           myDataClientPromise = new Promise(generateListOfSavedPaymentMethodsForReturningUser);
         }
@@ -96,7 +100,7 @@
           }
           else {
             window.paypalLoadScript({
-              "client-id": "AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk",
+              "client-id": clientId,
               "data-user-id-token": globalUserIdToken,
               "components": "card-fields",
               "currency": "USD",
@@ -233,6 +237,7 @@
 
       if (cardFields.isEligible()) {
         $("#loading-button").hide();
+        $("#payment-view").show();
         document.querySelector("#payment-view").style = 'display: block';
         cardFields.NameField().render("#card-holder-name");
         cardFields.NumberField().render("#card-number");
@@ -257,8 +262,21 @@
 
 
     }
+    fetch("/ppapi/auth/ppclientid",
+      {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }).then(async (data) => {
+        debugger;
+        const { clientId } = await data.json();
+        console.log(clientId);
+        createButton(false, clientId);
 
-    createButton(false);
+      });
+
+
   </script>
 
 

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const ppApiHelperV1 = require('../helpers/ppApiHelperV1')
 
+// - /ppapi/auth
+
 // test
 router.get('/', (req, res, next) => {
   // res.status(200).send("works");
@@ -66,7 +68,7 @@ router.post('/clienttoken/generate/baid', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
   const baId = req.body.baId; // RT
-  
+
   ppApiHelperV1.generateClientTokenWithBillingAgreementId(accessToken, baId, (data, error) => {
     if (error) {
       res.status(500).send(error);
@@ -83,9 +85,9 @@ router.post('/clienttoken/generate/baid', (req, res, next) => {
 router.post('/clienttoken/generate/customerid', (req, res, next) => {
 
   const accessToken = req.headers["authorization"];
- 
-  const customerId =  req.body.customer_id && req.body.customer_id.length > 0 ? req.body.customer_id : "uwmkKoRoWs";  // uwmkKoRoWs  is existing customerId in merchant app: ACDC (eran.m.us@merchant.com
-  ppApiHelperV1.generateClientTokenWithCustomerId(accessToken,customerId, (data, error) => {
+
+  const customerId = req.body.customer_id && req.body.customer_id.length > 0 ? req.body.customer_id : "uwmkKoRoWs";  // uwmkKoRoWs  is existing customerId in merchant app: ACDC (eran.m.us@merchant.com
+  ppApiHelperV1.generateClientTokenWithCustomerId(accessToken, customerId, (data, error) => {
     if (error) {
       res.status(500).send(error);
       return;
@@ -94,6 +96,22 @@ router.post('/clienttoken/generate/customerid', (req, res, next) => {
     return;
 
   });
+
+});
+
+router.get('/ppclientid', (req, res, next) => {
+
+  try {
+    let clientId = process.env.PP_API_CLIENT_ID;
+    res.status(200).send({clientId});
+    return;
+  }
+  catch (e) {
+    res.status(500).send(e);
+    return;
+
+  }
+
 
 });
 

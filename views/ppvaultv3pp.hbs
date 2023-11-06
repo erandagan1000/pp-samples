@@ -48,9 +48,10 @@
     var globalUserIdToken = "";
     let paypal;
     let vaultedCustomerId = "";
+    let cId ="";
 
 
-    function createButton(isRetruning) {
+    function createButton(isRetruning, clientId) {
       try {
 
         let myDataClientPromise;
@@ -64,7 +65,7 @@
         myDataClientPromise.then((data) => {
           console.log("reolved client token:", data);
           window.paypalLoadScript({
-            "client-id": "AejFLZGoRwLAURqQRnoVHS4eTYgbNtUKOK-3fL8O5RyL6-pMIucXdGH63VzN68abL5DcHdSuGS6S-JU9",
+            "client-id": clientId || cId,
             "data-user-id-token": globalUserIdToken,
             "components": "buttons,hosted-fields"
 
@@ -218,7 +219,20 @@
 
     }
 
-    createButton(false);
+    fetch("/ppapi/auth/ppclientid",
+      {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }).then(async (data) => {
+        
+        const { clientId } = await data.json();
+        cId = clientId
+        console.log(cId);
+        createButton(false, cId);
+
+      });
   </script>
 
 

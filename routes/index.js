@@ -136,7 +136,7 @@ router.get('/ppvaultv3pp', function(req, res, next) {
 });
 
 router.get('/ppvaultv3card', function(req, res, next) {
-  res.render('ppvaultv3card', { title: 'PP Vault V3 - Credit Card' });
+  res.render('ppvaultv3card', { title: 'PP Vault V3 - Credit Card', clientId: process.env.PP_API_CLIENT_ID });
 });
 
 router.get('/ppvaultv3venmo', function(req, res, next) {
