@@ -64,7 +64,8 @@
   paypal.Buttons({
     
     createOrder: function (data, actions) {
-      // dont create order. just create orderId
+      // dont create order. just return orderId
+      console.log("ORDERID: ", data);
       console.log("ORDERID: ", orderId);
       return orderId;
     },

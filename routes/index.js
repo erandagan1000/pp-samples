@@ -89,8 +89,11 @@ router.get('/ppccm', function(req, res, next) {
 router.get('/ppac', function(req, res, next) {
   res.render('ppac', { title: 'PP Rest API - Advanced Checkout' });
 });
-router.get('/ppsab', function(req, res, next) {
-  res.render('ppStandaloneButton', { title: 'PP Rest API - Standalone Button' });
+router.get('/ppsabv1', function(req, res, next) {
+  res.render('ppStandaloneButtonV1', { title: 'PP Rest API - Standalone Button - Payments V1' });
+});
+router.get('/ppsabv2', function(req, res, next) {
+  res.render('ppStandaloneButtonV2', { title: 'PP Rest API - Standalone Button - Orders V2' });
 });
 router.get('/ppacdls', function(req, res, next) {
   res.render('ppacLoadSdkOnRuntime', { title: 'PP Rest API - Advanced Checkout - Load Client SDK on runtime' });

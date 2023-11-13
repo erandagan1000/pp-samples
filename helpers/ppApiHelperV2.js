@@ -132,6 +132,24 @@ const onShippingChange = (data) => {
     };
 
     let baseAmount = data.baseOrderAmount;
+    let updatedAddress = data.updatedAddress;
+    let arrayOfUpdates = [];
+
+    arrayOfUpdates.push({
+      op: "replace",
+      path: "/purchase_units/@reference_id=='default'/amount",
+      value: { value: totalAmount.toString(), currency_code: "USD" },
+    });
+
+    if(updatedAddress) {
+      arrayOfUpdates.push({
+        op: "add",
+        path: "/transactions/0/item_list/shipping_address",
+        value: updatedAddress
+      })
+    }
+
+    
 
     const totalAmount = parseFloat(baseAmount) + parseFloat(data.selected_shipping_option.amount.value);
     return fetch(`https://api-m.paypal.com/v2/checkout/orders/${data.orderID}`, {
@@ -140,11 +158,7 @@ const onShippingChange = (data) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify([{
-        op: "replace",
-        path: "/purchase_units/@reference_id=='default'/amount",
-        value: { value: totalAmount.toString(), currency_code: "USD" },
-      }])
+      body: JSON.stringify(arrayOfUpdates)
     })
       .then((response) => response.json());
 
@@ -249,4 +263,4 @@ module.exports = {
   onShippingChange,
   createPaymentWithBa,
   getSavedPaymentMethodsForCustomer
-};
+} ;

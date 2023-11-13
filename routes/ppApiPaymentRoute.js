@@ -8,106 +8,86 @@
 const { default: axios } = require('axios');
 const express = require('express');
 const router = express.Router();
+const ppApiHelperV2 = require('../helpers/ppApiHelperV2')
+const ppApiHelperV1 = require('../helpers/ppApiHelperV1')
 
 
-router.get('/create-payment', (req, res, next) => {
 
-  const payload = req.body;
+router.post('/create', (req, res, next) => {
 
-  const body =
-  {
-    intent: 'sale',
-    payer:
-    {
-      payment_method: 'paypal'
-    },
-    transactions: [
-      {
-        amount:
-        {
-          total: '5.99',
-          currency: 'USD'
-        }
-      }],
-    redirect_urls:
+  let payload = req.body;
+  let body = {
+    ...payload, redirect_urls:
     {
       return_url: 'http://localhost:3000/success',
       cancel_url: 'http://localhost:3000/cancel'
     }
   }
+  const guid = ppApiHelperV2.uuidv4();
 
-  const options = {
-    auth: {
-      username: process.env.PP_API_CLIENT_ID,
-      password: process.PP_API_CLIENT_SECRET
-    }
-  };
-
-  axios({
-    method: 'post',
-    url: 'https://api-m.sandbox.paypal.com/v1/payments/payment',
-    data: body,
-    options: options
-  }).then(function (response) {
-    // handle success
-    const data = response.data;
-    res.status(200).send(data);
-  })
-    .catch(function (error) {
-      // handle error
-      console.log(error);
+  ppApiHelperV1.createPayment(guid, body, (data, error) => {
+    if (error) {
       res.status(500).send(error);
-    })
-    .then(function () {
-      // always executed
-      console.log("second then after error")
-    });
+      console.log(error.response.data.details)
+      return;
+    }
+    let token;
+
+    for (let link of data.links) {
+      if (link.rel === 'approval_url') {
+        token = link.href.match(/EC-\w+/)[0];
+      }
+    }
+    res.status(200).send({token, paymentId: data.id, links: data.links});
+    return;
+  });
+
 });
 
-router.post('/execute-payment', (req, res, next) => {
-  var paymentID = req.body.paymentID;
-  var payerID = req.body.payerID;
+router.get('/:paymentid', (req, res, next) => {
+  var paymentID = req.params.paymentid;
+  const guid = ppApiHelperV2.uuidv4();
+  ppApiHelperV1.getPayment(guid, paymentID, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      console.log(error.response.data.details)
+      return;
+    }
+    
+    res.status(200).send(data);
+    return;
+  });
+  
+});
+
+router.patch('/update', (req, res, next) => {
 
   const payload = req.body;
 
-  const body = {
-    payer_id: payerID,
-    transactions: [
-      {
-        amount:
-        {
-          total: '10.99',
-          currency: 'USD'
-        }
-      }]
-  };
-
-  const options = {
-    auth: {
-      username: process.env.PP_API_CLIENT_ID,
-      password: process.PP_API_CLIENT_SECRET
-    }
-  };
-
-  axios({
-    method: 'post',
-    url: `https://api-m.sandbox.paypal.com/v1/payments/payment/${paymentID}/execute`,
-    data: body,
-    options: options
-  }).then(function (response) {
-    // handle success
-    const data = response.data;
-    res.status(200).send(data);
-  })
-    .catch(function (error) {
-      // handle error
-      console.log(error);
+  ppApiHelperV1.onShippingChange(payload, (data, error) => {
+    if (error) {
       res.status(500).send(error);
-    })
-    .then(function () {
-      // always executed
-      console.log("second then after error")
-    });
+      return;
+    }
+    console.log("SUCCESS");
+    res.status(200).send(data);
+    return;
+
+  });
+});
+
+router.post('/execute-payment', (req, res, next) => {
+  var paymentId = req.body.paymentId;
+  const guid = ppApiHelperV2.uuidv4();
+
+  ppApiHelperV1.executePayment(guid, paymentId, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      return;
+    }
+    res.status(200).send(data);
+    return;
+  });
 
 });
 

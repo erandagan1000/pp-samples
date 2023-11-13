@@ -1,5 +1,6 @@
 const axios = require('axios').default;
 
+
 const test = () => {
   return "hello test"
 }
@@ -97,9 +98,9 @@ const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) 
 
 const generateClientTokenWithCustomerId = (accessToken, customerId, callback) => {
 
-  
+
   const config = {
-    
+
     headers: {
       "Authorization": accessToken,
       "Prefer": "return=representation",
@@ -243,33 +244,107 @@ const createBillingAgreement = (accessToken, data, callback) => {
 
 }
 
-const createPayment = (accessToken, data, clientMetaDataId, callback) => {
+const createPayment = (guid, data, callback) => {
 
-  let config = {
-    headers: {
-      "Authorization": accessToken,
-      "PAYPAL-CLIENT-METADATA-ID": clientMetaDataId
+  generateAccessToken((result, error) => {
+
+    if (error) {
+      callback(undefined, error);
     }
-  };
-  if (!data) {
-    callback(undefined, "Error: Payment data not provided");
-  }
+    const accessToken = result.access_token;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "PayPal-Request-Id": guid,
+        "Prefer": "return=representation"
+      }
+    };
+    // data.purchase_units[0].soft_descriptor = "MY UPDATED DESCRIPTOR";
 
-
-  axios.post('https://api-m.sandbox.paypal.com/v1/payments/payment', data, config)
-    .then(function (response) {
-      // handle success
-      const data = response.data;
-      callback(data, undefined);
-    })
-    .catch(function (error) {
-      // handle error
-      console.log(error.response.data);
-      callback(undefined, error)
-    });
-
+    axios.post('https://api-m.sandbox.paypal.com/v1/payments/payment', data, config)
+      .then(function (response) {
+        // handle success
+        const data = response.data;
+        console.log("ppApiHelperV1.payment");
+        console.log("PAYMENT-CREATED:", data);
+        callback(data, undefined);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        callback(undefined, error)
+      })
+  });
 }
 
+const getPayment = (guid, paymentId, callback) => {
+
+  generateAccessToken((result, error) => {
+
+    if (error) {
+      callback(undefined, error);
+    }
+    const accessToken = result.access_token;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "PayPal-Request-Id": guid,
+        "Prefer": "return=representation"
+      }
+    };
+
+    axios.get(`https://api-m.sandbox.paypal.com/v1/payments/payment/${paymentId}`, config)
+      .then(function (response) {
+        // handle success
+        const data = response.data;
+        callback(data);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        callback(error);
+      })
+
+
+
+  });
+}
+
+const executePayment = (guid, paymentId, callback) => {
+
+  generateAccessToken((result, error) => {
+
+    if (error) {
+      callback(undefined, error);
+    }
+    const accessToken = result.access_token;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "PayPal-Request-Id": guid,
+        "Prefer": "return=representation"
+      }
+    };
+    data = { "payer_id": "CTNJMD9U7U9N2"};
+    
+    axios.post(`https://api-m.sandbox.paypal.com/v1/payments/payment/${paymentId}/execute`, data, config)
+      .then(function (response) {
+        // handle success
+        const data = response.data;
+        console.log("ppApiHelperV1.paymentExecute");
+        console.log("PAYMENT-EXECUTED:", data);
+        callback(data, undefined);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error, " | ", error.response.data.message);
+        callback(undefined, error.response.data.message)
+      })
+  });
+}
 
 const getBillingAgreementDetails = (accessToken, baId, callback) => {
 
@@ -378,7 +453,7 @@ const cancelBillingAgreementDetails = (accessToken, baId, callback) => {
 
 // #endregion
 
-// #region Payouts Functions
+// #region PAYOUTS Functions
 
 const createPayout = (accessToken, callback) => {
 
@@ -446,6 +521,81 @@ const createPayout = (accessToken, callback) => {
 }
 
 
+// #endregion
+
+const onShippingChange = (data, callback) => {
+
+  console.log(data);
+
+  generateAccessToken((result, error) => {
+
+    if (error) {
+      callback(undefined, error);
+    }
+    const accessToken = result.access_token;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+      }
+    };
+    
+    let arrayOfUpdates = [
+      
+      {
+          "op": "add",
+          "path": "/transactions/0/item_list/shipping_address",
+         "value": {"recipient_name":"Yi Zhao","phone":"18655817","line1":"512 El Cerrito Plz Unit 109","city":"El Cerrito","country_code":"US","postal_code":"94530","state":"CA"}
+      // "value": {"recipient_name":"Ifeanyi Ezenagu","phone":"+12404443411","line1":"12809 RICKER RD","city":"UPPER MARLBORO","country_code":"US","postal_code":"20772","state":"MD"}  
+    }
+      
+  ];
+    
+    /*
+    let updatedAddress = data.updatedAddress;
+    let baseAmount = data.baseOrderAmount || 0;
+    // const totalAmount = parseFloat(baseAmount) + parseFloat(data.selected_shipping_option.amount.value);
+    const totalAmount = "220.00";
+
+    arrayOfUpdates.push({
+      op: "replace",
+      path: "/purchase_units/@reference_id=='default'/amount",
+      value: { value: totalAmount.toString() || "222.00", currency_code: "USD" },
+    });
+
+    if (updatedAddress) {
+      arrayOfUpdates.push({
+        op: "add",
+        path: "/transactions/0/item_list/shipping_address",
+        value: updatedAddress
+      })
+    }
+    */
+
+    let paymentId = data.orderID;
+    var payload = JSON.stringify(arrayOfUpdates);
+    axios.patch(`https://api-m.sandbox.paypal.com/v1/payments/payment/${paymentId}`, payload, config)
+      .then(function (response) {
+        // handle success
+        const data = response.data;
+        console.log("ppApiHelperV1.paymentPatched");
+        console.log("PAYMENT-PATACHED:", data);
+        callback(data, undefined);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error.response.data.message);
+        console.log(error.response.data.details);
+          callback(undefined, error.response.data.details)
+      })
+    
+  });
+
+
+}
+
+
 
 // #endregion
 
@@ -459,10 +609,13 @@ module.exports = {
   generateClientTokenWithCustomerId,
   createBillingAgreement,
   createPayment,
+  getPayment,
+  executePayment,
   getBillingAgreementDetails,
   getBillingAgreementTokenDetails,
   updateBillingAgreementDetails,
   cancelBillingAgreementDetails,
-  createPayout
+  createPayout,
+  onShippingChange
 
 };

@@ -1,6 +1,7 @@
 <div><a href="/">Home</a></div>
 <h1>{{title}}</h1>
-<p style="color:red;font-size:larger">This sample is not complete<br/>Need to contact BT support to enable ACH DD to merchant on sandbox
+<p style="color:red;font-size:larger">This sample is not complete<br />Need to contact BT support to enable ACH DD to
+    merchant on sandbox
 </p>
 <hr>
 <!---------------- Paypal Button ------------------>
@@ -10,17 +11,18 @@
 
 
 <div>
-    {{!-- <button id="generate-token">Generate Access Token</button> --}}
     <div class="loading" id="loading-token">Generating access token...</div>
     <div style="inline-size: 1350px;overflow-wrap: break-word; ">
         <p>Access token: </p>
         <div id="token" style="font-size: 6pt;"></div>
     </div>
 
-
-    {{!-- <div class="loading" id="loading-button">Loading paypal button...</div> --}}
-
 </div>
+<hr>
+<p><a target="_blank"
+        href="https://developer.paypal.com/braintree/docs/guides/ach/testing-go-live#account-numbers">Account numbers
+        For testing </a></p>
+<hr>
 <p>
     <input type="radio" id="check1" onclick="setCheckMethod(1)">Network Check / Micro-Transfers / Independent Check
     <input type="radio" id="check2" onclick="setCheckMethod(2)">Tokenized Check
@@ -37,6 +39,7 @@
     <input type="text" id="lastName" placeholder="lastName">
     <input type="text" id="businessName" placeholder="businessName">
     <input type="text" id="billingAddress" placeholder="billingAddress">
+    <button id="bank-login-button">BANK LOGIN</button>
 </form>
 
 <form id="bank-details-check-2">
@@ -74,6 +77,7 @@
 
 <script>
     $("#check1").prop("checked", true);
+    $("#bank-details-check-2").hide();
     var selectedBankAccountCheck = 1;
     function setCheckMethod(type) {
         if (type == 1) {
@@ -110,7 +114,8 @@
     }());
 
 
-        var checkOption1 = function (usBankAccountInstance) {
+    var checkOption1 = function (usBankAccountInstance) {
+        debugger;
         var bankDetails = {
             accountNumber: $('#account-number').val(),
             routingNumber: $('#routing-number').val(),
@@ -183,7 +188,7 @@
 
 
     var bankAccountCheckCallback = selectedBankAccountCheck == 1 ? checkOption1 : checkOption2;
-    
+
     function initBtUsBankAccount(token) {
         braintree.client.create({
             authorization: token
