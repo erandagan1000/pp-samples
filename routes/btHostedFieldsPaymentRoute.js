@@ -121,7 +121,14 @@ router.post("/checkout", (req, res) => {
         },
         customFields: {
           age: 30
+        },
+        descriptor: {
+          name: 'ERUS   *DYN DESCRIPTOR',  //[section]*[prodcut desc] - section must be same value as in Admin "CC Statement name"
+                                          //section must be either 3, 7 or 12 characters and the product descriptor can be up to 18, 14, or 9 characters respectively 
+         // phone: '8044822122',          //(with an * in between for a total descriptor name of 22
+          //url: 'erandagan.com',
         }
+
 
       },
       (err, result) => {

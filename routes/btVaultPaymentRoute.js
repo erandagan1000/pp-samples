@@ -38,8 +38,8 @@ router.get("/client_token/:customerid", (req, res) => {
 
 router.post("/checkout", (req, res) => {
   var nonceFromTheClient = req.body.paymentMethodNonce;
-  var amount = req.body.amount;
-  const selectedCurrency = req.body.currency;
+  var amount = req.body.amount || "25.00";
+  const selectedCurrency = req.body.currency || "USD";
   var storeInVault = (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || false;
   console.log("store in vault: ", storeInVault);
 
@@ -72,17 +72,17 @@ router.post("/checkout", (req, res) => {
   else {
     let qty1 = 1, qty2 = 3;
     let taxPerUnit = 1.00;
-    let totalTax = (qty1+qty2) * taxPerUnit;
+    let totalTax = (qty1 + qty2) * taxPerUnit;
     requestParams = {
-      amount: amount*(qty1+qty2) + totalTax,
+      amount: amount * (qty1 + qty2) + totalTax,
       purchaseOrderNumber: "12345",
       taxAmount: totalTax,
       paymentMethodNonce: nonceFromTheClient,
       merchantAccountId: merchantAccountId,  //if ommitted the default MID (configured on BT console) will be used
       descriptor: {
         name: 'ERUS   *DYN DESCRIPTOR',  //[section]*[prodcut desc] - section must be same value as in Admin "CC Statement name"
-                                        //section must be either 3, 7 or 12 characters and the product descriptor can be up to 18, 14, or 9 characters respectively 
-       // phone: '8044822122',          //(with an * in between for a total descriptor name of 22
+        //section must be either 3, 7 or 12 characters and the product descriptor can be up to 18, 14, or 9 characters respectively 
+        // phone: '8044822122',          //(with an * in between for a total descriptor name of 22
         //url: 'erandagan.com',
       },
       // customer: {
@@ -116,7 +116,7 @@ router.post("/checkout", (req, res) => {
         postalCode: "60103",
         countryCodeAlpha2: "US"
       },
-      
+
       lineItems: [
         {
           name: "Item 1 desc",
@@ -247,6 +247,92 @@ router.post("/checkout/localpaymethod", (req, res) => {
       console.log("Error:  " + err);
       res.status(500).send(err);
     });
+
+});
+router.post("/checkout/ach", (req, res) => {
+  var nonceFromTheClient = req.body.paymentMethodNonce;
+  var amount = req.body.amount || "25.00";
+  const selectedCurrency = req.body.currency || "USD";
+  var storeInVault = (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || true;
+  console.log("store in vault: ", storeInVault);
+
+  /* MUST VAULT Customer if want to charge with ACH*/
+
+  var customer = {
+    firstName: "Jen",
+    lastName: "Smith",
+    company: "Braintree",
+    email: "jen@example.com",
+    phone: "312.555.1234",
+    fax: "614.555.5678",
+    website: "www.example.com"
+  };
+  btHelper.customerCreate(customer).then(function (savedCustomer) {
+
+    console.log(savedCustomer);
+    btHelper.paymentMetohdCreate({
+      customerId: savedCustomer.customer.id,
+      paymentMethodNonce: nonceFromTheClient
+    }).then(function (savedPaymentMethod) {
+      console.log(savedPaymentMethod);
+      const merchantAccountId =  btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
+
+      let submitForSettlement = true;
+      
+      console.log("submitForSettlement: ", submitForSettlement);
+
+      let requestParams = {
+        amount,
+        purchaseOrderNumber: "12345",
+        customerId: savedCustomer.customer.id,
+        merchantAccountId: merchantAccountId,  //if ommitted the default MID (configured on BT console) will be used
+        descriptor: {
+          // name: 'ERUS   *DYN DESCRIPTOR',  //[section]*[prodcut desc] - section must be same value as in Admin "CC Statement name"
+          //section must be either 3, 7 or 12 characters and the product descriptor can be up to 18, 14, or 9 characters respectively 
+          // phone: '8044822122',          //(with an * in between for a total descriptor name of 22
+          //url: 'erandagan.com',
+          name: 'ERU*DYN DESCR',
+        },
+        options: {
+          submitForSettlement,
+          storeInVaultOnSuccess: storeInVault,
+          storeShippingAddressInVault: storeInVault,
+          paypal: {
+            "description": "Product xx description from options"
+          },
+          
+        },
+        transactionSource: "unscheduled"
+      }
+
+      btHelper.gateway.transaction.sale(
+        requestParams,
+        (err, result) => {
+          if (err) {
+            console.log(err);
+            res.status(500).send(err)
+          }
+          //const fullResult = JSON.stringify(result)
+          res.send(result);
+
+        }
+      );
+
+
+    }).catch(function (error) {
+      // handle error
+      console.log(error);
+      res.status(500).send(error);
+    });
+  })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+      res.status(500).send(error);
+    });
+
+
+
 
 });
 
