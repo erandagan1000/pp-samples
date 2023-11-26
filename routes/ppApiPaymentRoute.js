@@ -44,22 +44,6 @@ router.post('/create', (req, res, next) => {
 
 });
 
-router.get('/:paymentid', (req, res, next) => {
-  var paymentID = req.params.paymentid;
-  const guid = ppApiHelperV2.uuidv4();
-  ppApiHelperV1.getPayment(guid, paymentID, (data, error) => {
-    if (error) {
-      res.status(500).send(error);
-      console.log(error.response.data.details)
-      return;
-    }
-    
-    res.status(200).send(data);
-    return;
-  });
-  
-});
-
 router.patch('/update', (req, res, next) => {
 
   const payload = req.body;
@@ -89,6 +73,37 @@ router.post('/execute-payment', (req, res, next) => {
     return;
   });
 
+});
+
+router.get('/userinfo', (req, res, next) => {
+  
+  ppApiHelperV1.getUserInfo((data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      console.log(error.response.data.details)
+      return;
+    }
+    
+    res.status(200).send(data);
+    return;
+  });
+  
+});
+
+router.get('/:paymentid', (req, res, next) => {
+  var paymentID = req.params.paymentid;
+  const guid = ppApiHelperV2.uuidv4();
+  ppApiHelperV1.getPayment(guid, paymentID, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      console.log(error.response.data.details)
+      return;
+    }
+    
+    res.status(200).send(data);
+    return;
+  });
+  
 });
 
 module.exports = router;

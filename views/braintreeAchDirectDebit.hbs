@@ -30,7 +30,7 @@
     <h3>Network Check / Micro-Transfers / Independent Check</h3>
     </p>
     <label for="routing-number-1" style="width:200px">Routing Number:</label> 
-    <input type="text" style="width:500px" id="routing-number" name="routing-number-1" placeholder="routing Number" value="">
+    <input type="text" style="width:500px" id="routing-number-1" name="routing-number-1" placeholder="routing Number" value="">
     <br>
     <label for="account-number-1" style="width:200px">Account Number:</label>
     <input type="text" style="width:500px" id="account-number-1" placeholder="account Number" value="">
@@ -214,7 +214,8 @@
                     data: {
                         'paymentMethodNonce': nonce,
                         'amount': '100.00',
-                        'paymenmtId': undefined
+                        'paymenmtId': undefined,
+                        'checkOption': 1
 
                     }
                 }).done(function (result) {
@@ -286,7 +287,8 @@
                     data: {
                         'paymentMethodNonce': nonce,
                         'amount': '100.00',
-                        'paymenmtId': undefined
+                        'paymenmtId': undefined,
+                        'checkOption': 2
 
                     }
                 }).done(function (result) {
@@ -313,6 +315,7 @@
     };
 
    function initBtUsBankAccount(token) {
+    
         braintree.client.create({
             authorization: token
         }).then(function (clientInstance) {

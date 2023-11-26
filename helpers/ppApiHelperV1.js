@@ -133,6 +133,49 @@ const generateClientTokenWithCustomerId = (accessToken, customerId, callback) =>
 
 }
 
+const getUserInfo = (callback) => {
+
+  generateAccessToken((result, error) => {
+
+    if (error) {
+      callback(undefined, error);
+    }
+    const accessToken = result.access_token;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        "Prefer": "return=representation"
+      }
+    };
+
+    axios.get('https://api-m.sandbox.paypal.com/v1/identity/openidconnect/userinfo?schema=openid', config)
+      .then(function (response) {
+        // handle success
+        const data = response.data;
+        console.log("ppApiHelperV1.getUserInfo");
+        console.log("USER-INFO:", data);
+        callback(data, undefined);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        callback(undefined, error)
+      })
+  });
+
+
+
+
+
+
+
+
+  
+  
+
+}
+
 // #endregion
 
 // #region Billing Agreement Functions
@@ -607,6 +650,7 @@ module.exports = {
   generateBillingAgreementToken,
   generateClientTokenWithBillingAgreementId,
   generateClientTokenWithCustomerId,
+  getUserInfo,
   createBillingAgreement,
   createPayment,
   getPayment,

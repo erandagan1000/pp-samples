@@ -252,11 +252,12 @@ router.post("/checkout/localpaymethod", (req, res) => {
 router.post("/checkout/ach", (req, res) => {
   var nonceFromTheClient = req.body.paymentMethodNonce;
   var amount = req.body.amount || "25.00";
+
   const selectedCurrency = req.body.currency || "USD";
   var storeInVault = (req.body.hf_save_for_next_purchase && req.body.hf_save_for_next_purchase == 'true') || true;
   console.log("store in vault: ", storeInVault);
 
-  /* MUST VAULT Customer if want to charge with ACH*/
+  /* MUST VAULT and VERIFY Customer if want to charge with ACH*/
 
   var customer = {
     firstName: "Jen",
@@ -270,15 +271,29 @@ router.post("/checkout/ach", (req, res) => {
   btHelper.customerCreate(customer).then(function (savedCustomer) {
 
     console.log(savedCustomer);
+
+    var options = {};
+    if (req.body.checkOption == 1) {
+      options = {
+        usBankAccountVerificationMethod: btHelper.braintree.UsBankAccountVerification.VerificationMethod.NetworkCheck,   // or MicroTransfers or IndependentCheck
+        //verificationAddOns: btHelper.braintree.UsBankAccountVerification.VerificationAddOns.CustomerVerification  //optional, only applies to network check verifications.
+      }
+    }
+
     btHelper.paymentMetohdCreate({
       customerId: savedCustomer.customer.id,
-      paymentMethodNonce: nonceFromTheClient
+      paymentMethodNonce: nonceFromTheClient,
+      options
     }).then(function (savedPaymentMethod) {
-      console.log(savedPaymentMethod);
-      const merchantAccountId =  btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
+      console.log("SAVED PAYMENT METHOD: ", savedPaymentMethod);
+      const usBankAccount = savedPaymentMethod.usBankAccount;
+      const verified = usBankAccount.verified;
+      const responseCode = usBankAccount.verifications[0]?.processorResponseCode;
+      console.log("BANK ACCOUNT: ", `${usBankAccount} | ${verified} | ${responseCode}`);
+      const merchantAccountId = btHelper.getMerchantAccountIdByCurrency(selectedCurrency);
 
       let submitForSettlement = true;
-      
+
       console.log("submitForSettlement: ", submitForSettlement);
 
       let requestParams = {
@@ -300,7 +315,7 @@ router.post("/checkout/ach", (req, res) => {
           paypal: {
             "description": "Product xx description from options"
           },
-          
+
         },
         transactionSource: "unscheduled"
       }

@@ -128,7 +128,6 @@ module.exports = {
   searchByCurrency,
   paymentMetohdCreateFromPaymentMethodToken,
   get64BitApiKey,
-  voidTransaction 
-
-
+  voidTransaction,
+  braintree
 };
