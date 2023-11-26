@@ -198,7 +198,7 @@ router.post('/s2s', (req, res, next) => {
 
 });
 
-// create order
+// create order and vault payment method - Vault V3.
 router.post('/vault-payment-method', (req, res, next) => {
 
   let paymentSource = req.body.source;
@@ -263,6 +263,86 @@ router.post('/vault-payment-method', (req, res, next) => {
   };
 
   var payload = req.body && req.body.intent ? req.body : defaultPayload;
+
+  const guid = ppApiHelperV2.uuidv4();
+
+  ppApiHelperV2.createOrder(guid, payload, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      console.log(error.response.data.details)
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
+
+// create order ofr returning user Vault V3.
+router.post('/vault-checkout', (req, res, next) => {
+
+  let paymentSource = req.body.source;
+  let payment_source = undefined;
+
+  if (paymentSource == "paypal") {
+    payment_source = {
+      paypal: {
+        experience_context: {
+          shipping_preference: "SET_PROVIDED_ADDRESS",
+          brand_name: "ERAN BRAND FROM EXPERIENCE CONTEXT",
+          locale: "en-US",
+          landing_page: "LOGIN",
+          return_url: "htttp://localhost:3000",
+          cancel_url: "htttp://localhost:3000"
+        }
+      }
+    }
+  }
+  else if (paymentSource == "card") {
+    payment_source = {
+      card: {},
+      experience_context: {
+        shipping_preference: "SET_PROVIDED_ADDRESS",
+        return_url: "https://example.com/returnUrl",
+        cancel_url: "https://example.com/cancelUrl",
+      },
+    };
+  }
+
+
+
+  let defaultPayload = {
+    intent: "CAPTURE",
+    purchase_units: [
+      {
+        amount:
+          { currency_code: "USD", value: "115.00" },
+        shipping: {
+          type: "SHIPPING",
+          name: {
+            full_name: "John Doe"
+          },
+          address: {
+            country_code: "FR",
+            postal_code: "75002",
+            address_line_1: "21 Rue de la banque",
+            admin_area_1: "France",
+            admin_area_2: "Paris"
+          }
+        }
+      },
+    ],
+    payment_source,
+    /*application_context: {
+      brand_name: "Jon Doe's Clothing Shop",
+      locale: "en-US",
+      landing_page: "LOGIN",
+      return_url: "https://example.com/returnUrl",
+      cancel_url: "https://www.paypal.com/checkoutnow/error"
+    }*/
+  };
+
+  var payload = defaultPayload;
 
   const guid = ppApiHelperV2.uuidv4();
 

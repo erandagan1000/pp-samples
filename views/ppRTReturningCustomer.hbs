@@ -67,13 +67,11 @@
     let paypal;
 
     try {
-      debugger;
-
       const myDataClientPromise = new Promise(generateDataClientToken);
       myDataClientPromise.then((data) => {
         console.log("resolved client token:", data);
         console.log("clientId: ", globalClientId);
-        debugger;
+        
         window.paypalLoadScript({
           "client-id": globalClientId,
           "data-user-id-token": globalUserIdToken,

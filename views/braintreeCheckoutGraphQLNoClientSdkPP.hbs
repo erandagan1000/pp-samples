@@ -105,7 +105,7 @@
         $("#create-order-response").html(JSON.stringify(data));
         $("#get-order-details-button").removeAttr("disabled");
         $("#in-progress-1").hide();      
-        debugger;
+        
         const approveUrl = data.createPayPalOneTimePayment.approvalUrl;
         paymentToken = approveUrl.split("=")[1];
         paymentId = data.createPayPalOneTimePayment.paymentId;

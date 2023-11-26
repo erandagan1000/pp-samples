@@ -135,7 +135,7 @@ router.get('/ppvault', function(req, res, next) {
 // });
 
 router.get('/ppvaultv3pp', function(req, res, next) {
-  res.render('ppvaultv3pp', { title: 'PP Vault V3 - PayPal' });
+  res.render('ppvaultv3pp', { title: 'PP Vault V3 - PayPal', clientId: process.env.PP_API_CLIENT_ID });
 });
 
 router.get('/ppvaultv3card', function(req, res, next) {

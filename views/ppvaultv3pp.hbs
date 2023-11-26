@@ -48,7 +48,7 @@
     var globalUserIdToken = "";
     let paypal;
     let vaultedCustomerId = "";
-    let cId ="";
+    let cId = "";
 
 
     function createButton(isRetruning, clientId) {
@@ -74,7 +74,7 @@
             if (paypal) {
               try {
 
-                loadUiControls();
+                loadUiControls(isRetruning);
 
               } catch (error) {
                 console.error("failed to render the PayPal Buttons", error);
@@ -141,8 +141,8 @@
 
           const accesstoken = data.access_token;
           vaultedCustomerId = vaultedCustomerId || localStorage.getItem('vaultedCustomerId');
-          debugger;
-          if(!vaultedCustomerId) {
+
+          if (!vaultedCustomerId) {
             console.log("Using Default CustomerId");
             vaultedCustomerId = "qoeThVmauU";
           }
@@ -153,7 +153,7 @@
             },
             data: { customer_id: vaultedCustomerId },   //vaultedCustomerId
             success: function (data, status, xhr) {
-              
+
               //Should be set here, since sending the customerID
               globalUserIdToken = data.id_token;
               resolve(data);
@@ -173,7 +173,7 @@
       });
     }
 
-    function loadUiControls() {
+    function loadUiControls(isRetruning) {
 
       // Displays PayPal buttons
       paypal.Buttons({
@@ -181,7 +181,8 @@
           layout: 'vertical'
         },
         createOrder: function (data, actions) {
-          return fetch('/ppapi/order/vault-payment-method', {
+          var apiUrl = isRetruning ? '/ppapi/order/vault-checkout' : '/ppapi/order/vault-payment-method';
+          return fetch(apiUrl, {
             method: 'post',
             headers: {
               'Accept': 'application/json',
@@ -198,6 +199,7 @@
           });
         },
         onApprove: function (data, actions) {
+
           return fetch('/ppapi/order/' + data.orderID + '/capture', {
             method: 'post'
           }).then(function (result) {
@@ -206,9 +208,12 @@
           }).then(function (resJson) {
 
             console.log("resJson: ", resJson);
-            vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.customer.id;
-            // vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.id; 
-            localStorage.setItem('vaultedCustomerId', vaultedCustomerId);
+            if (!isRetruning) {
+              vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.customer.id;
+              // vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.id; 
+              localStorage.setItem('vaultedCustomerId', vaultedCustomerId);
+            }
+
             document.querySelector("#div-vaulted-customer-id").innerHTML = `<p>${vaultedCustomerId}</p>`;
             $("#payment-result").jsonViewer(resJson);
             document.querySelector("#payment-view").style = 'display: none';
@@ -232,10 +237,11 @@
           'Content-Type': 'application/json',
         }
       }).then(async (data) => {
-        
+        debugger;
+
         const { clientId } = await data.json();
         cId = clientId
-        console.log(cId);
+        console.log("****cId**** " ,cId);
         createButton(false, cId);
 
       });

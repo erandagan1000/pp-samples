@@ -103,7 +103,7 @@
 
 <!-- Load the PayPal JS SDK with your PayPal Client ID-->
 <script
-  src="https://www.paypal.com/sdk/js?client-id=AbfWHDmsApd4IM7TDiLYpsjH28utsEt-XfxVOxnE9SKbtSziPLp_LhMToOKgVKjXR7BVhDw6Pvw89ALk"></script>
+  src="https://www.paypal.com/sdk/js?client-id=AaLfG87rC4XN5QisWLhUw27uFUE0KypDXHNySFuya-jNbzKIE4s4a6Yu2q8ylFhMPgw3KflYRGc8Uhjz"></script>
 
 <!-- dropin -->
 <script src="https://js.braintreegateway.com/web/dropin/1.36.1/js/dropin.min.js"></script>
@@ -313,7 +313,7 @@
             // If this was a real integration, this is where you would
             // send the nonce to your server.
             alert('Got a nonce: ' + payload.nonce);
-            debugger;
+            
             console.log(payload);
             document.getElementById('hf-nonce').value = payload.nonce;
             document.getElementById('hf_save_for_next_purchase').value = $("#save-for-next-purchase")[0].checked;
