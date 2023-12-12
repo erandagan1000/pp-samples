@@ -116,7 +116,26 @@ const captureOrder = (orderId, callback) => {
 const onShippingChange = (data, callback) => {
 
   console.log(data);
+  let baseAmount = data.baseOrderAmount;
+    const totalAmount = parseFloat(baseAmount) + parseFloat(data.selectedShippingOption.amount.value);
+    let updatedAddress = data.updatedAddress;
+    let arrayOfUpdates = [];
 
+    arrayOfUpdates.push({
+      op: "replace",
+      path: "/purchase_units/@reference_id=='b16b98ad-08b1-4f4c-83db-8f7ed4df6559'/amount",
+      value: { value: totalAmount.toString(), currency_code: "USD" },
+    });
+
+    // if(updatedAddress) {
+    //   arrayOfUpdates.push({
+    //     op: "add",
+    //     path: "/transactions/0/item_list/shipping_address",
+    //     value: updatedAddress
+    //   })
+    // }
+
+  
   ppApiHelperV1.generateAccessToken((result, error) => {
 
     if (error) {
@@ -131,28 +150,10 @@ const onShippingChange = (data, callback) => {
       }
     };
     console.log(accessToken);
-    let baseAmount = data.baseOrderAmount;
-    const totalAmount = parseFloat(baseAmount) + parseFloat(data.selectedShippingOption.amount.value);
-    let updatedAddress = data.updatedAddress;
-    let arrayOfUpdates = [];
-
-    arrayOfUpdates.push({
-      op: "replace",
-      path: "/purchase_units/@reference_id=='default'/amount",
-      value: { value: totalAmount.toString(), currency_code: "USD" },
-    });
-
-    if(updatedAddress) {
-      arrayOfUpdates.push({
-        op: "add",
-        path: "/transactions/0/item_list/shipping_address",
-        value: updatedAddress
-      })
-    }
-
-    // var dat = JSON.stringify(arrayOfUpdates);
     
-    axios.patch(`https://api-m.paypal.com/v2/checkout/orders/${data.orderID}`, arrayOfUpdates, config)
+    var dat = JSON.stringify(arrayOfUpdates);
+    
+    axios.patch(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${data.orderID}`, dat, config)
       .then((response) => {
         console.log(response.data);
         callback(response.data, undefined);

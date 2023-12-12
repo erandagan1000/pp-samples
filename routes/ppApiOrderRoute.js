@@ -5,6 +5,7 @@ const { route } = require('.');
 const router = express.Router();
 const ppApiHelperV2 = require('../helpers/ppApiHelperV2')
 
+
 // route: /ppapi/order
 // create order
 router.post('/', (req, res, next) => {
@@ -57,6 +58,55 @@ router.post('/', (req, res, next) => {
   var payload1 = { ...payload, payment_source: additions };
 
   const guid = ppApiHelperV2.uuidv4();
+  console.log("payload1: ", payload1);
+  ppApiHelperV2.createOrder(guid, payload1, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      console.log(error.response.data.details)
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
+
+router.post('/shipping', (req, res, next) => {
+ 
+  const guid = ppApiHelperV2.uuidv4();
+  let payload1 = {
+    purchase_units: [{
+      reference_id:  guid,
+      amount: {
+        value: "15.00",
+        currency_code: "USD"
+      },
+      shipping: {
+        options: [
+          {
+            id: "SHIP_123",
+            label: "Free Shipping",
+            type: "SHIPPING",
+            selected: true,
+            amount: {
+                value: "3.00",
+                currency_code: "USD"
+            }
+          },
+          {
+            id: "SHIP_456",
+            label: "Pick up in Store",
+            type: "PICKUP",
+            selected: false,
+            amount: {
+                value: "0.00",
+                currency_code: "USD"
+            }
+          }
+        ]
+      }
+    }]
+  };
   console.log("payload1: ", payload1);
   ppApiHelperV2.createOrder(guid, payload1, (data, error) => {
     if (error) {

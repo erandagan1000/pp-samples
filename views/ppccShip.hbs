@@ -14,7 +14,7 @@
   const baseOrderAmount = "100.00";
   var purchase_units = [
     {
-      "reference_id": "d9f80740-38f0-11e8-b467-0ed5f89f718b",
+      "reference_id": "b16b98ad-08b1-4f4c-83db-8f7ed4df6559",
       "amount": {
         "currency_code": "USD",
         "value": baseOrderAmount
@@ -58,7 +58,7 @@
   const shippingContainer = document.querySelector("#paypal-shipping-container");
   $("#loading-button").show();
 
-  //var ppApi = "/ppapi/payment/create";
+  // var ppApi = "/ppapi/payment/create";
   var ppApi = "/ppapi/order";
   var isOrdersV2 = ppApi.indexOf("/order") > -1;
 
@@ -66,14 +66,16 @@
 
     // Sets up the transaction when a payment button is clicked
     createOrder: function (data, actions) {
+      // Using actions.order.create is NOT RECOMMENDED approach (BTW - default is orders v2)
+      // return actions.order.create(orderDataV2);
+      // RECOMMENDED: call merchant api to create order
       let orderDataV2 = {
         intent: "CAPTURE",
         payer: { payment_method: "paypal" },
         purchase_units
 
       };
-      // using orders v2
-      // return actions.order.create(orderDataV2);
+      
       // using payments v1
 
       let paymentDataV1 = {
@@ -127,7 +129,7 @@
       shippingContainer.innerHTML = `<p><b>Shipping address:</b> ${JSON.stringify(data.shipping_address)}</p><p><b>Selected Shipping Method:</b> ${JSON.stringify(data.selected_shipping_option)}</p>`
       
       if (isOrdersV2) {
-        // option1:  PATCH the order via the JS SDK using the actions object - it will use orders v2
+        
         return fetch("/ppapi/order", {
           method: "PATCH",
           headers: {
@@ -148,29 +150,10 @@
             }
           })
         });
-        /*
-        return actions.order.patch([
-          {
-            op: "replace",
-            path: "/purchase_units/@reference_id=='default'/amount",
-            value: { value: data.amount.value, currency_code: "USD" },
-          },
-          {
-            op: "add",
-            path: "/transactions/0/item_list/shipping_address",
-            value: {
-              recipient_name: "Ifeanyi Ezenagu",
-              phone: "+12404443411",
-              line1: "12809 RICKER RD",
-              city: "UPPER MARLBORO",
-              country_code: "US",
-              postal_code: "20772",
-              state: "MD"
-            }
-          }
-        ]);*/
+               
+        
       }
-      else {  //paymenyt v1
+      else {  //payment v1
 
         // option2:  PATCH the order on the merchant Server - to force using payments v1
 
