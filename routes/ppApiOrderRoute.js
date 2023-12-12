@@ -18,8 +18,8 @@ router.post('/', (req, res, next) => {
           // shipping_preference: "GET_FROM_FILE", //NO_SHIPPING or SET_PROVIDED_ADDRESS
           // landing_page: "LOGIN", //GUEST_CHECKOUT or NO_PREFERENCE
           user_action: "PAY_NOW",//PAY_NOW or CONTINUE
-          return_url: "htttp://localhost:3000",
-          cancel_url: "htttp://localhost:3000"
+          return_url: "http://localhost:3000",
+          cancel_url: "http://localhost:3000"
         },
         // email_address: "eran.buyer.us@email.com",
         // //name: "Eran Buyer US",
@@ -44,11 +44,20 @@ router.post('/', (req, res, next) => {
 
   var payload = req.body && req.body.intent ? req.body : defaultPayload;
 
-  var additions = { paypal: { experience_context: { brand_name: "ERAN BRAND FROM EXPERIENCE CONTEXT" } } };
+  var additions = {
+    paypal: {
+      experience_context: {
+        brand_name: "ERAN BRAND FROM EXPERIENCE CONTEXT",
+        user_action: "PAY_NOW",//PAY_NOW or CONTINUE
+        return_url: "http://localhost:3000",
+        cancel_url: "http://localhost:3000"
+      }
+    }
+  };
   var payload1 = { ...payload, payment_source: additions };
 
   const guid = ppApiHelperV2.uuidv4();
-
+  console.log("payload1: ", payload1);
   ppApiHelperV2.createOrder(guid, payload1, (data, error) => {
     if (error) {
       res.status(500).send(error);

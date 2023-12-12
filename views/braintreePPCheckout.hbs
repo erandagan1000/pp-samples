@@ -91,6 +91,7 @@
       url: `/bt/vault/payment/client_token?currency=${selectedCurrency}`
     }).done(function (result) {
       // console.log(result);
+      
       token = result;
       tokenSpan.innerHTML = `${token}`;
       $("#loading-token").hide();

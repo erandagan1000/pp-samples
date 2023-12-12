@@ -12,57 +12,64 @@
 
 <script>
   const baseOrderAmount = "100.00";
+  var purchase_units = [
+    {
+      "reference_id": "d9f80740-38f0-11e8-b467-0ed5f89f718b",
+      "amount": {
+        "currency_code": "USD",
+        "value": baseOrderAmount
+      },
+      shipping: {
+        options: [
+          {
+            id: "SHIP_123",
+            label: "Domestic Shipping",
+            type: "SHIPPING",
+            selected: true,
+            amount: {
+              value: "3.00",
+              currency_code: "USD"
+            }
+          },
+          {
+            id: "SHIP_456",
+            label: "International Shipping",
+            type: "SHIPPING",
+            selected: false,
+            amount: {
+              value: "13.00",
+              currency_code: "USD"
+            }
+          },
+          {
+            id: "SHIP_789",
+            label: "Pick up in Store",
+            type: "PICKUP",
+            selected: false,
+            amount: {
+              value: "0.00",
+              currency_code: "USD"
+            }
+          }
+        ]
+      }
+    }
+  ];
   const shippingContainer = document.querySelector("#paypal-shipping-container");
   $("#loading-button").show();
+
+  //var ppApi = "/ppapi/payment/create";
+  var ppApi = "/ppapi/order";
+  var isOrdersV2 = ppApi.indexOf("/order") > -1;
 
   paypal.Buttons({
 
     // Sets up the transaction when a payment button is clicked
     createOrder: function (data, actions) {
       let orderDataV2 = {
-        intent: "capture",
+        intent: "CAPTURE",
         payer: { payment_method: "paypal" },
-        purchase_units:
-          [{
-            amount: {
-              value: baseOrderAmount// Can reference variables or functions. Example: `value: document.getElementById('...').value`
-            },
-            shipping: {
-              options: [
-                {
-                  id: "SHIP_123",
-                  label: "Domestic Shipping",
-                  type: "SHIPPING",
-                  selected: true,
-                  amount: {
-                    value: "3.00",
-                    currency_code: "USD"
-                  }
-                },
-                {
-                  id: "SHIP_456",
-                  label: "International Shipping",
-                  type: "SHIPPING",
-                  selected: false,
-                  amount: {
-                    value: "13.00",
-                    currency_code: "USD"
-                  }
-                },
-                {
-                  id: "SHIP_789",
-                  label: "Pick up in Store",
-                  type: "PICKUP",
-                  selected: false,
-                  amount: {
-                    value: "0.00",
-                    currency_code: "USD"
-                  }
-                }
-              ]
-            }
-
-          }],
+        purchase_units
 
       };
       // using orders v2
@@ -94,74 +101,100 @@
         ]
       }
 
-      return (fetch("/ppapi/payment/create", {
+
+      return (fetch(ppApi, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(paymentDataV1)
+        body: isOrdersV2 ? JSON.stringify(orderDataV2) : JSON.stringify(paymentDataV1)
       }).then((response) => response.json())
-        .then((order) => order.token));
+        .then((order) => isOrdersV2 ? order.id : order.token));
     },
 
     // how to change the total price based on different shipping options and patch the order with updated amount based on selected shipping method
     onShippingChange: function (data, actions) {
+      
       console.log(data);
       console.log("SELECTED_OPTION", data.selected_shipping_option); // data.selected_shipping_option contains the selected shipping option
       // NOTE: data.selected_shipping_option_id contains the selected shipping ID
       // passed to the `actions.order.create()` call
-      data.amount.value =
+      {{!-- data.amount.value =
         parseFloat(baseOrderAmount, 10) +
-        parseFloat(data.selected_shipping_option.amount.value, 10);
+        parseFloat(data.selected_shipping_option.amount.value, 10); --}}
       // Here you can also check the data.shipping_address (reruned from PP review screen) if it is address your business support shipping to.
       var shippingContainer = document.querySelector("#paypal-shipping-container");
       shippingContainer.innerHTML = `<p><b>Shipping address:</b> ${JSON.stringify(data.shipping_address)}</p><p><b>Selected Shipping Method:</b> ${JSON.stringify(data.selected_shipping_option)}</p>`
-
-      // option1:  PATCH the order via the JS SDK using the actions object - it will use orders v2
-      /*
-      return actions.order.patch([
-        {
-          op: "replace",
-          path: "/purchase_units/@reference_id=='default'/amount",
-          value: { value: data.amount.value, currency_code: "USD" },
-        },
-        {
-          op: "add",
-          path: "/transactions/0/item_list/shipping_address",
-          value: {
-            recipient_name: "Ifeanyi Ezenagu",
-            phone: "+12404443411",
-            line1: "12809 RICKER RD",
-            city: "UPPER MARLBORO",
-            country_code: "US",
-            postal_code: "20772",
-            state: "MD"
+      
+      if (isOrdersV2) {
+        // option1:  PATCH the order via the JS SDK using the actions object - it will use orders v2
+        return fetch("/ppapi/order", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderID: data.orderID,
+            selectedShippingOption: data.selected_shipping_option,
+            baseOrderAmount,
+            updatedAddress: {
+              recipient_name: "Ifeanyi Ezenagu",
+              phone: "+12404443411",
+              line1: "12809 RICKER RD",
+              city: "UPPER MARLBORO",
+              country_code: "US",
+              postal_code: "20772",
+              state: "MD"
+            }
+          })
+        });
+        /*
+        return actions.order.patch([
+          {
+            op: "replace",
+            path: "/purchase_units/@reference_id=='default'/amount",
+            value: { value: data.amount.value, currency_code: "USD" },
+          },
+          {
+            op: "add",
+            path: "/transactions/0/item_list/shipping_address",
+            value: {
+              recipient_name: "Ifeanyi Ezenagu",
+              phone: "+12404443411",
+              line1: "12809 RICKER RD",
+              city: "UPPER MARLBORO",
+              country_code: "US",
+              postal_code: "20772",
+              state: "MD"
+            }
           }
-        }
-      ]);
-*/
-      // option2:  PATCH the order on the merchant Server - to force using payments v1
+        ]);*/
+      }
+      else {  //paymenyt v1
 
-      return fetch("/ppapi/payment/update", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          orderID: data.orderID,
-          selectedShippingOption: data.selected_shipping_option,
-          baseOrderAmount,
-          updatedAddress: {
-            recipient_name: "Ifeanyi Ezenagu",
-            phone: "+12404443411",
-            line1: "12809 RICKER RD",
-            city: "UPPER MARLBORO",
-            country_code: "US",
-            postal_code: "20772",
-            state: "MD"
-          }
-        })
-      });
+        // option2:  PATCH the order on the merchant Server - to force using payments v1
+
+        return fetch("/ppapi/payment/update", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderID: data.orderID,
+            selectedShippingOption: data.selected_shipping_option,
+            baseOrderAmount,
+            updatedAddress: {
+              recipient_name: "Ifeanyi Ezenagu",
+              phone: "+12404443411",
+              line1: "12809 RICKER RD",
+              city: "UPPER MARLBORO",
+              country_code: "US",
+              postal_code: "20772",
+              state: "MD"
+            }
+          })
+        });
+      }
 
 
     },
@@ -169,54 +202,66 @@
     // Finalize the transaction after payer approval
     onApprove: function (data, actions) {
       console.log("onApprove", data)
-      //Option 1: Use client side method to capture payment (DEPRACATED Approach). This will call orders V2 by default.
-      /*
-      return actions.order.capture().then(function (orderData) {
-        // Successful capture! For dev/demo purposes:
-        let resultJson = JSON.stringify(orderData, null, 2);
-        console.log('Capture result', orderData, resultJson)
-        var transaction = orderData.purchase_units[0].payments.captures[0];
-        // alert('Transaction ' + transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
-        $('#paypal-result-container').text(resultJson);
-        */
-      //Option 2: Call merchant server - Server Approach - best practice.
-      return fetch("/ppapi/payment/execute-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({paymentId: order.paymentId})
-      }).then((response) => response.json())
-        .then((orderData) => {
-          // Three cases to handle:
-          //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-          //   (2) Other non-recoverable errors -> Show a failure message
-          //   (3) Successful transaction -> Show confirmation or thank you
-
-          // This example reads a v2/checkout/orders capture response, propagated from the server
-          // You could use a different API or structure for your 'orderData'
-          const errorDetail = Array.isArray(orderData.details) && orderData.details[0];
-
-          // Recoverable state, per:
-          // https://developer.paypal.com/docs/checkout/integration-features/funding-failure/
-          if (errorDetail && errorDetail.issue === 'INSTRUMENT_DECLINED') {
-            return actions.restart();
-          }
-
-          if (errorDetail) {
-            console.error('Sorry, your transaction could not be processed.', errorDetail);
-          }
-
-          // Successful capture! For demo purposes:
-          console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+      if (isOrdersV2) {
+        //Option 1: Use client side method to capture payment (DEPRACATED Approach). This will call orders V2 by default.
+        return actions.order.capture().then(function (orderData) {
+          // Successful capture! For dev/demo purposes:
+          let resultJson = JSON.stringify(orderData, null, 2);
+          console.log('Capture result', orderData, resultJson)
+          var transaction = orderData.purchase_units[0].payments.captures[0];
+          // alert('Transaction ' + transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
+          $('#paypal-result-container').text(resultJson);
         }).catch(function (err) {
           // Failed capture
+          console.log(err);
         });
 
-    }     
+
+      }
+      else {  //payments v1
+        //Option 2: Call merchant server - Server Approach - best practice.
+        return fetch("/ppapi/payment/execute-payment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ paymentId: order.paymentId })
+        }).then((response) => response.json())
+          .then((orderData) => {
+            // Three cases to handle:
+            //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+            //   (2) Other non-recoverable errors -> Show a failure message
+            //   (3) Successful transaction -> Show confirmation or thank you
+
+            // This example reads a v2/checkout/orders capture response, propagated from the server
+            // You could use a different API or structure for your 'orderData'
+            const errorDetail = Array.isArray(orderData.details) && orderData.details[0];
+
+            // Recoverable state, per:
+            // https://developer.paypal.com/docs/checkout/integration-features/funding-failure/
+            if (errorDetail && errorDetail.issue === 'INSTRUMENT_DECLINED') {
+              return actions.restart();
+            }
+
+            if (errorDetail) {
+              console.error('Sorry, your transaction could not be processed.', errorDetail);
+            }
+
+            // Successful capture! For demo purposes:
+            console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+          }).catch(function (err) {
+            // Failed capture
+            console.log(err);
+          });
+
+      }
+
+
+
+    }
   }).render('#paypal-button-container').then(function () {
-      $("#loading-button").hide();
-    });
+    $("#loading-button").hide();
+  });
 
 
 </script>

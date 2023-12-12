@@ -113,7 +113,7 @@ const captureOrder = (orderId, callback) => {
 }
 
 // use the orders api to update an order
-const onShippingChange = (data) => {
+const onShippingChange = (data, callback) => {
 
   console.log(data);
 
@@ -125,13 +125,14 @@ const onShippingChange = (data) => {
     const accessToken = result.access_token;
     const config = {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${accessToken}`,
         "Content-Type": "application/json",
         "Prefer": "return=representation"
       }
     };
-
+    console.log(accessToken);
     let baseAmount = data.baseOrderAmount;
+    const totalAmount = parseFloat(baseAmount) + parseFloat(data.selectedShippingOption.amount.value);
     let updatedAddress = data.updatedAddress;
     let arrayOfUpdates = [];
 
@@ -149,35 +150,18 @@ const onShippingChange = (data) => {
       })
     }
 
+    // var dat = JSON.stringify(arrayOfUpdates);
     
+    axios.patch(`https://api-m.paypal.com/v2/checkout/orders/${data.orderID}`, arrayOfUpdates, config)
+      .then((response) => {
+        console.log(response.data);
+        callback(response.data, undefined);
 
-    const totalAmount = parseFloat(baseAmount) + parseFloat(data.selected_shipping_option.amount.value);
-    return fetch(`https://api-m.paypal.com/v2/checkout/orders/${data.orderID}`, {
-      method: "PATCH",
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify(arrayOfUpdates)
-    })
-      .then((response) => response.json());
-
-
-    /*
-    axios.post(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`, data, config)
-      .then(function (response) {
-        // handle success
-        const data = response.data;
-        console.log("ppApiHelperV2.captureOrder");
-        console.log("CAPTURE:", data);
-        callback(data, undefined);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-        callback(undefined, error)
-      })
-      */
+      }).catch((err) => {
+        console.log(err);
+        callback(undefined, err);
+      });
+    
   });
 
 
