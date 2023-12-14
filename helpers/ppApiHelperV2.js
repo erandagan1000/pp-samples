@@ -127,13 +127,13 @@ const onShippingChange = (data, callback) => {
       value: { value: totalAmount.toString(), currency_code: "USD" },
     });
 
-    // if(updatedAddress) {
-    //   arrayOfUpdates.push({
-    //     op: "add",
-    //     path: "/transactions/0/item_list/shipping_address",
-    //     value: updatedAddress
-    //   })
-    // }
+    if(updatedAddress) {
+      arrayOfUpdates.push({
+        op: "add",
+        path: "/purchase_units/@reference_id=='b16b98ad-08b1-4f4c-83db-8f7ed4df6559'/shipping/address",
+        value: updatedAddress
+      })
+    }
 
   
   ppApiHelperV1.generateAccessToken((result, error) => {
