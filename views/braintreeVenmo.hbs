@@ -89,6 +89,7 @@
         })
       ]);
     }).then(function (results) {
+      
       var dataCollectorInstance = results[0];
       var venmoInstance = results[1];
 
@@ -112,6 +113,7 @@
       }
     });
   }
+  
   function displayVenmoButton(venmoInstance) {
      // Assumes that venmoButton is initially display: none.
      venmoButton.style.display = 'block';
@@ -140,7 +142,7 @@
 
     // Send the payment method nonce to your server, e.g. by injecting
     // it into your form as a hidden input.
-    console.log('Got a payment method nonce:', payload.nonce);
+    console.log('Got a payment method nonce:', payload);
     // Display the Venmo username in your checkout UI.
     console.log('Venmo user:', payload.details.username);
   }
@@ -160,8 +162,11 @@
     }, function (createErr, instance) {
       button.addEventListener('click', function () {
         instance.requestPaymentMethod(function (requestPaymentMethodErr, payload) {
+          if(requestPaymentMethodErr){
+            console.log("Err: ", requestPaymentMethodErr);
+          }
           // Submit payload.nonce to your server
-          console.log("send nonce to server");
+          console.log("send nonce to server", payload);
         });
       });
     });
