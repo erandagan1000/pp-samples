@@ -267,9 +267,11 @@ router.post('/vault-payment-method', (req, res, next) => {
       permit_multiple_payment_tokens: paymentSource == "card",  // false for paypal, true for card
       store_in_vault: "ON_SUCCESS",
       usage_type: "MERCHANT",
-      customer_type: "CONSUMER"
+      customer_type: "CONSUMER",
+      description: "Your payment is secured with PayPal's payment system. You can manage your payment tokens by logging into your PayPal account"
     }
   };
+  
 
   if (paymentSource == "paypal") {
     payment_source = {
