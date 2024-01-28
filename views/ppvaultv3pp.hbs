@@ -67,7 +67,8 @@
           window.paypalLoadScript({
             "client-id": clientId || cId,
             "data-user-id-token": globalUserIdToken,
-            "components": "buttons,hosted-fields"
+            "components": "buttons,hosted-fields",
+            "buyer-country": "US"
 
           }).then((pp) => {
             paypal = pp;

@@ -71,7 +71,7 @@ router.post('/clienttoken/generate/baid', (req, res, next) => {
 
   ppApiHelperV1.generateClientTokenWithBillingAgreementId(accessToken, baId, (data, error) => {
     if (error) {
-      res.status(500).send(error);
+      res.status(error.response.status).send(error.response.data.details[0].description);
       return;
     }
     res.status(200).send(data);

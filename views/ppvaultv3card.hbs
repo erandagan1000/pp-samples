@@ -208,7 +208,8 @@
           const { id } = await result.json();
           return id;
         },
-        onApprove: async (data) => {
+        onApprove: async (data) => {  //this is trigered automatically after order is succesfully created
+          debugger;
           console.log("onApprove Data: ", data);
           const { orderID } = data;
           return fetch('/ppapi/order/' + orderID + '/capture', {

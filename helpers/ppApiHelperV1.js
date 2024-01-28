@@ -9,7 +9,7 @@ const test = () => {
 
 const generateAccessToken = (callback) => {
 
-  // console.log(process.env.PP_API_CLIENT_ID);
+  console.log(process.env.PP_API_CLIENT_ID);
   const options = {
     auth: {
       username: process.env.PP_API_CLIENT_ID,
@@ -91,6 +91,7 @@ const generateClientTokenWithBillingAgreementId = (accessToken, baId, callback) 
     .catch(function (error) {
       // handle error
       console.log(error);
+      console.log("error: ", error.response.data.details[0].description);
       callback(undefined, error)
     })
 

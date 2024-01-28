@@ -15,8 +15,9 @@
   <div><a href="/">Home</a></div>
   <h1>{{title}}</h1>
   <h2>Note</h2>
-  <p>This example uses a hard coded Billing Agreement: B-2BG585865D559962H, in order to demo the returning user UX</p>
+  <p>This example uses a hard coded Billing Agreement: B-35C23357DH429874X, in order to demo the returning user UX</p>
   <p>A real merchant will generally get the BA as a property of the user profile</p>
+  <p><font color="red">Problem: id_token not retruned in response, cannot nitialize button with: data-user-id-token </font></p>
   <br><a href="https://developer.paypal.com/limited-release/pay-later-billing-agreements-sdk/returning-buyer/">
     Link to docs with BA (not working as of Jun-2023</a>
 
@@ -82,6 +83,7 @@
 
 
             console.log("resolved- id_token is:", data);
+            console.log("globalClientId:", globalClientId);
 
             var script = document.createElement('script');
             var scriptSrc = `https://www.paypal.com/sdk/js?client-id=${globalClientId}`;
@@ -129,9 +131,9 @@
               'Authorization': `Bearer ${accesstoken}`
             },
             data: {
-              baId: "B-2BG585865D559962H",  //for RT - client token with saved BA - not working as of jun-30-2023
-              customerId: "customer_9999"
-            }, // for Vault V3 , cusomter created in this page: http://localhost:3000/ppvaultv3
+              baId: "B-35C23357DH429874X",  //for RT - client token with saved BA - not working as of jun-30-2023
+              customerId: "customer_9999"  // for Vault V3 , cusomter created in this page: http://localhost:3000/ppvaultv3
+            }, 
             success: function (data, status, xhr) {
 
               console.log(data.client_token);
