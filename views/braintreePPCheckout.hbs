@@ -124,9 +124,12 @@
         var ppJsSdkOptions = {
           currency: selectedCurrency,
           intent: authOrCapture,
+          "buyer-country": "US",
           //// options object here: https://braintree.github.io/braintree-web/current/PayPalCheckout.html#loadPayPalSDK
-          // dataAttributes: {}
-          // "components": 'buttons,messages', //optional
+          dataAttributes: {
+            
+          },
+          "components": 'buttons,messages', //optional
         };
 
         return paypalCheckoutInstance.loadPayPalSDK(ppJsSdkOptions);
