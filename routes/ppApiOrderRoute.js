@@ -7,6 +7,8 @@ const ppApiHelperV2 = require('../helpers/ppApiHelperV2')
 
 
 // route: /ppapi/order
+
+
 // create order
 router.post('/', (req, res, next) => {
 
@@ -72,11 +74,11 @@ router.post('/', (req, res, next) => {
 });
 
 router.post('/shipping', (req, res, next) => {
- 
+
   const guid = ppApiHelperV2.uuidv4();
   let payload1 = {
     purchase_units: [{
-      reference_id:  guid,
+      reference_id: guid,
       amount: {
         value: "15.00",
         currency_code: "USD"
@@ -89,8 +91,8 @@ router.post('/shipping', (req, res, next) => {
             type: "SHIPPING",
             selected: true,
             amount: {
-                value: "3.00",
-                currency_code: "USD"
+              value: "3.00",
+              currency_code: "USD"
             }
           },
           {
@@ -99,8 +101,8 @@ router.post('/shipping', (req, res, next) => {
             type: "PICKUP",
             selected: false,
             amount: {
-                value: "0.00",
-                currency_code: "USD"
+              value: "0.00",
+              currency_code: "USD"
             }
           }
         ]
@@ -271,7 +273,7 @@ router.post('/vault-payment-method', (req, res, next) => {
       description: "Your payment is secured with PayPal's payment system. You can manage your payment tokens by logging into your PayPal account"
     }
   };
-  
+
 
   if (paymentSource == "paypal") {
     payment_source = {
@@ -339,7 +341,7 @@ router.post('/vault-payment-method', (req, res, next) => {
   });
 });
 
-// create order ofr returning user Vault V3.
+// create order for returning user Vault v3 (with retrun UX implemeted via JSSDK)
 router.post('/vault-checkout', (req, res, next) => {
 
   let paymentSource = req.body.source;
@@ -418,6 +420,104 @@ router.post('/vault-checkout', (req, res, next) => {
 
   });
 });
+
+// create subsequent payment using Vault order for returning user Vault v3 (with retrun UX implemeted via JSSDK)
+
+router.post('/vault/setup-tokens', (req, res, next) => {
+
+  const guid = ppApiHelperV2.uuidv4();
+  let payload = {
+    "payment_source": {
+      "paypal": {
+        "usage_type": "MERCHANT",
+        "experience_context": {
+          "return_url": "http://localhost:3000/ppvaultv3pp",
+          "cancel_url": "http://localhost:3000/ppvaultv3pp"
+        }
+      }
+    }
+  };
+
+  ppApiHelperV2.vaultSetupTokens(guid, payload, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      console.log(error.response.data.details)
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
+
+router.post('/vault/create-payment-token', (req, res, next) => {
+
+  vaultSetupToken = req.body.vaultSetupToken;
+
+  var payload = {
+    payment_source: {
+      token: {
+        id: vaultSetupToken,
+        type: "SETUP_TOKEN"
+      }
+    }
+  };
+
+  const guid = ppApiHelperV2.uuidv4();
+
+  ppApiHelperV2.vaultCreatePaymentToken(guid, payload, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      console.log(error.response.data.details)
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
+
+router.post('/vault/process-payment-mit', (req, res, next) => {
+
+  let vault_id = req.body.vault_id;
+  let paymentSource = req.body.source;
+
+  let payment_source = undefined;
+
+  if (paymentSource == "paypal") {
+    payment_source = { paypal: { vault_id } };
+  }
+
+  if (paymentSource == "card") {
+    payment_source = { card: { vault_id } };
+  }
+
+  let defaultPayload = {
+    intent: "CAPTURE",
+    purchase_units: [
+      {
+        amount:
+          { currency_code: "USD", value: "115.00" }
+      }],
+    payment_source
+  };
+
+  var payload = defaultPayload;
+
+  const guid = ppApiHelperV2.uuidv4();
+
+  ppApiHelperV2.createOrder(guid, payload, (data, error) => {
+    if (error) {
+      res.status(500).send(error);
+      console.log(error.response.data.details)
+      return;
+    }
+    res.status(200).send(data);
+    return;
+
+  });
+});
+
 
 // order details
 router.post('/:id', (req, res, next) => {

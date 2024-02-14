@@ -71,6 +71,10 @@ router.get('/ccgnosdk', function(req, res, next) {
 router.get('/ppsc', function(req, res, next) {
   res.render('ppsc', { title: 'PP Smart Payment Button - Standard Checkout' });
 });
+router.get('/ppif', function(req, res, next) {
+  res.render('ppWithIframe', { title: 'PP Smart Payment Button - Standard Checkout in IFRAME' });
+});
+
 router.get('/ppscmsg', function(req, res, next) {
   res.render('ppscMessaging', { title: 'PP Messaging' });
 });

@@ -103,7 +103,8 @@ router.get('/ppclientid', (req, res, next) => {
 
   try {
     let clientId = process.env.PP_API_CLIENT_ID;
-    res.status(200).send({clientId});
+    let merchantId = process.env.PP_MERCHANT_ID;
+    res.status(200).send({clientId, merchantId});
     return;
   }
   catch (e) {

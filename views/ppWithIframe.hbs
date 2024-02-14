@@ -1,0 +1,21 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<hr>
+
+<p>
+<script
+  src="https://www.paypal.com/sdk/js?client-id=AaLfG87rC4XN5QisWLhUw27uFUE0KypDXHNySFuya-jNbzKIE4s4a6Yu2q8ylFhMPgw3KflYRGc8Uhjz&enable-funding=venmo&buyer-country=US">
+  </script>
+  <br>
+<div id="screen-width">&nbsp;</div>
+<div id="inner-width">&nbsp;</div>
+<iframe width="496px" height="700px" style="border-style: solid;border-width:3px" src="https://4479-94-188-131-83.ngrok-free.app/ppvenmo"></iframe>
+<script>
+  console.log("window.screen.width: ", window.screen.width);
+  console.log("window.innerWidth: ", window.innerWidth);
+  var sw = document.querySelector("#screen-width");
+  sw.innerHTML = `screen width: ${window.screen.width}`;
+  var iw = document.querySelector("#inner-width");
+  iw.innerHTML = `inner width: ${window.innerWidth}`;
+</script>
+</p>

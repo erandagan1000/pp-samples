@@ -1,7 +1,7 @@
 <div><a href="/">Home</a></div>
 <h1>{{title}}</h1>
 <div class="loading" id="loading-button">Loading paypal button...</div>
-<div id="paypal-button-container-P-7E4700406U868454GMIW6SUY"></div>
+<div id="paypal-button-container"></div>
 <div id="paypal-button-container"></div>
 <div id="paypal-result-container"></div>
 
@@ -21,7 +21,7 @@
     createSubscription: function (data, actions) {
       return actions.subscription.create({
         /* Creates the subscription */
-        plan_id: 'P-7E4700406U868454GMIW6SUY'
+        plan_id: 'P-6NW106568F536160NMXFTUUQ' //'P-7E4700406U868454GMIW6SUY'
       });
     },
     onApprove: function (data, actions) {
@@ -30,7 +30,7 @@
       $('#paypal-result-container').text(resultJson);
     }
 
-  }).render('#paypal-button-container-P-7E4700406U868454GMIW6SUY').then(function () {
+  }).render('#paypal-button-container').then(function () {
     $("#loading-button").hide();
   }); // Renders the PayPal button
 </script>

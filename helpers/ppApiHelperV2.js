@@ -239,6 +239,72 @@ const getSavedPaymentMethodsForCustomer = (customerId, callback) => {
 
 }
 
+const vaultSetupTokens = (guid, data, callback) => {
+
+  ppApiHelperV1.generateAccessToken((result, error) => {
+
+    if (error) {
+      callback(undefined, error);
+    }
+    const accessToken = result.access_token;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "PayPal-Request-Id": guid,
+        "Prefer": "return=representation"
+      }
+    };
+
+    axios.post('https://api-m.sandbox.paypal.com/v3/vault/setup-tokens', data, config)
+      .then(function (response) {
+        // handle success
+        const data = response.data;
+        console.log("ppApiHelperV2.setupTokens");
+        console.log("DATA:", data);
+        callback(data, undefined);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        callback(undefined, error)
+      })
+  });
+}
+
+const vaultCreatePaymentToken = (guid, data, callback) => {
+
+  ppApiHelperV1.generateAccessToken((result, error) => {
+
+    if (error) {
+      callback(undefined, error);
+    }
+    const accessToken = result.access_token;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "PayPal-Request-Id": guid,
+        "Prefer": "return=representation"
+      }
+    };
+
+    axios.post('https://api-m.sandbox.paypal.com/v3/vault/payment-tokens', data, config)
+      .then(function (response) {
+        // handle success
+        const data = response.data;
+        console.log("ppApiHelperV2.setupTokens");
+        console.log("DATA:", data);
+        callback(data, undefined);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        callback(undefined, error)
+      })
+  });
+}
+
 module.exports = {
   test,
   createOrder,
@@ -247,5 +313,7 @@ module.exports = {
   uuidv4,
   onShippingChange,
   createPaymentWithBa,
-  getSavedPaymentMethodsForCustomer
+  getSavedPaymentMethodsForCustomer,
+  vaultSetupTokens,
+  vaultCreatePaymentToken
 } ;

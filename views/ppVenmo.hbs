@@ -1,13 +1,25 @@
 <div><a href="/">Home</a></div>
 <h1>{{title}}</h1>
 <div class="loading" id="loading-button">Loading paypal button...</div>
-<div style="margin:0px 2% 40px 2%;padding:40px;wdth:92%;max-width:600px;box-sizing:border-box;background:aqua;border-radius:10px;float:left">
-<div id="paypal-button-container" style="padding:4px;max-width:275px;width:96%"></div>
+<div id="ifr-screen-width">&nbsp;</div>
+<div id="ifr-inner-width">&nbsp;</div>
+<div style="background:aqua;border-radius:10px;">
+<div id="paypal-button-container" ></div>
 </div>
 
+<script>
+   console.log("iframe - window.screen.width: ", window.screen.width);
+  console.log("iframe - window.innerWidth: ", window.innerWidth);
+  
+  var ifsw = document.querySelector("#ifr-screen-width");
+  ifsw.innerHTML = `iframe - screen width: ${window.screen.width}`;
+  
+  var ifw = document.querySelector("#ifr-inner-width");
+  ifw.innerHTML = `iframe - inner width: ${window.innerWidth}`;
+</script>
+
+
 <div id="paypal-result-container"></div>
-{{!-- PP Rest API simple --}}
-{{!-- client-id=AeGY.. #App: MerchantApp | Account: eran.m.il@merchant.com (BusinessPro) --}}
 <script
   src="https://www.paypal.com/sdk/js?client-id=AaLfG87rC4XN5QisWLhUw27uFUE0KypDXHNySFuya-jNbzKIE4s4a6Yu2q8ylFhMPgw3KflYRGc8Uhjz&enable-funding=venmo&buyer-country=US">
   </script>
@@ -27,4 +39,7 @@
   }).render('#paypal-button-container').then(function () {
     $("#loading-button").hide();
   });
+
+ 
+
 </script>

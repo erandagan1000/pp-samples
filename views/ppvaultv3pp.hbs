@@ -14,28 +14,44 @@
   <h1>{{title}}</h1>
 
   <br>
-  
-  
-<div class="row mt-2">
-    <div class="col-12">
-      <div id="payment-view">
-    <!-- Buttons container -->
-    <div id="paypal-button-container"></div>
-
-  </div>
-
-    </div>
-    </div>
   <div class="row mt-2">
-    <div class="col-12" id="return-ux-div"><button class="btn btn-primary" onclick="createButton(true)" style="width:fit-content">RELOAD FOR RETURNING USER EXP.
-      </button></div>
-    <div class="col-12" >
-      <div class="label label-primary" id="div-vaulted-customer-id" style="margin-top:10px;background-color:rgb(210, 211, 231);width:298px">Place Holder for saved customer</div>
+    <div class="col-6 text-center">
+      <h3>SAVE DURING PURCHASE</h3>
     </div>
-    
-    
-    
+    <div class="col-6 text-center">
+      <h3>SAVE FOR LATER PURCHASE</h3>
+    </div>
   </div>
+  <div class="row mt-2">
+    <div class="col-6">
+      <div id="payment-view">
+        <!-- Buttons container -->
+        <div id="paypal-button-container"></div>
+
+      </div>
+
+    </div>
+    <div class="col-6">
+      <div id="payment-view-save-for-later">
+        <!-- Buttons container -->
+        <div id="paypal-button-container-save-for-later"></div>
+      </div>
+
+
+
+    </div>
+  </div>
+  <div class="row mt-2">
+    <div class="col-6" id="return-ux-div"><button class="btn btn-primary" onclick="createButton(true)"
+        style="width:fit-content">RELOAD FOR RETURNING USER EXP.
+      </button></div>
+    <div class="col-6">
+      <div class="label label-primary" id="div-vaulted-customer-id"
+        style="margin-top:10px;background-color:rgb(210, 211, 231);width:298px">Place Holder for saved customer</div>
+    </div>
+  </div>
+
+
 
   <div id="payment-result">&nbsp;</div>
 
@@ -51,10 +67,11 @@
     let paypal;
     let vaultedCustomerId = "";
     let cId = "";
+    let mId = "";
     document.querySelector("#return-ux-div").style = 'display: none';
 
 
-    function createButton(isRetruning, clientId) {
+    function createButton(isRetruning, clientId, merchantId) {
       try {
 
         let myDataClientPromise;
@@ -71,14 +88,16 @@
             "client-id": clientId || cId,
             "data-user-id-token": globalUserIdToken,
             "components": "buttons,hosted-fields",
-            "buyer-country": "US"
+            "buyer-country": "US",
+            "merchant-id": merchantId || mId
 
           }).then((pp) => {
             paypal = pp;
             if (paypal) {
               try {
 
-                loadUiControls(isRetruning);
+                loadUiControlsSaveDuringPurchase(isRetruning);
+                loadUiControlsSaveForLaterPurchase();
 
               } catch (error) {
                 console.error("failed to render the PayPal Buttons", error);
@@ -177,7 +196,7 @@
       });
     }
 
-    function loadUiControls(isRetruning) {
+    function loadUiControlsSaveDuringPurchase(isRetruning) {
 
       // Displays PayPal buttons
       paypal.Buttons({
@@ -223,9 +242,9 @@
             document.querySelector("#payment-result").innerHTML = `<H3><font color='green'>Payment Processed Successfully By: ${resJson.payer.email_address}</font></H3>`;
             document.querySelector("#payment-view").style = 'display: none';
             document.querySelector("#payment-result").style = 'display: block';
-             
+
             document.querySelector("#return-ux-div").style = 'display: block';
-            
+
 
           });
 
@@ -238,6 +257,81 @@
 
     }
 
+    function loadUiControlsSaveForLaterPurchase(isRetruning) {
+
+      // Displays PayPal buttons
+      paypal.Buttons({
+        style: {
+          layout: 'vertical'
+        },
+        createVaultSetupToken: function () {
+          // Call your server API to generate a setup token
+          // and return it here as a string
+          return fetch("/ppapi/order/vault/setup-tokens", {
+            method: 'post',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+
+          }).then(function (res) {
+
+            console.log("RESOLVED1: createVaultSetupToken: ", res);
+            return res.json();
+          }).then(function (setupTokenData) {
+
+            console.log("RESOLVED2: createOrder: ", setupTokenData);
+            return setupTokenData.id;
+          });
+
+        },
+        onApprove: function (data) {
+          console.log("onApproveData: ", data);
+          return fetch("ppapi/order/vault/create-payment-token",
+            {
+              method: "post",
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ vaultSetupToken: data.vaultSetupToken })
+            }).then(function (result) {
+              return result.json();
+            }).then(function (resJson) {
+
+              console.log("resJson: ", resJson);
+              if (!isRetruning) {
+                vaultedCustomerId = resJson.customer.id;
+                // vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.id; 
+                localStorage.setItem('vaultedCustomerId', vaultedCustomerId);
+              }
+
+              document.querySelector("#div-vaulted-customer-id").innerHTML = `<H2 ><b>Saved CsutomerId: </b>${vaultedCustomerId}</H2>`;
+              // $("#payment-result").jsonViewer(resJson);
+              document.querySelector("#payment-result").innerHTML = `<H3><font color='green'>Payment Processed Successfully By: ${resJson.payment_source.paypal.email_address}</font></H3>`;
+              document.querySelector("#payment-view").style = 'display: none';
+              document.querySelector("#payment-result").style = 'display: block';
+
+              document.querySelector("#return-ux-div").style = 'display: block';
+
+
+            });
+
+
+        },
+        onError: (error) => {
+          console.log("An error occurred: ", error)
+        }
+      }).render("#paypal-button-container-save-for-later").then(() => {
+        console.log("render executed");
+        $("#loading-button").hide();
+        document.querySelector("#payment-view").style = 'display: block';
+      });
+
+    }
+
+
+    /************START*****************/
     fetch("/ppapi/auth/ppclientid",
       {
         method: "GET",
@@ -245,12 +339,13 @@
           'Content-Type': 'application/json',
         }
       }).then(async (data) => {
-        debugger;
 
-        const { clientId } = await data.json();
+        const { clientId, merchantId } = await data.json();
         cId = clientId
-        console.log("****cId**** " ,cId);
-        createButton(false, cId);
+        mId = merchantId;
+        console.log("****cId**** ", cId);
+        console.log("****mId**** ", mId);
+        createButton(false, cId, mId);
 
       });
   </script>
