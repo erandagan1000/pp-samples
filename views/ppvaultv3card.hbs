@@ -73,7 +73,7 @@
 
     function createButton(isRetruning, clientId) {
       try {
-        debugger;
+        
         console.log("** clientId ***", clientId);
         $("#loading-button").show();
         $("#payment-result").hide();
@@ -209,7 +209,7 @@
           return id;
         },
         onApprove: async (data) => {  //this is trigered automatically after order is succesfully created
-          debugger;
+          
           console.log("onApprove Data: ", data);
           const { orderID } = data;
           return fetch('/ppapi/order/' + orderID + '/capture', {
@@ -272,7 +272,7 @@
           'Content-Type': 'application/json',
         }
       }).then(async (data) => {
-        debugger;
+        
         const { clientId } = await data.json();
         console.log(clientId);
         createButton(false, clientId);

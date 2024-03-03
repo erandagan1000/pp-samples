@@ -15,6 +15,7 @@
 
   <br>
   <div class="row mt-2">
+    {{!-- titles --}}
     <div class="col-6 text-center">
       <h3>SAVE DURING PURCHASE</h3>
     </div>
@@ -22,6 +23,7 @@
       <h3>SAVE FOR LATER PURCHASE</h3>
     </div>
   </div>
+  {{!-- buttons --}}
   <div class="row mt-2">
     <div class="col-6">
       <div id="payment-view">
@@ -41,15 +43,27 @@
 
     </div>
   </div>
+  {{!-- labels --}}
   <div class="row mt-2">
-    <div class="col-6" id="return-ux-div"><button class="btn btn-primary" onclick="createButton(true)"
-        style="width:fit-content">RELOAD FOR RETURNING USER EXP.
-      </button></div>
+    
     <div class="col-6">
       <div class="label label-primary" id="div-vaulted-customer-id"
-        style="margin-top:10px;background-color:rgb(210, 211, 231);width:298px">Place Holder for saved customer</div>
+        style="margin-top:10px;background-color:rgb(210, 211, 231);width:600px">Place Holder for saved customer</div>
+      <div class="label label-primary" id="div-vaulted-vault-id"
+        style="margin-top:10px;background-color:rgb(210, 211, 231);width:600px">Place Holder for saved customer vault id
+      </div>
     </div>
+
   </div>
+  {{!-- returning UX --}}
+  <div class="row mt-2" id="return-ux-div">
+    <div class="col-6" ><button class="btn btn-primary" onclick="createButton(true)"
+        style="width:fit-content">RELOAD FOR RETURNING USER EXP.
+      </button>
+    </div>
+
+  </div>
+
 
 
 
@@ -65,7 +79,7 @@
     let orderId;
     var globalUserIdToken = "";
     let paypal;
-    let vaultedCustomerId = "";
+    let vaultedCustomerId = "", vaultedCustomerVaultId = "";
     let cId = "";
     let mId = "";
     document.querySelector("#return-ux-div").style = 'display: none';
@@ -233,11 +247,12 @@
             console.log("resJson: ", resJson);
             if (!isRetruning) {
               vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.customer.id;
-              // vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.id; 
+              vaultedCustomerVaultId = resJson.payment_source.paypal.attributes.vault.id;
               localStorage.setItem('vaultedCustomerId', vaultedCustomerId);
             }
 
             document.querySelector("#div-vaulted-customer-id").innerHTML = `<H2 ><b>Saved CsutomerId: </b>${vaultedCustomerId}</H2>`;
+            document.querySelector("#div-vaulted-vault-id").innerHTML = `<H2 ><b>Saved VaultId (to be used in subsequent payment): </b>${vaultedCustomerVaultId}</H2>`;
             // $("#payment-result").jsonViewer(resJson);
             document.querySelector("#payment-result").innerHTML = `<H3><font color='green'>Payment Processed Successfully By: ${resJson.payer.email_address}</font></H3>`;
             document.querySelector("#payment-view").style = 'display: none';
@@ -302,11 +317,12 @@
               console.log("resJson: ", resJson);
               if (!isRetruning) {
                 vaultedCustomerId = resJson.customer.id;
-                // vaultedCustomerId = resJson.payment_source.paypal.attributes.vault.id; 
+                vaultedCustomerVaultId = resJson.id;
                 localStorage.setItem('vaultedCustomerId', vaultedCustomerId);
               }
 
               document.querySelector("#div-vaulted-customer-id").innerHTML = `<H2 ><b>Saved CsutomerId: </b>${vaultedCustomerId}</H2>`;
+              document.querySelector("#div-vaulted-vault-id").innerHTML = `<H2 ><b>Saved VaultId (to be used in subsequent payment): </b>${vaultedCustomerVaultId}</H2>`;
               // $("#payment-result").jsonViewer(resJson);
               document.querySelector("#payment-result").innerHTML = `<H3><font color='green'>Payment Processed Successfully By: ${resJson.payment_source.paypal.email_address}</font></H3>`;
               document.querySelector("#payment-view").style = 'display: none';

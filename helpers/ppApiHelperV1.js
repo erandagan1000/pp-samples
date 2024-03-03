@@ -7,7 +7,7 @@ const test = () => {
 
 // #region Auth Functions 
 
-const generateAccessToken = (callback) => {
+const generateAccessToken = (callback, guid) => {
 
   console.log(process.env.PP_API_CLIENT_ID);
   const options = {
@@ -21,6 +21,7 @@ const generateAccessToken = (callback) => {
   // added according to Vault V3 doc
   params.append('response_type', 'id_token');
   // params.append('Content-Type', 'application/x-www-form-urlencoded');
+  params.append('PayPal-Request-Id', guid);
   // console.log(options);
 
   // generate access token, givven merchant credenials

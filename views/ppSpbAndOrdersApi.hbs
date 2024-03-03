@@ -15,7 +15,7 @@
   <li>Click to start PP InContext Flow
     <div id="paypal-button-container"></div>
   </li>
-  
+
   <div id="paypal-result-container"></div>
 
 </ol>
@@ -34,45 +34,55 @@
 <script>
   var amountElement = $("#input-amount");
   var amount = amountElement.val();
-  var orderId ='';
+  var orderId = '';
   amountElement.change(function () {
     amount = amountElement.val();
     console.log("amount: ", amount);
   });
 
   $("#loading-button").show();
-  
+
 
   /*****************For the manual crate order***********/
   var orderData = {
-      intent: "CAPTURE", purchase_units: [
-        {
-          reference_id: uuidv4(),
-          amount: { currency_code: "USD", value: amount }
-        }]
-    };
+    intent: "CAPTURE", purchase_units: [
+      {
+        reference_id: uuidv4(),
+        amount: { currency_code: "USD", value: amount }
+      }]
+  };
 
-  
+
   var confirmButton = document.querySelector('#confirm-order');
   confirmButton.addEventListener('click', function () {
     console.log("CONFIRM ORDER");
     createOrder();
-      
+
   });
 
 
   paypal.Buttons({
-    
+
     createOrder: function (data, actions) {
       // dont create order. just return orderId
-      console.log("ORDERID: ", data);
+      // console.log("data: ", data);
       console.log("ORDERID: ", orderId);
       return orderId;
     },
 
     // Finalize the transaction after payer approval
+
     onApprove: function (data, actions) {
-      return actions.order.capture().then(function (orderData) {
+      console.log("data: ", data);
+      console.log("orderId: ", orderId);
+      return fetch('/ppapi/order/' + orderId + '/capture', {
+        method: 'post'
+      }).then(function (result) {
+        return result.json();
+
+      }).then(function (orderData) {
+
+        console.log("resJson: ", orderData);
         // Successful capture! For dev/demo purposes:
         let resultJson = JSON.stringify(orderData, null, 2);
         console.log('Capture result', orderData, resultJson);
@@ -84,17 +94,22 @@
         // element.innerHTML = '';
         // element.innerHTML = '<h3>Thank you for your payment!</h3>';
         // Or go to another URL:  actions.redirect('thank_you.html');
+
+
       }).catch(function (err) {
         console.log(err);
         $('#paypal-result-container').text(err);
-      });
+      });;
+
     }
+
+
   }).render('#paypal-button-container').then(function () {
     $("#loading-button").hide();
   });
-  
+
   function createOrder() {
-    
+
     $.ajax('/ppapi/order', {
       type: 'POST',
       headers: {
@@ -105,7 +120,7 @@
       success: function (createOrderResData, status, xhr) {
         console.log(createOrderResData);
         $("#create-order-response").html(JSON.stringify(createOrderResData));
-       
+
         orderId = createOrderResData.id;
         console.log("orderId: ", orderId);
 

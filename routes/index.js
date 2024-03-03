@@ -154,6 +154,10 @@ router.get('/ppvaultv3apay', function(req, res, next) {
   res.render('ppvaultv3apay', { title: 'PP Vault V3 - Apple Pay' });
 });
 
+router.get('/pplwpp', function(req, res, next) {
+  res.render('pplwpp', { title: 'PP Login With PayPal' });
+});
+
 // #endregion
 
 // ********************  PayPal NVP ************************

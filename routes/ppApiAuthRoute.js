@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ppApiHelperV1 = require('../helpers/ppApiHelperV1')
-
+const ppApiHelperV2 = require('../helpers/ppApiHelperV2')
 // - /ppapi/auth
 
 // test
@@ -24,6 +24,7 @@ router.get('/', (req, res, next) => {
 router.post('/accesstoken/generate', (req, res, next) => {
 
   try {
+    const guid = ppApiHelperV2.uuidv4();
     ppApiHelperV1.generateAccessToken((data, error) => {
       if (error) {
         res.status(500).send(error);
@@ -34,7 +35,7 @@ router.post('/accesstoken/generate', (req, res, next) => {
       res.status(200).send(data);
       return;
 
-    });
+    }, guid );
 
 
   }

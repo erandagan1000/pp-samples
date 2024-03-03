@@ -1,0 +1,79 @@
+<div><a href="/">Home</a></div>
+<h1>{{title}}</h1>
+<div class="loading" id="loading-button">Loading paypal button...</div>
+<div id="paypal-login-button-container"></div>
+
+
+<div id="paypal-result-container"></div>
+
+<span id=''></span>
+
+<script src='https://www.paypalobjects.com/js/external/api.js'></script>
+
+
+<script>
+  $("#loading-button").show();
+
+  var globalClientToken = "";
+
+  try {
+
+    {
+      {
+        !-- const myDataClientPromise = new Promise(generateDataClientToken);
+        myDataClientPromise.then((data) => {
+          console.log("reolved client token:", data);
+          loadUiControls();
+
+        }); --}
+    }
+  }
+
+  catch (error) {
+    console.error("failed to load the PayPal JS SDK script", error);
+  }
+
+  function generateDataClientToken(resolve, reject) {
+
+    $.ajax('ppapi/auth/accesstoken/generate', {
+      type: 'POST',  // http method
+      data: {},  // data to submit
+      success: function (data, status, xhr) {
+        console.log(data);
+        const accesstoken = data.access_token;
+        loadButtons();
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log(errorMessage);
+        reject(errorMessage);
+      }
+    });
+  }
+
+  function loadButtons() {
+
+    paypal.use(['login'], function (login) {
+      login.render({
+        "appid": "AaLfG87rC4XN5QisWLhUw27uFUE0KypDXHNySFuya-jNbzKIE4s4a6Yu2q8ylFhMPgw3KflYRGc8Uhjz",
+        "authend": "sandbox",
+        "containerid": "paypal-login-button-container",
+        "responseType": "code",
+        "locale": "en-us",
+        "buttonType": "LWP",
+        "buttonShape": "rect",
+        "buttonSize": "lg",
+        "fullPage": "true",
+        "returnurl": "https://example.com"
+      });
+      $("#loading-button").hide();
+    });
+
+
+  }
+
+  loadButtons();
+
+
+
+
+</script>
