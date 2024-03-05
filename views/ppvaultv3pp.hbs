@@ -180,8 +180,8 @@
           vaultedCustomerId = vaultedCustomerId || localStorage.getItem('vaultedCustomerId');
 
           if (!vaultedCustomerId) {
-            console.log("Using Default CustomerId");
-            vaultedCustomerId = "qoeThVmauU";
+            console.log("Missing vaultedCustomerId");
+            // vaultedCustomerId = "qoeThVmauU";
           }
           $.ajax('/ppapi/auth/clienttoken/generate/customerid', {
             type: 'POST',
