@@ -6,7 +6,8 @@ const router = express.Router();
 const ppApiHelperV2 = require('../helpers/ppApiHelperV2')
 
 
-// route: /ppapi/order
+// route: /ppapi/orders
+
 
 
 // create order
@@ -89,7 +90,7 @@ router.post('/shipping', (req, res, next) => {
             id: "SHIP_123",
             label: "Free Shipping",
             type: "SHIPPING",
-            selected: true,
+            selected: false,
             amount: {
               value: "3.00",
               currency_code: "USD"

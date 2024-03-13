@@ -21,11 +21,21 @@
       },
       shipping: {
         options: [
+        {
+            id: "SHIP_000",
+            label: "Select Shipping Method",
+            type: "SHIPPING",
+            selected: true,
+            amount: {
+              value: "0.00",
+              currency_code: "USD"
+            }
+          },
           {
             id: "SHIP_123",
             label: "Domestic Shipping",
             type: "SHIPPING",
-            selected: true,
+            selected: false,
             amount: {
               value: "3.00",
               currency_code: "USD"
@@ -75,7 +85,7 @@
         purchase_units
 
       };
-      
+
       // using payments v1
 
       let paymentDataV1 = {
@@ -115,7 +125,9 @@
     },
 
     // how to change the total price based on different shipping options and patch the order with updated amount based on selected shipping method
+    /*DEPRECARTED
     onShippingChange: function (data, actions) {
+      
       
       console.log(data);
       console.log("SELECTED_OPTION", data.selected_shipping_option); // data.selected_shipping_option contains the selected shipping option
@@ -178,7 +190,111 @@
           })
         });
       }
+    },
+*/
+    /*NEW VERSION*/
+    onShippingOptionsChange: function (data, actions) {
+      console.log("SELECTED_OPTION", data.selectedShippingOption); // data.selectedShippingOption contains the selected shipping option
+      // NOTE: data.selected_shipping_option_id contains the selected shipping ID
+      // Here you can also check the data.shipping_address (reruned from PP review screen) if it is address your business support shipping to.
+      var shippingContainer = document.querySelector("#paypal-shipping-container");
+      shippingContainer.innerHTML = `<p><b>Shipping address:</b> ${JSON.stringify(data.shippingAddress)}</p><p><b>Selected Shipping Method:</b> ${JSON.stringify(data.selectedShippingOption)}</p>`
 
+      let payload = {
+        orderID: data.orderID,
+        selectedShippingOption: data.selectedShippingOption,
+        baseOrderAmount,
+        updatedAddress: data.shippingAddress
+      };
+      if (isOrdersV2) {
+
+        return fetch("/ppapi/order", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload)
+        });
+
+
+      }
+      else {  //payment v1
+
+        // option2:  PATCH the order on the merchant Server - to force using payments v1
+
+        return fetch("/ppapi/payment/update", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderID: data.orderID,
+            selectedShippingOption: data.selectedShippingOption,
+            baseOrderAmount,
+            updatedAddress: {
+              recipient_name: "Ifeanyi Ezenagu",
+              phone: "+12404443411",
+              line1: "12809 RICKER RD",
+              city: "UPPER MARLBORO",
+              country_code: "US",
+              postal_code: "20772",
+              state: "MD"
+            }
+          })
+        });
+      }
+
+    },
+    onShippingAddressChange: function (data, actions) {
+      console.log("SELECTED_ADDRESS", data.shippingAddress); // data.selectedShippingOption contains the selected shipping option
+      // NOTE: data.selected_shipping_option_id contains the selected shipping ID
+      // Here you can also check the data.shipping_address (reruned from PP review screen) if it is address your business support shipping to.
+      var shippingContainer = document.querySelector("#paypal-shipping-container");
+      shippingContainer.innerHTML = `<p><b>Shipping address:</b> ${JSON.stringify(data.shippingAddress)}</p><p><b>Selected Shipping Method:</b> ${JSON.stringify(data.selectedShippingOption)}</p>`
+
+      let payload = {
+        orderID: data.orderID,
+        selectedShippingOption: data.selectedShippingOption,
+        baseOrderAmount,
+        updatedAddress: data.shippingAddress
+      };
+      if (isOrdersV2) {
+
+        return fetch("/ppapi/order", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload)
+        });
+
+
+      }
+      else {  //payment v1
+
+        // option2:  PATCH the order on the merchant Server - to force using payments v1
+
+        return fetch("/ppapi/payment/update", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderID: data.orderID,
+            selectedShippingOption: data.selectedShippingOption,
+            baseOrderAmount,
+            updatedAddress: {
+              recipient_name: "Ifeanyi Ezenagu",
+              phone: "+12404443411",
+              line1: "12809 RICKER RD",
+              city: "UPPER MARLBORO",
+              country_code: "US",
+              postal_code: "20772",
+              state: "MD"
+            }
+          })
+        });
+      }
 
     },
 

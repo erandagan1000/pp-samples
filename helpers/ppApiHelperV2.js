@@ -117,8 +117,8 @@ const onShippingChange = (data, callback) => {
 
   console.log(data);
   let baseAmount = data.baseOrderAmount;
-    const totalAmount = parseFloat(baseAmount) + parseFloat(data.selectedShippingOption.amount.value);
-    let updatedAddress = data.updatedAddress;
+    const totalAmount = parseFloat(baseAmount) + parseFloat(data.selectedShippingOption?.amount.value || 0);
+    let updatedAddress = data.updatedAddress ? {...data.updatedAddress, country_code: data.updatedAddress.countryCode}: undefined;
     let arrayOfUpdates = [];
 
     arrayOfUpdates.push({
