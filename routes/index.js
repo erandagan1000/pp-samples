@@ -38,6 +38,9 @@ router.get('/btlpm', function(req, res, next) {
 router.get('/btdihf', function(req, res, next) {
   res.render('braintreeDropinAndHostedFields', { title: 'BrainTree Dropin + Hosted Fields' });
 });
+router.get('/btdi', function(req, res, next) {
+  res.render('braintreeDropin', { title: 'BrainTree Dropin - Payment Page Example' });
+});
 router.get('/bthfcvvon', function(req, res, next) {
   res.render('braintreeHostedFieldsCvvOnlyNonce', { title: 'BrainTree Hosted Fields CVV-Only Nonce' });
 });

@@ -247,8 +247,16 @@
     },
     onShippingAddressChange: function (data, actions) {
       console.log("SELECTED_ADDRESS", data.shippingAddress); // data.selectedShippingOption contains the selected shipping option
-      // NOTE: data.selected_shipping_option_id contains the selected shipping ID
       // Here you can also check the data.shipping_address (reruned from PP review screen) if it is address your business support shipping to.
+      if(data.shippingAddress.state=="IL") {
+       var myWindow = window.open("", "Error","width=330,height=200,location=no,left=600,top=500,menubar=no,resizeable=no,toolbar=no,titlebar=no");
+       myWindow.document.write("<p>we do not ship to: " + data.shippingAddress.state+"</p>");
+       // alert("we do not ship to " + data.shippingAddress.state);
+        console.log("data: ", data);
+        console.log("actions: ", actions);
+        return actions.reject("we DO NOT");
+        
+      }
       var shippingContainer = document.querySelector("#paypal-shipping-container");
       shippingContainer.innerHTML = `<p><b>Shipping address:</b> ${JSON.stringify(data.shippingAddress)}</p><p><b>Selected Shipping Method:</b> ${JSON.stringify(data.selectedShippingOption)}</p>`
 
