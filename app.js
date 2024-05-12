@@ -9,20 +9,14 @@ var usersRouter = require('./routes/users');
 
 //pp api
 var authRouter = require('./routes/ppApiAuthRoute');
-var ppApiPaymentRouter = require('./routes/ppApiPaymentRoute');
 var ppApiOrderRouter = require('./routes/ppApiOrderRoute');
-var ppApiRtRouter = require('./routes/ppApiReferenceTransactionRoute');
-var ppApiPayoutRouter = require('./routes/ppApiPayoutRoute');
 
 //braintree
 var btCommonRouter = require('./routes/btCommonRoute');
 var btDropInCheckoutRouter = require('./routes/btDropInCheckoutRoute');
 var btHostedFieldsPaymentRouter = require('./routes/btHostedFieldsPaymentRoute');
 var btVaultPaymentRouter = require('./routes/btVaultPaymentRoute');
-var btGraphQlRouter = require('./routes/btGraphQLRoute');
 
-//NVP
-var ppNvpApiRouter = require('./routes/ppNvpApiRoute');
 
 var app = express();
 require('dotenv').config();
@@ -66,16 +60,12 @@ app.use('/bt', btCommonRouter);
 app.use('/bt/di/checkout', btDropInCheckoutRouter);
 app.use('/bt/hf/payment', btHostedFieldsPaymentRouter);
 app.use('/bt/vault/payment', btVaultPaymentRouter);
-app.use('/bt/gql',btGraphQlRouter );
 
 // pp rest api  
 app.use('/ppapi/auth', authRouter);
-app.use('/ppapi/payment',ppApiPaymentRouter);  //orders v1  
+
 app.use('/ppapi/order',ppApiOrderRouter);  // orders v2
-app.use('/ppapi/rt',ppApiRtRouter);
-app.use('/ppapi/payout',ppApiPayoutRouter);
-// nvp
-app.use('/ppnvp',ppNvpApiRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {  
